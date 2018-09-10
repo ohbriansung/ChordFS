@@ -54,8 +54,10 @@ Retrieving files in parallel. Each chunk in the file being retrieved will be req
 
 * **Sep. 09, 2018**: design document complete, basic Protocol Buffer messaging implementation.
 * **Sep. 16, 2018**: client chunking functionality, Chord network data structures and messaging.
+* Checkpoint 1
 * **Sep. 23, 2018**: storage node implementation, heartbeats.
 * **Sep. 30, 2018**: failure detection and recovery, parallel retrievals.
+* Checkpoint 2
 * **Oct. 05, 2018**: wrap-up, client functions, retrospective.
 
 ## References
