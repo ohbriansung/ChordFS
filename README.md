@@ -40,7 +40,7 @@ If nodes fail and go down, the successors will figure out and reconcile the fing
 
 ### Client
 
-Client connects to one Storage Node in the ring, is able to send the requests, and also represents the details of the system.
+Client connects to one Storage Node in the ring, is able to send the requests, and also represents the details of the system. Using java.nio for faster data processing.
 
 #### Stores data
 
