@@ -32,7 +32,7 @@ The node is responsible for storing data (chunk) with key K will replicate the d
 
 #### Accepts messages
 
-Storage Node accepts requests: Store chunk, get number of chunks, get chunk location, retrieve chunk, lst chunks and file names, and get copy of current hash space.
+Storage Node accepts requests: Store chunk, get number of chunks, get chunk location, retrieve chunk, list chunks and file names, and get copy of current hash space.
 
 #### Failures
 
@@ -45,6 +45,8 @@ Client connects to one Storage Node in the ring, is able to send the requests, a
 #### Stores data
 
 Breaking files into chunks, asking Storage Nodes where to store them, and then sending them to the appropriate node(s). The replication will be proceeded by the storage nodes, client is only responsible for send the first replica. Replacing the old data chunks if the file is already existed and remove redundant data chunks if file is smaller.
+
+Chunk size = 16 Mb (pending)
 
 #### Retrieves data
 
