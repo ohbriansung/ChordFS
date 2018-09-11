@@ -9,10 +9,11 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.Files;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 class DataProcessor {
-    private static final int MAX_CHUNK_SIZE = 16777216;  // 16Mb
+    private static final int MAX_CHUNK_SIZE = 16 * 1024 * 1024;  // 16Mb
 
     /**
      * Use java.nio to read files faster.
@@ -26,19 +27,12 @@ class DataProcessor {
     List<byte[]> breakFile(String fileName) throws IOException {
         List<byte[]> chunks = new ArrayList<>();
         Path path = Paths.get(fileName);
-
         FileChannel channel = (FileChannel) Files.newByteChannel(path);
         ByteBuffer buffer = ByteBuffer.allocate(MAX_CHUNK_SIZE);
-        while (channel.read(buffer) > 0) {
-            int remaining = buffer.remaining();
 
-            if (remaining == 0) {
-                chunks.add(buffer.array());
-            } else {
-                byte[] tail = new byte[MAX_CHUNK_SIZE - remaining];
-                buffer.get(tail, 0, tail.length);
-                chunks.add(tail);
-            }
+        int bytesCount;
+        while ((bytesCount = channel.read(buffer)) > 0) {
+            chunks.add(Arrays.copyOf(buffer.array(), bytesCount));  // deep copy
             buffer.clear();
         }
         channel.close();

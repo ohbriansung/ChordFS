@@ -10,7 +10,9 @@ class Client {
 
         try {
             List<byte[]> chunks = dp.breakFile("/Users/brian/Downloads/movies.txt");
-            dp.restoreFile("/Users/brian/Downloads/movies-copy.txt", chunks);
+            dp.restoreFile("/Users/brian/Downloads/_movies.txt", chunks);
+//            List<byte[]> chunks = dp.breakFile("test.txt");
+//            dp.restoreFile("test-copy.txt", chunks);
         } catch (IOException ioe) {
             ioe.printStackTrace();
         }
