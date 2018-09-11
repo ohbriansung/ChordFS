@@ -1,25 +1,36 @@
 syntax = "proto3";
 option java_package = "edu.usfca.cs.dfs";
 
-message SendChunk {
-    string fileName = 1;
-    int32 totalChunk = 2;
-    int32 chunkId = 3;
-    bytes data = 4;
-}
-
 message Request {
     requestType type = 1;
-    string info = 2;
+    string fileName = 2;
+    int32 totalChunk = 3;
+    int32 chunkId = 4;
+    bytes data = 5;
 
     enum requestType {
-        LIST_NODE = 0;
-        DISK_SPACE = 1;
-        NUM_REQUESTS = 2;
-        LIST_FILES = 3;
-        NUM_CHUNKS = 4;
-        CHUNK_LOCATION = 5;
-        RETRIEVE_CHUNK = 6;
+        FIND_HOST = 0;
+        DATA = 1;
+        ACK = 2;
+        INFO = 3;
+    }
+}
+
+message Info {
+    infoType type = 1;
+    bytes data = 2;
+
+    enum requestType {
+        LIST_NODE = 0;  // list all nodes in chord network
+        DISK_SPACE = 1;  // check remaining disk space
+        NUM_REQUESTS = 2;  // check number of total requests received
+        LIST_FILES = 3;  // list all file name
+        NUM_CHUNKS = 4;  // get total number of chunks of a particular file
+        CHUNK_LOCATION = 5;  // get all chunk location of a particular file
+        RETRIEVE_CHUNK = 6;  // retrieve a chunk
+        FINGER = 7;  // finger table
+        PREDECESSOR = 8;
+        UPDATE = 9;  // update finger table request
     }
 }
 

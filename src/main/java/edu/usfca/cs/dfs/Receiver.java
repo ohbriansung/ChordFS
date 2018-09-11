@@ -25,12 +25,15 @@ public class Receiver implements Runnable {
 
     @Override
     public void run() {
+        // other metadata like fileName, chunkId...
+        int headerBytes = 512;
+
         try {
             printInfo();
 
             while (DFS.alive) {
-                byte[] bytes = new byte[DFS.MAX_CHUNK_SIZE];
-                DatagramPacket packet = new DatagramPacket(bytes, DFS.MAX_CHUNK_SIZE);
+                byte[] bytes = new byte[DFS.MAX_CHUNK_SIZE + headerBytes];
+                DatagramPacket packet = new DatagramPacket(bytes, bytes.length);
 
                 this.socket.receive(packet);
                 this.pool.submit(new RequestHandler(packet));
