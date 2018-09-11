@@ -13,12 +13,11 @@ import java.util.Arrays;
 import java.util.List;
 
 class DataProcessor {
-    private static final int MAX_CHUNK_SIZE = 16 * 1024 * 1024;  // 16Mb
 
     /**
      * Use java.nio to read files faster.
      * FileChannel to stream bytes so we can read files larger than 2Gb.
-     * Remove the remaining of the last chunk.
+     * Deep copy into ArrayList for later usage.
      *
      * @param fileName
      * @return List
@@ -28,7 +27,7 @@ class DataProcessor {
         List<byte[]> chunks = new ArrayList<>();
         Path path = Paths.get(fileName);
         FileChannel channel = (FileChannel) Files.newByteChannel(path);
-        ByteBuffer buffer = ByteBuffer.allocate(MAX_CHUNK_SIZE);
+        ByteBuffer buffer = ByteBuffer.allocate(DFS.MAX_CHUNK_SIZE);
 
         int bytesCount;
         while ((bytesCount = channel.read(buffer)) > 0) {
