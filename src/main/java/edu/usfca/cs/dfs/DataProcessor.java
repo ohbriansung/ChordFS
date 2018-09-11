@@ -1,51 +1,62 @@
 package edu.usfca.cs.dfs;
 
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.nio.ByteBuffer;  // https://docs.oracle.com/javase/10/docs/api/java/nio/ByteBuffer.html
+import java.nio.channels.FileChannel;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.Files;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 class DataProcessor {
     private static final int MAX_CHUNK_SIZE = 16777216;  // 16Mb
 
-    List<byte[]> breakFile(String fileName) {
+    /**
+     * Use java.nio to read files faster.
+     * FileChannel to stream bytes so we can read files larger than 2Gb.
+     * Remove the remaining of the last chunk.
+     *
+     * @param fileName
+     * @return List
+     * @throws IOException
+     */
+    List<byte[]> breakFile(String fileName) throws IOException {
         List<byte[]> chunks = new ArrayList<>();
+        Path path = Paths.get(fileName);
 
-        try {
-            byte[] bytes = Files.readAllBytes(Paths.get(fileName));  //TODO: need to support files larger than 2Gb.
-            System.out.println(bytes.length);  //TODO: remove debug
+        FileChannel channel = (FileChannel) Files.newByteChannel(path);
+        ByteBuffer buffer = ByteBuffer.allocate(MAX_CHUNK_SIZE);
+        while (channel.read(buffer) > 0) {
+            int remaining = buffer.remaining();
 
-            int from = 0;
-            int to = MAX_CHUNK_SIZE > bytes.length ? bytes.length : MAX_CHUNK_SIZE;
-            while (from < bytes.length) {
-                chunks.add(Arrays.copyOfRange(bytes, from , to));
-                from = to;
-                to = from + MAX_CHUNK_SIZE > bytes.length ? bytes.length : from + MAX_CHUNK_SIZE;
+            if (remaining == 0) {
+                chunks.add(buffer.array());
+            } else {
+                byte[] tail = new byte[MAX_CHUNK_SIZE - remaining];
+                buffer.get(tail, 0, tail.length);
+                chunks.add(tail);
             }
-        } catch (IOException ioe) {
-            ioe.printStackTrace();
+            buffer.clear();
         }
+        channel.close();
 
         return chunks;
     }
 
-    void restoreFile(String fileName, List<byte[]> chunks) {
-        int totalBytes = (chunks.size() - 1) * MAX_CHUNK_SIZE + chunks.get(chunks.size() - 1).length;
-        byte[] bytes = new byte[totalBytes];
-        System.out.println(bytes.length);  //TODO: remove debug
-
-        for (int i = 0; i < chunks.size(); i++) {
-            byte[] src = chunks.get(i);
-            int from = i * MAX_CHUNK_SIZE;
-            System.arraycopy(src, 0, bytes, from, src.length);
+    void restoreFile(String fileName, List<byte[]> chunks) throws IOException {
+        if (chunks.size() == 0) {
+            return;
         }
 
-        try {
-            Files.write(Paths.get(fileName), bytes);
-        } catch (IOException ioe) {
-            ioe.printStackTrace();
+        File file = new File(fileName);
+        FileChannel channel = new FileOutputStream(file).getChannel();
+        for (byte[] bytes : chunks) {
+            channel.write(ByteBuffer.wrap(bytes));
         }
+
+        channel.close();
     }
 }
