@@ -26,6 +26,7 @@ public class Receiver implements Runnable {
     @Override
     public void run() {
         // other metadata like fileName, chunkId...
+        // maximum file name length is 255: https://en.wikipedia.org/wiki/Filename#Comparison_of_filename_limitations
         int headerBytes = 512;
 
         try {
@@ -44,6 +45,7 @@ public class Receiver implements Runnable {
             if (!this.socket.isClosed()) {
                 this.socket.close();
             }
+
             if (!this.pool.isShutdown()) {
                 this.pool.shutdown();
             }

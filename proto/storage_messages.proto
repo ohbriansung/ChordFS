@@ -20,7 +20,7 @@ message Info {
     infoType type = 1;
     bytes data = 2;
 
-    enum requestType {
+    enum infoType {
         LIST_NODE = 0;  // list all nodes in chord network
         DISK_SPACE = 1;  // check remaining disk space
         NUM_REQUESTS = 2;  // check number of total requests received
