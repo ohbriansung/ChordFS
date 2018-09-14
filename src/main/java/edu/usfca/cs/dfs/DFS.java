@@ -3,22 +3,26 @@ package edu.usfca.cs.dfs;
 import java.net.SocketException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.CountDownLatch;
 
 public class DFS {
     static final int MAX_CHUNK_SIZE = 16 * 1024 * 1024;
+    static final int THREAD = 8;
+    static final CountDownLatch READY = new CountDownLatch(1);
     static volatile boolean alive = true;
-
-    private static final int THREAD = 8;
 
     public static void main(String[] args) {
         Map<String, String> arguments = parseArgs(args);
 
+        // TODO: uncomment
         /*if (!checkArgs(arguments)) {
-            System.out.println("Usage: java dfs.jar --run <storage/client> --port <port> ...");
+            System.out.println("Usage: java dfs.jar --run <storage/client> ...");
             System.exit(1);
         }*/
 
-        startReceiver(arguments, THREAD);
+        Receiver receiver = startReceiver(arguments);
+        UserInterface ui = new UserInterface(receiver);
+        ui.start();
     }
 
     private static Map<String, String> parseArgs(String[] args) {
@@ -43,29 +47,30 @@ public class DFS {
     private static boolean checkArgs(Map<String, String> arguments) {
         boolean checked = true;
 
-        if (!arguments.containsKey("run") || !arguments.containsKey("port")) {
+        if (!arguments.containsKey("run")) {
             checked = false;
         }
 
         return checked;
     }
 
-    private static void startReceiver(Map<String, String> arguments, int thread) {
-        // TODO: delete debug mode
+    private static Receiver startReceiver(Map<String, String> arguments) {
         if (arguments.size() == 0) {
             arguments.put("port", "13000");
         }
 
         int port = Integer.parseInt(arguments.get("port"));
+        Receiver receiver = null;
 
         try {
-            Receiver receiver = new Receiver(port, thread);
+            receiver = new Receiver(port);
 
             Thread listen = new Thread(receiver);
             listen.start();
-            listen.join();
-        } catch (SocketException | InterruptedException e) {
+        } catch (SocketException e) {
             e.printStackTrace();
         }
+
+        return receiver;
     }
 }

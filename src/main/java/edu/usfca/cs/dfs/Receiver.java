@@ -9,18 +9,16 @@ public class Receiver implements Runnable {
     private final ExecutorService pool;
     private final DatagramSocket socket;
 
-    Receiver(int port, int threadNum) throws SocketException {
-        this.pool = Executors.newFixedThreadPool(threadNum);
+    Receiver(int port) throws SocketException {
+        this.pool = Executors.newFixedThreadPool(DFS.THREAD);
         this.socket = new DatagramSocket(port);
     }
 
     /**
      * Usage: for closing socket.
-     *
-     * @return DatagramSocket - UDP socket listener
      */
-    DatagramSocket getSocket() {
-        return this.socket;
+    void close() {
+        this.socket.close();
     }
 
     @Override
@@ -31,6 +29,7 @@ public class Receiver implements Runnable {
 
         try {
             printInfo();
+            DFS.READY.countDown();
 
             while (DFS.alive) {
                 byte[] bytes = new byte[DFS.MAX_CHUNK_SIZE + headerBytes];
