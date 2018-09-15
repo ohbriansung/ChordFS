@@ -7,18 +7,16 @@ import java.util.concurrent.Executors;
 
 public class Receiver implements Runnable {
     private final ExecutorService pool;
-    private final DatagramSocket socket;
 
-    Receiver(int port) throws SocketException {
+    Receiver() {
         this.pool = Executors.newFixedThreadPool(DFS.THREAD);
-        this.socket = new DatagramSocket(port);
     }
 
     /**
      * Usage: for closing socket.
      */
     void close() {
-        this.socket.close();
+        DFS.SOCKET.close();
     }
 
     @Override
@@ -35,14 +33,14 @@ public class Receiver implements Runnable {
                 byte[] bytes = new byte[DFS.MAX_CHUNK_SIZE + headerBytes];
                 DatagramPacket packet = new DatagramPacket(bytes, bytes.length);
 
-                this.socket.receive(packet);
+                DFS.SOCKET.receive(packet);
                 this.pool.submit(new RequestHandler(packet));
             }
         } catch (IOException ignore) {
             // IOException will be caused by closing DatagramSocket or UnknownHostException
         } finally {
-            if (!this.socket.isClosed()) {
-                this.socket.close();
+            if (!DFS.SOCKET.isClosed()) {
+                DFS.SOCKET.close();
             }
 
             if (!this.pool.isShutdown()) {
@@ -53,7 +51,7 @@ public class Receiver implements Runnable {
 
     private void printInfo() throws UnknownHostException {
         String hostName = InetAddress.getLocalHost().getHostName();
-        int port = this.socket.getLocalPort();
+        int port = DFS.SOCKET.getLocalPort();
         System.out.println("Starts receiver on " + hostName + ":" + port);
     }
 }

@@ -1,5 +1,6 @@
 package edu.usfca.cs.dfs;
 
+import java.net.DatagramSocket;
 import java.net.SocketException;
 import java.util.HashMap;
 import java.util.Map;
@@ -8,7 +9,8 @@ import java.util.concurrent.CountDownLatch;
 public class DFS {
     static final int MAX_CHUNK_SIZE = 16 * 1024 * 1024;
     static final int THREAD = 8;
-    static final CountDownLatch READY = new CountDownLatch(1);
+    static final CountDownLatch READY = new CountDownLatch(1);  // ui waits for receiver and sender
+    static DatagramSocket SOCKET;
     static volatile boolean alive = true;
 
     public static void main(String[] args) {
@@ -20,9 +22,20 @@ public class DFS {
             System.exit(1);
         }*/
 
-        Receiver receiver = startReceiver(arguments);
-        UserInterface ui = new UserInterface(receiver);
-        ui.start();
+        try {
+            SOCKET = new DatagramSocket(Integer.parseInt(arguments.get("port")));
+        } catch (SocketException e) {
+            e.printStackTrace();
+            System.exit(1);
+        }
+
+        Receiver receiver = startReceiver();
+        Sender sender = new Sender();
+
+        if (arguments.get("run").equals("client")) {
+            UserInterface ui = new UserInterface(receiver, sender);
+            ui.start();
+        }
     }
 
     private static Map<String, String> parseArgs(String[] args) {
@@ -41,6 +54,9 @@ public class DFS {
             map.put(key, args[i + 1]);
         }
 
+        map.put("run", "client");
+        map.put("port", "13000");
+
         return map;
     }
 
@@ -54,22 +70,10 @@ public class DFS {
         return checked;
     }
 
-    private static Receiver startReceiver(Map<String, String> arguments) {
-        if (arguments.size() == 0) {
-            arguments.put("port", "13000");
-        }
-
-        int port = Integer.parseInt(arguments.get("port"));
-        Receiver receiver = null;
-
-        try {
-            receiver = new Receiver(port);
-
-            Thread listen = new Thread(receiver);
-            listen.start();
-        } catch (SocketException e) {
-            e.printStackTrace();
-        }
+    private static Receiver startReceiver() {
+        Receiver receiver = new Receiver();
+        Thread listen = new Thread(receiver);
+        listen.start();
 
         return receiver;
     }
