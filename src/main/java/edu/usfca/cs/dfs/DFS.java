@@ -33,8 +33,11 @@ public class DFS {
         Sender sender = new Sender();
 
         if (arguments.get("run").equals("client")) {
-            UserInterface ui = new UserInterface(receiver, sender);
-            ui.start();
+            Client client = new Client(receiver, sender);
+            client.startUI();
+        }
+        else {
+            StorageNode node = new StorageNode();
         }
     }
 
