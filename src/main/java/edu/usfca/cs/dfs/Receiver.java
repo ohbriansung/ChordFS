@@ -6,9 +6,13 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 public class Receiver implements Runnable {
+    private String host;
+    private int port;
     private final ExecutorService pool;
 
-    Receiver() {
+    Receiver(String host, int port) {
+        this.host = host;
+        this.port = port;
         this.pool = Executors.newFixedThreadPool(DFS.THREAD);
     }
 
@@ -49,9 +53,7 @@ public class Receiver implements Runnable {
         }
     }
 
-    private void printInfo() throws UnknownHostException {
-        String hostName = InetAddress.getLocalHost().getHostName();
-        int port = DFS.SOCKET.getLocalPort();
-        System.out.println("Starts receiver on " + hostName + ":" + port);
+    private void printInfo() {
+        System.out.println("Starts receiver on " + this.host + ":" + this.port);
     }
 }

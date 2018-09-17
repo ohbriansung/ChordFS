@@ -1,7 +1,9 @@
 package edu.usfca.cs.dfs;
 
 import java.net.DatagramSocket;
+import java.net.InetAddress;
 import java.net.SocketException;
+import java.net.UnknownHostException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.CountDownLatch;
@@ -22,14 +24,20 @@ public class DFS {
             System.exit(1);
         }*/
 
+        String host = "";
+        int port = 13000;
+        int m = 4;
         try {
-            SOCKET = new DatagramSocket(Integer.parseInt(arguments.get("port")));
-        } catch (SocketException e) {
+            host = InetAddress.getLocalHost().getHostAddress();
+            port = Integer.parseInt(arguments.get("port"));
+            m = (arguments.containsKey("m") ? Integer.parseInt(arguments.get("m")) : m);
+            SOCKET = new DatagramSocket(port);
+        } catch (UnknownHostException | NumberFormatException | SocketException e) {
             e.printStackTrace();
             System.exit(1);
         }
 
-        Receiver receiver = startReceiver();
+        Receiver receiver = startReceiver(host, port);
         Sender sender = new Sender();
 
         if (arguments.get("run").equals("client")) {
@@ -37,7 +45,7 @@ public class DFS {
             client.startUI();
         }
         else {
-            StorageNode node = new StorageNode();
+            StorageNode node = new StorageNode(host, port, m);
         }
     }
 
@@ -57,7 +65,7 @@ public class DFS {
             map.put(key, args[i + 1]);
         }
 
-        map.put("run", "client");
+        map.put("run", "storage");
         map.put("port", "13000");
 
         return map;
@@ -73,8 +81,8 @@ public class DFS {
         return checked;
     }
 
-    private static Receiver startReceiver() {
-        Receiver receiver = new Receiver();
+    private static Receiver startReceiver(String host, int port) {
+        Receiver receiver = new Receiver(host, port);
         Thread listen = new Thread(receiver);
         listen.start();
 
