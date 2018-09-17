@@ -9,13 +9,16 @@ import java.util.Map;
 import java.util.concurrent.CountDownLatch;
 
 public class DFS {
-    static final int MAX_CHUNK_SIZE = 16 * 1024 * 1024;
-    static final int THREAD = 8;
+    static final int MAX_CHUNK_SIZE = 64 * 1024 * 1024;
+    static final int UDP_PACKET_SIZE = 64 * 1024;
+    static final int THREAD = 16;
     static final CountDownLatch READY = new CountDownLatch(1);  // ui waits for receiver and sender
+    static volatile boolean alive = true;
+
     static DatagramSocket socket;
     static Receiver receiver;
     static Sender sender;
-    static volatile boolean alive = true;
+    static StorageNode storageNode;
 
     public static void main(String[] args) {
         Map<String, String> arguments = parseArgs(args);
@@ -47,7 +50,7 @@ public class DFS {
             client.startUI();
         }
         else {
-            StorageNode node = new StorageNode(host, port, m);
+            DFS.storageNode = new StorageNode(host, port, m);
         }
     }
 
