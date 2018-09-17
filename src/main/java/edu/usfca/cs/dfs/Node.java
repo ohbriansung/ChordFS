@@ -1,16 +1,31 @@
 package edu.usfca.cs.dfs;
 
-import java.net.InetSocketAddress;
-
 class Node {
-    private final InetSocketAddress address;
-
+    private final String host;
+    private final int port;
     private Integer id;
-    private Node successor;
-    private Node predecessor;
+    private String successor;
+    private Integer successorId;
+    private String predecessor;
 
     Node(String host, int port) {
-        this.address = new InetSocketAddress(host, port);
+        this.host = host;
+        this.port = port;
+    }
+
+
+    /**
+     * Directly deserialize from StorageMessages.Node
+     *
+     * @param node
+     */
+    Node(StorageMessages.Node node) {
+        this.host = node.getHost();
+        this.port = node.getPort();
+        this.id = node.getId();
+        this.successor = node.getSuccessor();
+        this.successorId = node.getSuccessorId();
+        this.predecessor = node.getPredecessor();
     }
 
     /**
@@ -27,27 +42,39 @@ class Node {
         }
     }
 
-    void setSuccessor(Node successor) {
+    public void setSuccessorId(Integer successorId) {
+        this.successorId = successorId;
+    }
+
+    void setSuccessor(String successor) {
         this.successor = successor;
     }
 
-    void setPredecessor(Node predecessor) {
+    void setPredecessor(String predecessor) {
         this.predecessor = predecessor;
     }
 
-    InetSocketAddress getAddress() {
-        return this.address;
+    String getHost() {
+        return this.host;
+    }
+
+    int getPort() {
+        return this.port;
     }
 
     int getId() {
         return this.id;
     }
 
-    Node getSuccessor() {
+    String getSuccessor() {
         return this.successor;
     }
 
-    Node getPredecessor() {
+    Integer getSuccessorId() {
+        return successorId;
+    }
+
+    String getPredecessor() {
         return this.predecessor;
     }
 

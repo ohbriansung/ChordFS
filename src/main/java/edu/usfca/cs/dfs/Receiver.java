@@ -20,21 +20,19 @@ public class Receiver implements Runnable {
      * Usage: for closing socket.
      */
     void close() {
-        DFS.socket.close();
+        if (!DFS.socket.isClosed()) {
+            DFS.socket.close();
+        }
     }
 
     @Override
     public void run() {
-        // other metadata like fileName, chunkId...
-        // maximum file name length is 255: https://en.wikipedia.org/wiki/Filename#Comparison_of_filename_limitations
-        int headerBytes = 512;
-
         try {
             printInfo();
             DFS.READY.countDown();
 
             while (DFS.alive) {
-                byte[] bytes = new byte[DFS.MAX_CHUNK_SIZE + headerBytes];
+                byte[] bytes = new byte[DFS.UDP_PACKET_SIZE];
                 DatagramPacket packet = new DatagramPacket(bytes, bytes.length);
 
                 DFS.socket.receive(packet);

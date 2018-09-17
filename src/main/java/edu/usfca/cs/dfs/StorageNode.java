@@ -6,7 +6,7 @@ import java.net.InetSocketAddress;
 import java.util.Hashtable;
 import java.util.concurrent.CountDownLatch;
 
-class StorageNode {
+class StorageNode extends Serializer {
     private final int m;
     private final Node self;
     private final FingerTable finger;
@@ -31,20 +31,26 @@ class StorageNode {
 
     Node findSuccessor(int id) {
         Node node = findPredecessor(id);
-        return node.getSuccessor();
+
+        String address[] = node.getSuccessor().split(":");
+        int successorId = node.getSuccessorId();
+        Node successor = new Node(address[0], Integer.parseInt(address[1]));
+        successor.setId(successorId);
+
+        return successor;
     }
 
     Node findPredecessor(int id) {
         Node node = this.self;
 
         // id not in (node, node.successor]
-        while (!(id > node.getId() && id <= node.getSuccessor().getId())) {
+        while (!(id > node.getId() && id <= node.getSuccessorId())) {
             if (node.getId() == this.self.getId()) {
                 node = closestPrecedingFinger(id);
             }
             else {
                 // node.closestPrecedingFinger(id)
-                node = ask(node.getAddress());
+                node = ask(id, node.getHost(), node.getPort());
             }
         }
 
@@ -79,24 +85,26 @@ class StorageNode {
     /**
      * Identify the request by timestamp.
      *
-     * @param address
+     * @param id
+     * @param host
+     * @param port
      * @return Node
      */
-    Node ask(InetSocketAddress address) {
+    Node ask(int id, String host, int port) {
         long time = System.currentTimeMillis();
         CountDownLatch goSignal = new CountDownLatch(1);
         this.awaitTasks.put(time, goSignal);
 
         // serialize info
-        int type = StorageMessages.Info.infoType.CLOSEST_PRECEDING_FINGER_VALUE;
-        StorageMessages.Info info = StorageMessages.Info.newBuilder().setTypeValue(type).setTime(time).build();
+        ByteString askingId = ByteString.copyFromUtf8(String.valueOf(id));
+        StorageMessages.Info info = serializeInfo(StorageMessages.infoType.CLOSEST_PRECEDING_FINGER, askingId, time);
 
         // serialize request with info type
-        type = StorageMessages.Request.requestType.INFO_VALUE;
         ByteString data = info.toByteString();
-        StorageMessages.Request request = StorageMessages.Request.newBuilder().setTypeValue(type).setData(data).build();
+        StorageMessages.Message request = serializeMessage(StorageMessages.messageType.INFO, data);
 
         // send request to node
+        InetSocketAddress address = new InetSocketAddress(host, port);
         DFS.sender.send(request, address);
 
         try {
@@ -111,5 +119,17 @@ class StorageNode {
         this.answers.remove(time);
 
         return node;
+    }
+
+    void awaitTasksCountDown(long time) {
+        if (this.awaitTasks.contains(time)) {
+            this.awaitTasks.get(time).countDown();
+        }
+    }
+
+    void addAnswer(long time, Node node) {
+        if (this.awaitTasks.contains(time)) {
+            this.answers.put(time, node);
+        }
     }
 }

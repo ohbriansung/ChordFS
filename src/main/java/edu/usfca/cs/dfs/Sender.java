@@ -14,13 +14,40 @@ class Sender {
         this.pool = Executors.newFixedThreadPool(DFS.THREAD);
     }
 
-    void send(StorageMessages.Request request, InetSocketAddress address) {
+    void send(StorageMessages.Message message, InetSocketAddress address) {
         try (ByteArrayOutputStream outStream = new ByteArrayOutputStream()) {
-            request.writeDelimitedTo(outStream);
-            byte[] packet = outStream.toByteArray();
-            DatagramPacket datagramPacket = new DatagramPacket(packet, packet.length, address);
-            DFS.socket.send(datagramPacket);
+            message.writeDelimitedTo(outStream);
+            byte[] bytes = outStream.toByteArray();
+            DatagramPacket packet = new DatagramPacket(bytes, bytes.length, address);
+
+            this.pool.submit(new Task(packet));
         }
-        catch (IOException ignore) {}
+        catch (IOException ioe) {
+            ioe.printStackTrace();
+        }
+    }
+
+    void close() {
+        if (!this.pool.isShutdown()) {
+            this.pool.shutdown();
+        }
+    }
+
+    private class Task implements Runnable {
+        private final DatagramPacket packet;
+
+        private Task(DatagramPacket packet) {
+            this.packet = packet;
+        }
+
+        @Override
+        public void run() {
+            try {
+                DFS.socket.send(this.packet);
+            }
+            catch (IOException ioe) {
+                ioe.printStackTrace();
+            }
+        }
     }
 }

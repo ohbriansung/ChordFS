@@ -44,9 +44,10 @@ Client connects to one Storage Node in the ring, is able to send the requests, a
 
 #### Stores data
 
-Breaking files into chunks, asking Storage Nodes where to store them, and then sending them to the appropriate node(s). The replication will be proceeded by the storage nodes, client is only responsible for send the first replica. Replacing the old data chunks if the file is already existed and remove redundant data chunks if file is smaller.
+Breaks file into chunks, asks Storage Nodes where to store them, breaks chunks into fragments, and then sends them to the appropriate node(s). The replication will be proceeded by the storage nodes, client is only responsible for send the first replica. Replacing the old data chunks if the file is already existed and remove redundant data chunks if file is smaller.
 
-Chunk size = 16 Mb (pending)
+Chunk size = 64 Mb
+Fragment size = 46 Kb
 
 #### Retrieves data
 
