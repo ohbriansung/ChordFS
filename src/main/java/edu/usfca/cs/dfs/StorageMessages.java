@@ -983,6 +983,11 @@ public final class StorageMessages {
      * <code>bytes data = 2;</code>
      */
     com.google.protobuf.ByteString getData();
+
+    /**
+     * <code>int64 time = 3;</code>
+     */
+    long getTime();
   }
   /**
    * Protobuf type {@code Info}
@@ -999,6 +1004,7 @@ public final class StorageMessages {
     private Info() {
       type_ = 0;
       data_ = com.google.protobuf.ByteString.EMPTY;
+      time_ = 0L;
     }
 
     @java.lang.Override
@@ -1034,6 +1040,11 @@ public final class StorageMessages {
             case 18: {
 
               data_ = input.readBytes();
+              break;
+            }
+            case 24: {
+
+              time_ = input.readInt64();
               break;
             }
             default: {
@@ -1149,6 +1160,14 @@ public final class StorageMessages {
        * <code>UPDATE = 9;</code>
        */
       UPDATE(9),
+      /**
+       * <pre>
+       * ask for the closest preceding finger
+       * </pre>
+       *
+       * <code>CLOSEST_PRECEDING_FINGER = 10;</code>
+       */
+      CLOSEST_PRECEDING_FINGER(10),
       UNRECOGNIZED(-1),
       ;
 
@@ -1228,6 +1247,14 @@ public final class StorageMessages {
        * <code>UPDATE = 9;</code>
        */
       public static final int UPDATE_VALUE = 9;
+      /**
+       * <pre>
+       * ask for the closest preceding finger
+       * </pre>
+       *
+       * <code>CLOSEST_PRECEDING_FINGER = 10;</code>
+       */
+      public static final int CLOSEST_PRECEDING_FINGER_VALUE = 10;
 
 
       public final int getNumber() {
@@ -1258,6 +1285,7 @@ public final class StorageMessages {
           case 7: return FINGER;
           case 8: return PREDECESSOR;
           case 9: return UPDATE;
+          case 10: return CLOSEST_PRECEDING_FINGER;
           default: return null;
         }
       }
@@ -1336,6 +1364,15 @@ public final class StorageMessages {
       return data_;
     }
 
+    public static final int TIME_FIELD_NUMBER = 3;
+    private long time_;
+    /**
+     * <code>int64 time = 3;</code>
+     */
+    public long getTime() {
+      return time_;
+    }
+
     private byte memoizedIsInitialized = -1;
     @java.lang.Override
     public final boolean isInitialized() {
@@ -1356,6 +1393,9 @@ public final class StorageMessages {
       if (!data_.isEmpty()) {
         output.writeBytes(2, data_);
       }
+      if (time_ != 0L) {
+        output.writeInt64(3, time_);
+      }
       unknownFields.writeTo(output);
     }
 
@@ -1372,6 +1412,10 @@ public final class StorageMessages {
       if (!data_.isEmpty()) {
         size += com.google.protobuf.CodedOutputStream
           .computeBytesSize(2, data_);
+      }
+      if (time_ != 0L) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeInt64Size(3, time_);
       }
       size += unknownFields.getSerializedSize();
       memoizedSize = size;
@@ -1392,6 +1436,8 @@ public final class StorageMessages {
       result = result && type_ == other.type_;
       result = result && getData()
           .equals(other.getData());
+      result = result && (getTime()
+          == other.getTime());
       result = result && unknownFields.equals(other.unknownFields);
       return result;
     }
@@ -1407,6 +1453,9 @@ public final class StorageMessages {
       hash = (53 * hash) + type_;
       hash = (37 * hash) + DATA_FIELD_NUMBER;
       hash = (53 * hash) + getData().hashCode();
+      hash = (37 * hash) + TIME_FIELD_NUMBER;
+      hash = (53 * hash) + com.google.protobuf.Internal.hashLong(
+          getTime());
       hash = (29 * hash) + unknownFields.hashCode();
       memoizedHashCode = hash;
       return hash;
@@ -1544,6 +1593,8 @@ public final class StorageMessages {
 
         data_ = com.google.protobuf.ByteString.EMPTY;
 
+        time_ = 0L;
+
         return this;
       }
 
@@ -1572,6 +1623,7 @@ public final class StorageMessages {
         edu.usfca.cs.dfs.StorageMessages.Info result = new edu.usfca.cs.dfs.StorageMessages.Info(this);
         result.type_ = type_;
         result.data_ = data_;
+        result.time_ = time_;
         onBuilt();
         return result;
       }
@@ -1625,6 +1677,9 @@ public final class StorageMessages {
         }
         if (other.getData() != com.google.protobuf.ByteString.EMPTY) {
           setData(other.getData());
+        }
+        if (other.getTime() != 0L) {
+          setTime(other.getTime());
         }
         this.mergeUnknownFields(other.unknownFields);
         onChanged();
@@ -1725,6 +1780,32 @@ public final class StorageMessages {
       public Builder clearData() {
         
         data_ = getDefaultInstance().getData();
+        onChanged();
+        return this;
+      }
+
+      private long time_ ;
+      /**
+       * <code>int64 time = 3;</code>
+       */
+      public long getTime() {
+        return time_;
+      }
+      /**
+       * <code>int64 time = 3;</code>
+       */
+      public Builder setTime(long value) {
+        
+        time_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>int64 time = 3;</code>
+       */
+      public Builder clearTime() {
+        
+        time_ = 0L;
         onChanged();
         return this;
       }
@@ -3710,18 +3791,19 @@ public final class StorageMessages {
       "Name\030\002 \001(\t\022\022\n\ntotalChunk\030\003 \001(\005\022\017\n\007chunkI" +
       "d\030\004 \001(\005\022\014\n\004data\030\005 \001(\014\"9\n\013requestType\022\r\n\t" +
       "FIND_HOST\020\000\022\010\n\004DATA\020\001\022\007\n\003ACK\020\002\022\010\n\004INFO\020\003" +
-      "\"\341\001\n\004Info\022\034\n\004type\030\001 \001(\0162\016.Info.infoType\022" +
-      "\014\n\004data\030\002 \001(\014\"\254\001\n\010infoType\022\r\n\tLIST_NODE\020" +
-      "\000\022\016\n\nDISK_SPACE\020\001\022\020\n\014NUM_REQUESTS\020\002\022\016\n\nL" +
-      "IST_FILES\020\003\022\016\n\nNUM_CHUNKS\020\004\022\022\n\016CHUNK_LOC" +
-      "ATION\020\005\022\022\n\016RETRIEVE_CHUNK\020\006\022\n\n\006FINGER\020\007\022" +
-      "\017\n\013PREDECESSOR\020\010\022\n\n\006UPDATE\020\t\"f\n\013FingerTa" +
-      "ble\022(\n\006finger\030\001 \003(\0132\030.FingerTable.Finger" +
-      "Entry\032-\n\013FingerEntry\022\013\n\003key\030\001 \001(\005\022\r\n\005val" +
-      "ue\030\002 \001(\t:\0028\001\"\036\n\013Predecessor\022\017\n\007address\030\001" +
-      " \001(\t\"1\n\021UpdateFingerTable\022\017\n\007address\030\001 \001" +
-      "(\t\022\013\n\003key\030\002 \001(\005B\022\n\020edu.usfca.cs.dfsb\006pro" +
-      "to3"
+      "\"\215\002\n\004Info\022\034\n\004type\030\001 \001(\0162\016.Info.infoType\022" +
+      "\014\n\004data\030\002 \001(\014\022\014\n\004time\030\003 \001(\003\"\312\001\n\010infoType" +
+      "\022\r\n\tLIST_NODE\020\000\022\016\n\nDISK_SPACE\020\001\022\020\n\014NUM_R" +
+      "EQUESTS\020\002\022\016\n\nLIST_FILES\020\003\022\016\n\nNUM_CHUNKS\020" +
+      "\004\022\022\n\016CHUNK_LOCATION\020\005\022\022\n\016RETRIEVE_CHUNK\020" +
+      "\006\022\n\n\006FINGER\020\007\022\017\n\013PREDECESSOR\020\010\022\n\n\006UPDATE" +
+      "\020\t\022\034\n\030CLOSEST_PRECEDING_FINGER\020\n\"f\n\013Fing" +
+      "erTable\022(\n\006finger\030\001 \003(\0132\030.FingerTable.Fi" +
+      "ngerEntry\032-\n\013FingerEntry\022\013\n\003key\030\001 \001(\005\022\r\n" +
+      "\005value\030\002 \001(\t:\0028\001\"\036\n\013Predecessor\022\017\n\007addre" +
+      "ss\030\001 \001(\t\"1\n\021UpdateFingerTable\022\017\n\007address" +
+      "\030\001 \001(\t\022\013\n\003key\030\002 \001(\005B\022\n\020edu.usfca.cs.dfsb" +
+      "\006proto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
@@ -3746,7 +3828,7 @@ public final class StorageMessages {
     internal_static_Info_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_Info_descriptor,
-        new java.lang.String[] { "Type", "Data", });
+        new java.lang.String[] { "Type", "Data", "Time", });
     internal_static_FingerTable_descriptor =
       getDescriptor().getMessageTypes().get(2);
     internal_static_FingerTable_fieldAccessorTable = new

@@ -12,7 +12,9 @@ public class DFS {
     static final int MAX_CHUNK_SIZE = 16 * 1024 * 1024;
     static final int THREAD = 8;
     static final CountDownLatch READY = new CountDownLatch(1);  // ui waits for receiver and sender
-    static DatagramSocket SOCKET;
+    static DatagramSocket socket;
+    static Receiver receiver;
+    static Sender sender;
     static volatile boolean alive = true;
 
     public static void main(String[] args) {
@@ -29,19 +31,19 @@ public class DFS {
         int m = 4;
         try {
             host = InetAddress.getLocalHost().getHostAddress();
-            port = Integer.parseInt(arguments.get("port"));
+            port = (arguments.containsKey("port") ? Integer.parseInt(arguments.get("port")) : port);
             m = (arguments.containsKey("m") ? Integer.parseInt(arguments.get("m")) : m);
-            SOCKET = new DatagramSocket(port);
+            DFS.socket = new DatagramSocket(port);
         } catch (UnknownHostException | NumberFormatException | SocketException e) {
             e.printStackTrace();
             System.exit(1);
         }
 
-        Receiver receiver = startReceiver(host, port);
-        Sender sender = new Sender();
+        DFS.receiver = startReceiver(host, port);
+        DFS.sender = new Sender();
 
         if (arguments.get("run").equals("client")) {
-            Client client = new Client(receiver, sender);
+            Client client = new Client();
             client.startUI();
         }
         else {

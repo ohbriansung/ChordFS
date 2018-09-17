@@ -3,7 +3,7 @@ package edu.usfca.cs.dfs;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.net.DatagramPacket;
-import java.net.InetAddress;
+import java.net.InetSocketAddress;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -14,14 +14,12 @@ class Sender {
         this.pool = Executors.newFixedThreadPool(DFS.THREAD);
     }
 
-    void send(StorageMessages.Info info) {
+    void send(StorageMessages.Request request, InetSocketAddress address) {
         try (ByteArrayOutputStream outStream = new ByteArrayOutputStream()) {
-            info.writeDelimitedTo(outStream);
+            request.writeDelimitedTo(outStream);
             byte[] packet = outStream.toByteArray();
-            DatagramPacket datagramPacket = new DatagramPacket(packet, packet.length
-                    , InetAddress.getLocalHost(), 13000);
-
-            DFS.SOCKET.send(datagramPacket);
+            DatagramPacket datagramPacket = new DatagramPacket(packet, packet.length, address);
+            DFS.socket.send(datagramPacket);
         }
         catch (IOException ignore) {}
     }

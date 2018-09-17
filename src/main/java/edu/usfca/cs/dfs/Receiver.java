@@ -20,7 +20,7 @@ public class Receiver implements Runnable {
      * Usage: for closing socket.
      */
     void close() {
-        DFS.SOCKET.close();
+        DFS.socket.close();
     }
 
     @Override
@@ -37,14 +37,14 @@ public class Receiver implements Runnable {
                 byte[] bytes = new byte[DFS.MAX_CHUNK_SIZE + headerBytes];
                 DatagramPacket packet = new DatagramPacket(bytes, bytes.length);
 
-                DFS.SOCKET.receive(packet);
+                DFS.socket.receive(packet);
                 this.pool.submit(new RequestHandler(packet));
             }
         } catch (IOException ignore) {
             // IOException will be caused by closing DatagramSocket or UnknownHostException
         } finally {
-            if (!DFS.SOCKET.isClosed()) {
-                DFS.SOCKET.close();
+            if (!DFS.socket.isClosed()) {
+                DFS.socket.close();
             }
 
             if (!this.pool.isShutdown()) {

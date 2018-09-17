@@ -19,6 +19,7 @@ message Request {
 message Info {
     infoType type = 1;
     bytes data = 2;
+    int64 time = 3;
 
     enum infoType {
         LIST_NODE = 0;  // list all nodes in chord network
@@ -31,6 +32,7 @@ message Info {
         FINGER = 7;  // finger table
         PREDECESSOR = 8;
         UPDATE = 9;  // update finger table request
+        CLOSEST_PRECEDING_FINGER = 10;  // ask for the closest preceding finger
     }
 }
 

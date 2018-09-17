@@ -10,13 +10,8 @@ import java.util.List;
 import java.util.Scanner;
 
 class Client {
-    private final Receiver receiver;
-    private final Sender sender;
 
-    Client(Receiver receiver, Sender sender) {
-        this.receiver = receiver;
-        this.sender = sender;
-
+    Client() {
         try {
             // wait for receiver and sender
             DFS.READY.await();
@@ -37,12 +32,12 @@ class Client {
             StorageMessages.Info info = StorageMessages.Info.newBuilder()
                     .setType(StorageMessages.Info.infoType.LIST_NODE).setData(bs).build();
 
-            this.sender.send(info);
+            //DFS.sender.send(info);
 
             printInfo();
         }
 
-        this.receiver.close();
+        DFS.receiver.close();
     }
 
     private void printInfo() {
