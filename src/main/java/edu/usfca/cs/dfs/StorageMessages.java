@@ -227,6 +227,30 @@ public final class StorageMessages {
      * <code>NODE = 11;</code>
      */
     NODE(11),
+    /**
+     * <pre>
+     * find successor of particular id
+     * </pre>
+     *
+     * <code>ASK_SUCCESSOR = 12;</code>
+     */
+    ASK_SUCCESSOR(12),
+    /**
+     * <pre>
+     * ask for the m parameter
+     * </pre>
+     *
+     * <code>ASK_M = 13;</code>
+     */
+    ASK_M(13),
+    /**
+     * <pre>
+     * m-bit ring
+     * </pre>
+     *
+     * <code>M = 14;</code>
+     */
+    M(14),
     UNRECOGNIZED(-1),
     ;
 
@@ -322,6 +346,30 @@ public final class StorageMessages {
      * <code>NODE = 11;</code>
      */
     public static final int NODE_VALUE = 11;
+    /**
+     * <pre>
+     * find successor of particular id
+     * </pre>
+     *
+     * <code>ASK_SUCCESSOR = 12;</code>
+     */
+    public static final int ASK_SUCCESSOR_VALUE = 12;
+    /**
+     * <pre>
+     * ask for the m parameter
+     * </pre>
+     *
+     * <code>ASK_M = 13;</code>
+     */
+    public static final int ASK_M_VALUE = 13;
+    /**
+     * <pre>
+     * m-bit ring
+     * </pre>
+     *
+     * <code>M = 14;</code>
+     */
+    public static final int M_VALUE = 14;
 
 
     public final int getNumber() {
@@ -354,6 +402,9 @@ public final class StorageMessages {
         case 9: return UPDATE;
         case 10: return CLOSEST_PRECEDING_FINGER;
         case 11: return NODE;
+        case 12: return ASK_SUCCESSOR;
+        case 13: return ASK_M;
+        case 14: return M;
         default: return null;
       }
     }
@@ -1261,9 +1312,14 @@ public final class StorageMessages {
     com.google.protobuf.ByteString getData();
 
     /**
-     * <code>int64 time = 3;</code>
+     * <code>string time = 3;</code>
      */
-    long getTime();
+    java.lang.String getTime();
+    /**
+     * <code>string time = 3;</code>
+     */
+    com.google.protobuf.ByteString
+        getTimeBytes();
   }
   /**
    * Protobuf type {@code Info}
@@ -1280,7 +1336,7 @@ public final class StorageMessages {
     private Info() {
       type_ = 0;
       data_ = com.google.protobuf.ByteString.EMPTY;
-      time_ = 0L;
+      time_ = "";
     }
 
     @java.lang.Override
@@ -1318,9 +1374,10 @@ public final class StorageMessages {
               data_ = input.readBytes();
               break;
             }
-            case 24: {
+            case 26: {
+              java.lang.String s = input.readStringRequireUtf8();
 
-              time_ = input.readInt64();
+              time_ = s;
               break;
             }
             default: {
@@ -1382,12 +1439,37 @@ public final class StorageMessages {
     }
 
     public static final int TIME_FIELD_NUMBER = 3;
-    private long time_;
+    private volatile java.lang.Object time_;
     /**
-     * <code>int64 time = 3;</code>
+     * <code>string time = 3;</code>
      */
-    public long getTime() {
-      return time_;
+    public java.lang.String getTime() {
+      java.lang.Object ref = time_;
+      if (ref instanceof java.lang.String) {
+        return (java.lang.String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        time_ = s;
+        return s;
+      }
+    }
+    /**
+     * <code>string time = 3;</code>
+     */
+    public com.google.protobuf.ByteString
+        getTimeBytes() {
+      java.lang.Object ref = time_;
+      if (ref instanceof java.lang.String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        time_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
     }
 
     private byte memoizedIsInitialized = -1;
@@ -1410,8 +1492,8 @@ public final class StorageMessages {
       if (!data_.isEmpty()) {
         output.writeBytes(2, data_);
       }
-      if (time_ != 0L) {
-        output.writeInt64(3, time_);
+      if (!getTimeBytes().isEmpty()) {
+        com.google.protobuf.GeneratedMessageV3.writeString(output, 3, time_);
       }
       unknownFields.writeTo(output);
     }
@@ -1430,9 +1512,8 @@ public final class StorageMessages {
         size += com.google.protobuf.CodedOutputStream
           .computeBytesSize(2, data_);
       }
-      if (time_ != 0L) {
-        size += com.google.protobuf.CodedOutputStream
-          .computeInt64Size(3, time_);
+      if (!getTimeBytes().isEmpty()) {
+        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(3, time_);
       }
       size += unknownFields.getSerializedSize();
       memoizedSize = size;
@@ -1453,8 +1534,8 @@ public final class StorageMessages {
       result = result && type_ == other.type_;
       result = result && getData()
           .equals(other.getData());
-      result = result && (getTime()
-          == other.getTime());
+      result = result && getTime()
+          .equals(other.getTime());
       result = result && unknownFields.equals(other.unknownFields);
       return result;
     }
@@ -1471,8 +1552,7 @@ public final class StorageMessages {
       hash = (37 * hash) + DATA_FIELD_NUMBER;
       hash = (53 * hash) + getData().hashCode();
       hash = (37 * hash) + TIME_FIELD_NUMBER;
-      hash = (53 * hash) + com.google.protobuf.Internal.hashLong(
-          getTime());
+      hash = (53 * hash) + getTime().hashCode();
       hash = (29 * hash) + unknownFields.hashCode();
       memoizedHashCode = hash;
       return hash;
@@ -1610,7 +1690,7 @@ public final class StorageMessages {
 
         data_ = com.google.protobuf.ByteString.EMPTY;
 
-        time_ = 0L;
+        time_ = "";
 
         return this;
       }
@@ -1695,8 +1775,9 @@ public final class StorageMessages {
         if (other.getData() != com.google.protobuf.ByteString.EMPTY) {
           setData(other.getData());
         }
-        if (other.getTime() != 0L) {
-          setTime(other.getTime());
+        if (!other.getTime().isEmpty()) {
+          time_ = other.time_;
+          onChanged();
         }
         this.mergeUnknownFields(other.unknownFields);
         onChanged();
@@ -1801,28 +1882,71 @@ public final class StorageMessages {
         return this;
       }
 
-      private long time_ ;
+      private java.lang.Object time_ = "";
       /**
-       * <code>int64 time = 3;</code>
+       * <code>string time = 3;</code>
        */
-      public long getTime() {
-        return time_;
+      public java.lang.String getTime() {
+        java.lang.Object ref = time_;
+        if (!(ref instanceof java.lang.String)) {
+          com.google.protobuf.ByteString bs =
+              (com.google.protobuf.ByteString) ref;
+          java.lang.String s = bs.toStringUtf8();
+          time_ = s;
+          return s;
+        } else {
+          return (java.lang.String) ref;
+        }
       }
       /**
-       * <code>int64 time = 3;</code>
+       * <code>string time = 3;</code>
        */
-      public Builder setTime(long value) {
-        
+      public com.google.protobuf.ByteString
+          getTimeBytes() {
+        java.lang.Object ref = time_;
+        if (ref instanceof String) {
+          com.google.protobuf.ByteString b = 
+              com.google.protobuf.ByteString.copyFromUtf8(
+                  (java.lang.String) ref);
+          time_ = b;
+          return b;
+        } else {
+          return (com.google.protobuf.ByteString) ref;
+        }
+      }
+      /**
+       * <code>string time = 3;</code>
+       */
+      public Builder setTime(
+          java.lang.String value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  
         time_ = value;
         onChanged();
         return this;
       }
       /**
-       * <code>int64 time = 3;</code>
+       * <code>string time = 3;</code>
        */
       public Builder clearTime() {
         
-        time_ = 0L;
+        time_ = getDefaultInstance().getTime();
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>string time = 3;</code>
+       */
+      public Builder setTimeBytes(
+          com.google.protobuf.ByteString value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  checkByteStringIsUtf8(value);
+        
+        time_ = value;
         onChanged();
         return this;
       }
@@ -4825,7 +4949,7 @@ public final class StorageMessages {
       "ype\030\001 \001(\0162\014.messageType\022\020\n\010fileName\030\002 \001(" +
       "\t\022\022\n\ntotalChunk\030\003 \001(\005\022\017\n\007chunkId\030\004 \001(\005\022\014" +
       "\n\004data\030\005 \001(\014\";\n\004Info\022\027\n\004type\030\001 \001(\0162\t.inf" +
-      "oType\022\014\n\004data\030\002 \001(\014\022\014\n\004time\030\003 \001(\003\"f\n\013Fin" +
+      "oType\022\014\n\004data\030\002 \001(\014\022\014\n\004time\030\003 \001(\t\"f\n\013Fin" +
       "gerTable\022(\n\006finger\030\001 \003(\0132\030.FingerTable.F" +
       "ingerEntry\032-\n\013FingerEntry\022\013\n\003key\030\001 \001(\005\022\r" +
       "\n\005value\030\002 \001(\t:\0028\001\"\036\n\013Predecessor\022\017\n\007addr" +
@@ -4834,13 +4958,14 @@ public final class StorageMessages {
       "(\t\022\014\n\004port\030\002 \001(\005\022\n\n\002id\030\003 \001(\005\022\021\n\tsuccesso" +
       "r\030\004 \001(\t\022\023\n\013successorId\030\005 \001(\005\022\023\n\013predeces" +
       "sor\030\006 \001(\t*9\n\013messageType\022\r\n\tFIND_HOST\020\000\022" +
-      "\010\n\004DATA\020\001\022\007\n\003ACK\020\002\022\010\n\004INFO\020\003*\324\001\n\010infoTyp" +
+      "\010\n\004DATA\020\001\022\007\n\003ACK\020\002\022\010\n\004INFO\020\003*\371\001\n\010infoTyp" +
       "e\022\r\n\tLIST_NODE\020\000\022\016\n\nDISK_SPACE\020\001\022\020\n\014NUM_" +
       "REQUESTS\020\002\022\016\n\nLIST_FILES\020\003\022\016\n\nNUM_CHUNKS" +
       "\020\004\022\022\n\016CHUNK_LOCATION\020\005\022\022\n\016RETRIEVE_CHUNK" +
       "\020\006\022\n\n\006FINGER\020\007\022\017\n\013PREDECESSOR\020\010\022\n\n\006UPDAT" +
       "E\020\t\022\034\n\030CLOSEST_PRECEDING_FINGER\020\n\022\010\n\004NOD" +
-      "E\020\013B\022\n\020edu.usfca.cs.dfsb\006proto3"
+      "E\020\013\022\021\n\rASK_SUCCESSOR\020\014\022\t\n\005ASK_M\020\r\022\005\n\001M\020\016" +
+      "B\022\n\020edu.usfca.cs.dfsb\006proto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {

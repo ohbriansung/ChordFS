@@ -7,11 +7,11 @@ import java.util.Hashtable;
 import java.util.concurrent.CountDownLatch;
 
 class StorageNode extends Serializer {
-    private final int m;
-    private final Node self;
-    private final FingerTable finger;
-    private final Hashtable<Long, CountDownLatch> awaitTasks;
-    private final Hashtable<Long, Node> answers;
+    private int m;
+    private Node self;
+    private FingerTable finger;
+    private Hashtable<String, CountDownLatch> awaitTasks;
+    private Hashtable<String, Object> answers;
 
     /**
      * Initialize the m bits identifier ring.
@@ -22,11 +22,39 @@ class StorageNode extends Serializer {
      * @param m
      */
     StorageNode(String host, int port, int m) {
-        this.m = m;
-        this.self = new Node(host, port);
-        this.finger = new FingerTable(this.m, this.self);
         this.awaitTasks = new Hashtable<>();
         this.answers = new Hashtable<>();
+
+        this.m = m;
+
+        this.self = new Node(host, port);
+        this.self.setId(generateId(m));
+        String address = this.self.getHost() + ":" + this.self.getPort();
+        this.self.setPredecessor(address);
+        this.self.setSuccessor(address);
+        this.self.setSuccessorId(this.self.getId());
+
+        this.finger = new FingerTable(this.m, this.self);
+        System.out.println(this.finger.toString());
+    }
+
+    StorageNode(String host, int port) {
+        this.awaitTasks = new Hashtable<>();
+        this.answers = new Hashtable<>();
+        this.self = new Node(host, port);
+    }
+
+    void prepare(InetSocketAddress existingNode) {
+        this.m = askM(existingNode);
+
+        InetSocketAddress successor = askIdAndSuccessor(this.m, this.self, existingNode);
+
+        this.finger = new FingerTable(this.m, this.self);
+        System.out.println(this.finger.toString());
+    }
+
+    private int generateId(int m) {
+        return Math.abs(Long.hashCode(System.currentTimeMillis()) % (0b1 << m));
     }
 
     Node findSuccessor(int id) {
@@ -40,17 +68,13 @@ class StorageNode extends Serializer {
         return successor;
     }
 
-    Node findPredecessor(int id) {
+    private Node findPredecessor(int id) {
         Node node = this.self;
 
-        // id not in (node, node.successor]
-        while (!(id > node.getId() && id <= node.getSuccessorId())) {
-            if (node.getId() == this.self.getId()) {
-                node = closestPrecedingFinger(id);
-            }
-            else {
-                // node.closestPrecedingFinger(id)
-                node = ask(id, node.getHost(), node.getPort());
+        if (node.getId() != node.getSuccessorId()) {
+            // id not in (node, node.successor]
+            while (!(id > node.getId() && id <= node.getSuccessorId())) {
+                node = askClosestPrecedingFinger(id, node.getHost(), node.getPort());
             }
         }
 
@@ -82,6 +106,10 @@ class StorageNode extends Serializer {
         return this.self;
     }
 
+    FingerTable join(InetSocketAddress successAddress) {
+        return null;
+    }
+
     /**
      * Identify the request by timestamp.
      *
@@ -90,46 +118,92 @@ class StorageNode extends Serializer {
      * @param port
      * @return Node
      */
-    Node ask(int id, String host, int port) {
-        long time = System.currentTimeMillis();
-        CountDownLatch goSignal = new CountDownLatch(1);
-        this.awaitTasks.put(time, goSignal);
-
-        // serialize info
-        ByteString askingId = ByteString.copyFromUtf8(String.valueOf(id));
-        StorageMessages.Info info = serializeInfo(StorageMessages.infoType.CLOSEST_PRECEDING_FINGER, askingId, time);
-
-        // serialize request with info type
-        ByteString data = info.toByteString();
-        StorageMessages.Message request = serializeMessage(StorageMessages.messageType.INFO, data);
-
-        // send request to node
-        InetSocketAddress address = new InetSocketAddress(host, port);
-        DFS.sender.send(request, address);
+    private Node askClosestPrecedingFinger(int id, String host, int port) {
+        String time = setTaskAndGetTime();
+        createInfoAndSend(new InetSocketAddress(host, port), StorageMessages.infoType.CLOSEST_PRECEDING_FINGER,
+                time, ByteString.copyFromUtf8(String.valueOf(id)));
 
         try {
             // wait for the reply from the node we just asked
-            goSignal.await();
+            CountDownLatch signal = this.awaitTasks.get(time);
+            signal.await();
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
 
-        Node node = this.answers.get(time);
+        Node node = (Node) this.answers.get(time);
         this.awaitTasks.remove(time);
         this.answers.remove(time);
 
         return node;
     }
 
-    void awaitTasksCountDown(long time) {
-        if (this.awaitTasks.contains(time)) {
+    private int askM(InetSocketAddress address) {
+        String time = setTaskAndGetTime();
+        createInfoAndSend(address, StorageMessages.infoType.ASK_M, time);
+
+        try {
+            CountDownLatch signal = this.awaitTasks.get(time);
+            signal.await();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        int m = (int) this.answers.get(time);
+        this.awaitTasks.remove(time);
+        this.answers.remove(time);
+
+        return m;
+    }
+
+    private InetSocketAddress askIdAndSuccessor(int m, Node self, InetSocketAddress address) {
+        Node successor;
+        int id;
+
+        do {
+            id = generateId(m);
+            String time = setTaskAndGetTime();
+
+            createInfoAndSend(address, StorageMessages.infoType.ASK_SUCCESSOR,
+                    time, ByteString.copyFromUtf8(String.valueOf(id)));
+
+            try {
+                CountDownLatch signal = this.awaitTasks.get(time);
+                signal.await();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+
+            successor = (Node) this.answers.get(time);
+            this.awaitTasks.remove(time);
+            this.answers.remove(time);
+        } while (successor.getId() == id);  // if there exists a node with same id, regenerate the id and try again.
+
+        self.setId(id);
+
+        return new InetSocketAddress(successor.getHost(), successor.getPort());
+    }
+
+    private String setTaskAndGetTime() {
+        String time = String.valueOf(System.currentTimeMillis());
+        this.awaitTasks.put(time, new CountDownLatch(1));
+
+        return time;
+    }
+
+    void awaitTasksCountDown(String time) {
+        if (this.awaitTasks.containsKey(time)) {
             this.awaitTasks.get(time).countDown();
         }
     }
 
-    void addAnswer(long time, Node node) {
-        if (this.awaitTasks.contains(time)) {
-            this.answers.put(time, node);
+    void addAnswer(String time, Object ans) {
+        if (this.awaitTasks.containsKey(time)) {
+            this.answers.put(time, ans);
         }
+    }
+
+    int getM() {
+        return this.m;
     }
 }

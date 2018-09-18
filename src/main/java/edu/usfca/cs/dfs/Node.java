@@ -13,7 +13,6 @@ class Node {
         this.port = port;
     }
 
-
     /**
      * Directly deserialize from StorageMessages.Node
      *

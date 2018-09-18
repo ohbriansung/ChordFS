@@ -19,7 +19,7 @@ enum messageType {
 message Info {
     infoType type = 1;
     bytes data = 2;
-    int64 time = 3;
+    string time = 3;
 }
 
 enum infoType {
@@ -35,6 +35,9 @@ enum infoType {
     UPDATE = 9;  // update finger table request
     CLOSEST_PRECEDING_FINGER = 10;  // ask for the closest preceding finger
     NODE = 11;  // reply closest preceding finger
+    ASK_SUCCESSOR = 12;  // find successor of particular id
+    ASK_M = 13;  // ask for the m parameter
+    M = 14;  // m-bit ring
 }
 
 message FingerTable {

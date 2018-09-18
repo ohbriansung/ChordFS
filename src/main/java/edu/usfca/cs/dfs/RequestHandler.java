@@ -50,42 +50,53 @@ class RequestHandler extends Serializer implements Runnable {
 
     private void parseInfo(StorageMessages.Info info) {
         StorageMessages.infoType type = info.getType();
+        int id;
 
         switch (type) {
             case CLOSEST_PRECEDING_FINGER:
-                int id = Integer.parseInt(info.getData().toStringUtf8());
-                Node closest = DFS.storageNode.closestPrecedingFinger(id);
-                responseNode(closest, info.getTime());
+                id = Integer.parseInt(info.getData().toStringUtf8());
+                responseNode(DFS.storageNode.closestPrecedingFinger(id), info.getTime());
                 break;
             case NODE:
-                Node node = parseNode(info.getData());
-                DFS.storageNode.addAnswer(info.getTime(), node);
+                DFS.storageNode.addAnswer(info.getTime(), parseNode(info.getData()));
                 DFS.storageNode.awaitTasksCountDown(info.getTime());
+                break;
+            case ASK_M:
+                responseM(DFS.storageNode.getM(), info.getTime());
+                break;
+            case M:
+                DFS.storageNode.addAnswer(info.getTime(), Integer.parseInt(info.getData().toStringUtf8()));
+                DFS.storageNode.awaitTasksCountDown(info.getTime());
+                break;
+            case ASK_SUCCESSOR:
+                id = Integer.parseInt(info.getData().toStringUtf8());
+                responseNode(DFS.storageNode.findSuccessor(id), info.getTime());
                 break;
         }
     }
 
-    private void responseNode(Node node, long time) {
+    private void responseNode(Node node, String time) {
         // serialize node
         String host = node.getHost();
         int port = node.getPort();
         int id = node.getId();
-        String successor = node.getSuccessor();
-        int successorId = node.getSuccessorId();
-        String predecessor = node.getPredecessor();
-        StorageMessages.Node responseNode = StorageMessages.Node.newBuilder().setHost(host).setPort(port).setId(id)
-                .setSuccessor(successor).setSuccessorId(successorId).setPredecessor(predecessor).build();
+        StorageMessages.Node.Builder builder = StorageMessages.Node.newBuilder().setHost(host).setPort(port).setId(id);
 
-        // serialize info
-        ByteString nodeBytes = responseNode.toByteString();
-        StorageMessages.Info info = serializeInfo(StorageMessages.infoType.NODE, nodeBytes, time);
+        if (node.getSuccessor() != null) {
+            builder = builder.setSuccessor(node.getSuccessor());
+        }
 
-        // serialize request
-        ByteString data = info.toByteString();
-        StorageMessages.Message message = serializeMessage(StorageMessages.messageType.INFO, data);
+        if (node.getSuccessorId() != null) {
+            builder = builder.setSuccessorId(node.getSuccessorId());
+        }
 
-        // send response to node
-        DFS.sender.send(message, this.remoteAddress);
+        if (node.getPredecessor() != null) {
+            builder = builder.setPredecessor(node.getPredecessor());
+        }
+
+        StorageMessages.Node responseNode = builder.build();
+
+        createInfoAndSend(this.remoteAddress, StorageMessages.infoType.NODE, time, responseNode.toByteString());
     }
 
     private Node parseNode(ByteString nodeBytes) {
@@ -97,5 +108,10 @@ class RequestHandler extends Serializer implements Runnable {
         }
 
         return null;
+    }
+
+    private void responseM(int m, String time) {
+        createInfoAndSend(this.remoteAddress, StorageMessages.infoType.M,
+                time, ByteString.copyFromUtf8(String.valueOf(m)));
     }
 }

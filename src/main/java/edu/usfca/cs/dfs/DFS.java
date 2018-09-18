@@ -1,9 +1,6 @@
 package edu.usfca.cs.dfs;
 
-import java.net.DatagramSocket;
-import java.net.InetAddress;
-import java.net.SocketException;
-import java.net.UnknownHostException;
+import java.net.*;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.CountDownLatch;
@@ -50,7 +47,14 @@ public class DFS {
             client.startUI();
         }
         else {
-            DFS.storageNode = new StorageNode(host, port, m);
+            if (arguments.containsKey("node")) {
+                String[] address = arguments.get("node").split(":");
+                DFS.storageNode = new StorageNode(host, port);
+                DFS.storageNode.prepare(new InetSocketAddress(address[0], Integer.parseInt(address[1])));
+            }
+            else {
+                DFS.storageNode = new StorageNode(host, port, m);
+            }
         }
     }
 
@@ -71,7 +75,8 @@ public class DFS {
         }
 
         map.put("run", "storage");
-        map.put("port", "13000");
+        map.put("port", "13001");
+        map.put("node", "localhost:13000");
 
         return map;
     }

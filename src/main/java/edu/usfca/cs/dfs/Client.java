@@ -3,13 +3,15 @@ package edu.usfca.cs.dfs;
 import com.google.protobuf.ByteString;
 
 import java.io.IOException;
+import java.net.InetSocketAddress;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 import java.util.Scanner;
 
-class Client {
+class Client extends Serializer {
+    private InetSocketAddress storageNodeAddress;
 
     Client() {
         try {
@@ -26,13 +28,17 @@ class Client {
         String command;
         printInfo();
         while (!(command = scanner.nextLine()).equals("exit")) {
-            System.out.println("Command: " + command);
+            // serialize info
+            ByteString bytesCommand = ByteString.copyFromUtf8(command);
+            StorageMessages.Info info = serializeInfo(StorageMessages.infoType.ASK_SUCCESSOR, bytesCommand);
 
-            ByteString bs = ByteString.copyFromUtf8(command);
-            StorageMessages.Info info = StorageMessages.Info.newBuilder()
-                    .setType(StorageMessages.Info.infoType.LIST_NODE).setData(bs).build();
+            // serialize message
+            ByteString data = info.toByteString();
+            StorageMessages.Message message = serializeMessage(StorageMessages.messageType.INFO, data);
 
-            //DFS.sender.send(info);
+            // TODO: detete debug
+            this.storageNodeAddress = new InetSocketAddress("localhost", 13000);
+            DFS.sender.send(message, this.storageNodeAddress);
 
             printInfo();
         }
@@ -63,6 +69,19 @@ class Client {
 
         try {
             dp.restoreFile(fileName, chunks);
+        } catch (IOException ioe) {
+            ioe.printStackTrace();
+        }
+    }
+
+    // TODO: delete debug
+    public static void main(String[] args) {
+        DataProcessor dp = new DataProcessor();
+
+        try {
+            List<byte[]> chunks = dp.breakFile("/Users/brian/Downloads/Cell_Phones_and_Accessories_5.json");
+            System.out.println(chunks.size());
+            dp.restoreFile("/Users/brian/Downloads/Cell_Phones_and_Accessories_5_copy.json", chunks);
         } catch (IOException ioe) {
             ioe.printStackTrace();
         }
