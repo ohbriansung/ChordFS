@@ -21,7 +21,16 @@ class FingerTable {
         }
     }
 
-    Node getNode(int i) {
+    FingerTable(int m) {
+        this.capacity = (0b1 << m);
+        this.finger = new Node[m];
+    }
+
+    void setFinger(int i, Node node) {
+        this.finger[i] = node;
+    }
+
+    Node getFinger(int i) {
         return this.finger[i];
     }
 

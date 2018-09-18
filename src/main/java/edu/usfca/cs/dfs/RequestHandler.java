@@ -43,6 +43,9 @@ class RequestHandler extends Serializer implements Runnable {
                 System.out.println("Received info: " + info.getType().name());
                 parseInfo(info);
             }
+            else if (type == StorageMessages.messageType.ACK) {
+                DFS.storageNode.awaitTasksCountDown(request.getData().toStringUtf8());
+            }
         } catch (InvalidProtocolBufferException e) {
             e.printStackTrace();
         }
@@ -72,30 +75,22 @@ class RequestHandler extends Serializer implements Runnable {
                 id = Integer.parseInt(info.getData().toStringUtf8());
                 responseNode(DFS.storageNode.findSuccessor(id), info.getTime());
                 break;
+            case ASK_NODE_DETAIL:
+                responseNode(DFS.storageNode.getSelf(), info.getTime());
+                break;
+            case UPDATE_PREDECESSOR:
+                Node predecessor = parseNode(info.getData());
+                if (predecessor != null) {
+                    DFS.storageNode.getSelf().setPredecessor(predecessor.getAddress());
+                    DFS.storageNode.updateFingerTable(predecessor);
+                    ack(info.getTime());
+                }
+                break;
         }
     }
 
     private void responseNode(Node node, String time) {
-        // serialize node
-        String host = node.getHost();
-        int port = node.getPort();
-        int id = node.getId();
-        StorageMessages.Node.Builder builder = StorageMessages.Node.newBuilder().setHost(host).setPort(port).setId(id);
-
-        if (node.getSuccessor() != null) {
-            builder = builder.setSuccessor(node.getSuccessor());
-        }
-
-        if (node.getSuccessorId() != null) {
-            builder = builder.setSuccessorId(node.getSuccessorId());
-        }
-
-        if (node.getPredecessor() != null) {
-            builder = builder.setPredecessor(node.getPredecessor());
-        }
-
-        StorageMessages.Node responseNode = builder.build();
-
+        StorageMessages.Node responseNode = node.serialize();
         createInfoAndSend(this.remoteAddress, StorageMessages.infoType.NODE, time, responseNode.toByteString());
     }
 
@@ -113,5 +108,11 @@ class RequestHandler extends Serializer implements Runnable {
     private void responseM(int m, String time) {
         createInfoAndSend(this.remoteAddress, StorageMessages.infoType.M,
                 time, ByteString.copyFromUtf8(String.valueOf(m)));
+    }
+
+    // TODO: temp ack
+    private void ack(String time) {
+        StorageMessages.Message message = serializeMessage(StorageMessages.messageType.ACK, ByteString.copyFromUtf8(time));
+        DFS.sender.send(message, this.remoteAddress);
     }
 }

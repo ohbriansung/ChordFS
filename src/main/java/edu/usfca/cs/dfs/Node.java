@@ -77,6 +77,33 @@ class Node {
         return this.predecessor;
     }
 
+    StorageMessages.Node serialize() {
+        // serialize node
+        StorageMessages.Node.Builder builder = StorageMessages.Node.newBuilder().setHost(this.host).setPort(this.port);
+
+        if (this.id != null) {
+            builder.setId(this.id);
+        }
+
+        if (this.successor != null) {
+            builder.setSuccessor(this.successor);
+        }
+
+        if (this.successorId != null) {
+            builder.setSuccessorId(this.successorId);
+        }
+
+        if (this.predecessor != null) {
+            builder.setPredecessor(this.predecessor);
+        }
+
+        return builder.build();
+    }
+
+    String getAddress() {
+        return this.host + ":" + this.port;
+    }
+
     private void printId() {
         System.out.println("Current node id: " + this.id);
     }
