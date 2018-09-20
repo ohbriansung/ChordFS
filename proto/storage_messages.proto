@@ -19,11 +19,20 @@ enum messageType {
 message Info {
     infoType type = 1;
     bytes data = 2;
-    string time = 3;
+    int32 integerData = 3;
+    string time = 4;
 }
 
 enum infoType {
-    LIST_NODE = 0;  // list all nodes in chord network
+    CLOSEST_PRECEDING_FINGER = 0;  // ask for the closest preceding finger
+    NODE = 1;  // reply closest preceding finger
+    ASK_M = 2;  // ask for the m parameter
+    M = 3;  // m-bit ring
+    ASK_SUCCESSOR = 4;  // find successor of particular id
+    ASK_NODE_DETAIL = 5;  // get the detail of the node been asked
+    UPDATE_PREDECESSOR = 6;
+    UPDATE_FINGER_TABLE = 7;
+    /*LIST_NODE = 0;  // list all nodes in chord network
     DISK_SPACE = 1;  // check remaining disk space
     NUM_REQUESTS = 2;  // check number of total requests received
     LIST_FILES = 3;  // list all file name
@@ -31,15 +40,7 @@ enum infoType {
     CHUNK_LOCATION = 5;  // get all chunk location of a particular file
     RETRIEVE_CHUNK = 6;  // retrieve a chunk
     FINGER = 7;  // finger table
-    PREDECESSOR = 8;
-    UPDATE = 9;  // update finger table request
-    CLOSEST_PRECEDING_FINGER = 10;  // ask for the closest preceding finger
-    NODE = 11;  // reply closest preceding finger
-    ASK_M = 12;  // ask for the m parameter
-    M = 13;  // m-bit ring
-    ASK_SUCCESSOR = 14;  // find successor of particular id
-    ASK_NODE_DETAIL = 15;  // get the detail of the node been asked
-    UPDATE_PREDECESSOR = 16;
+    PREDECESSOR = 8;*/
 }
 
 message Node {

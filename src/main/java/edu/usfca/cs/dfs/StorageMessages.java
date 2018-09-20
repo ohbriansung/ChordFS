@@ -137,263 +137,143 @@ public final class StorageMessages {
       implements com.google.protobuf.ProtocolMessageEnum {
     /**
      * <pre>
-     * list all nodes in chord network
-     * </pre>
-     *
-     * <code>LIST_NODE = 0;</code>
-     */
-    LIST_NODE(0),
-    /**
-     * <pre>
-     * check remaining disk space
-     * </pre>
-     *
-     * <code>DISK_SPACE = 1;</code>
-     */
-    DISK_SPACE(1),
-    /**
-     * <pre>
-     * check number of total requests received
-     * </pre>
-     *
-     * <code>NUM_REQUESTS = 2;</code>
-     */
-    NUM_REQUESTS(2),
-    /**
-     * <pre>
-     * list all file name
-     * </pre>
-     *
-     * <code>LIST_FILES = 3;</code>
-     */
-    LIST_FILES(3),
-    /**
-     * <pre>
-     * get total number of chunks of a particular file
-     * </pre>
-     *
-     * <code>NUM_CHUNKS = 4;</code>
-     */
-    NUM_CHUNKS(4),
-    /**
-     * <pre>
-     * get all chunk location of a particular file
-     * </pre>
-     *
-     * <code>CHUNK_LOCATION = 5;</code>
-     */
-    CHUNK_LOCATION(5),
-    /**
-     * <pre>
-     * retrieve a chunk
-     * </pre>
-     *
-     * <code>RETRIEVE_CHUNK = 6;</code>
-     */
-    RETRIEVE_CHUNK(6),
-    /**
-     * <pre>
-     * finger table
-     * </pre>
-     *
-     * <code>FINGER = 7;</code>
-     */
-    FINGER(7),
-    /**
-     * <code>PREDECESSOR = 8;</code>
-     */
-    PREDECESSOR(8),
-    /**
-     * <pre>
-     * update finger table request
-     * </pre>
-     *
-     * <code>UPDATE = 9;</code>
-     */
-    UPDATE(9),
-    /**
-     * <pre>
      * ask for the closest preceding finger
      * </pre>
      *
-     * <code>CLOSEST_PRECEDING_FINGER = 10;</code>
+     * <code>CLOSEST_PRECEDING_FINGER = 0;</code>
      */
-    CLOSEST_PRECEDING_FINGER(10),
+    CLOSEST_PRECEDING_FINGER(0),
     /**
      * <pre>
      * reply closest preceding finger
      * </pre>
      *
-     * <code>NODE = 11;</code>
+     * <code>NODE = 1;</code>
      */
-    NODE(11),
+    NODE(1),
     /**
      * <pre>
      * ask for the m parameter
      * </pre>
      *
-     * <code>ASK_M = 12;</code>
+     * <code>ASK_M = 2;</code>
      */
-    ASK_M(12),
+    ASK_M(2),
     /**
      * <pre>
      * m-bit ring
      * </pre>
      *
-     * <code>M = 13;</code>
+     * <code>M = 3;</code>
      */
-    M(13),
+    M(3),
     /**
      * <pre>
      * find successor of particular id
      * </pre>
      *
-     * <code>ASK_SUCCESSOR = 14;</code>
+     * <code>ASK_SUCCESSOR = 4;</code>
      */
-    ASK_SUCCESSOR(14),
+    ASK_SUCCESSOR(4),
     /**
      * <pre>
      * get the detail of the node been asked
      * </pre>
      *
-     * <code>ASK_NODE_DETAIL = 15;</code>
+     * <code>ASK_NODE_DETAIL = 5;</code>
      */
-    ASK_NODE_DETAIL(15),
+    ASK_NODE_DETAIL(5),
     /**
-     * <code>UPDATE_PREDECESSOR = 16;</code>
+     * <code>UPDATE_PREDECESSOR = 6;</code>
      */
-    UPDATE_PREDECESSOR(16),
+    UPDATE_PREDECESSOR(6),
+    /**
+     * <pre>
+     *LIST_NODE = 0;  // list all nodes in chord network
+     *DISK_SPACE = 1;  // check remaining disk space
+     *NUM_REQUESTS = 2;  // check number of total requests received
+     *LIST_FILES = 3;  // list all file name
+     *NUM_CHUNKS = 4;  // get total number of chunks of a particular file
+     *CHUNK_LOCATION = 5;  // get all chunk location of a particular file
+     *RETRIEVE_CHUNK = 6;  // retrieve a chunk
+     *FINGER = 7;  // finger table
+     *PREDECESSOR = 8;
+     * </pre>
+     *
+     * <code>UPDATE_FINGER_TABLE = 7;</code>
+     */
+    UPDATE_FINGER_TABLE(7),
     UNRECOGNIZED(-1),
     ;
 
     /**
      * <pre>
-     * list all nodes in chord network
-     * </pre>
-     *
-     * <code>LIST_NODE = 0;</code>
-     */
-    public static final int LIST_NODE_VALUE = 0;
-    /**
-     * <pre>
-     * check remaining disk space
-     * </pre>
-     *
-     * <code>DISK_SPACE = 1;</code>
-     */
-    public static final int DISK_SPACE_VALUE = 1;
-    /**
-     * <pre>
-     * check number of total requests received
-     * </pre>
-     *
-     * <code>NUM_REQUESTS = 2;</code>
-     */
-    public static final int NUM_REQUESTS_VALUE = 2;
-    /**
-     * <pre>
-     * list all file name
-     * </pre>
-     *
-     * <code>LIST_FILES = 3;</code>
-     */
-    public static final int LIST_FILES_VALUE = 3;
-    /**
-     * <pre>
-     * get total number of chunks of a particular file
-     * </pre>
-     *
-     * <code>NUM_CHUNKS = 4;</code>
-     */
-    public static final int NUM_CHUNKS_VALUE = 4;
-    /**
-     * <pre>
-     * get all chunk location of a particular file
-     * </pre>
-     *
-     * <code>CHUNK_LOCATION = 5;</code>
-     */
-    public static final int CHUNK_LOCATION_VALUE = 5;
-    /**
-     * <pre>
-     * retrieve a chunk
-     * </pre>
-     *
-     * <code>RETRIEVE_CHUNK = 6;</code>
-     */
-    public static final int RETRIEVE_CHUNK_VALUE = 6;
-    /**
-     * <pre>
-     * finger table
-     * </pre>
-     *
-     * <code>FINGER = 7;</code>
-     */
-    public static final int FINGER_VALUE = 7;
-    /**
-     * <code>PREDECESSOR = 8;</code>
-     */
-    public static final int PREDECESSOR_VALUE = 8;
-    /**
-     * <pre>
-     * update finger table request
-     * </pre>
-     *
-     * <code>UPDATE = 9;</code>
-     */
-    public static final int UPDATE_VALUE = 9;
-    /**
-     * <pre>
      * ask for the closest preceding finger
      * </pre>
      *
-     * <code>CLOSEST_PRECEDING_FINGER = 10;</code>
+     * <code>CLOSEST_PRECEDING_FINGER = 0;</code>
      */
-    public static final int CLOSEST_PRECEDING_FINGER_VALUE = 10;
+    public static final int CLOSEST_PRECEDING_FINGER_VALUE = 0;
     /**
      * <pre>
      * reply closest preceding finger
      * </pre>
      *
-     * <code>NODE = 11;</code>
+     * <code>NODE = 1;</code>
      */
-    public static final int NODE_VALUE = 11;
+    public static final int NODE_VALUE = 1;
     /**
      * <pre>
      * ask for the m parameter
      * </pre>
      *
-     * <code>ASK_M = 12;</code>
+     * <code>ASK_M = 2;</code>
      */
-    public static final int ASK_M_VALUE = 12;
+    public static final int ASK_M_VALUE = 2;
     /**
      * <pre>
      * m-bit ring
      * </pre>
      *
-     * <code>M = 13;</code>
+     * <code>M = 3;</code>
      */
-    public static final int M_VALUE = 13;
+    public static final int M_VALUE = 3;
     /**
      * <pre>
      * find successor of particular id
      * </pre>
      *
-     * <code>ASK_SUCCESSOR = 14;</code>
+     * <code>ASK_SUCCESSOR = 4;</code>
      */
-    public static final int ASK_SUCCESSOR_VALUE = 14;
+    public static final int ASK_SUCCESSOR_VALUE = 4;
     /**
      * <pre>
      * get the detail of the node been asked
      * </pre>
      *
-     * <code>ASK_NODE_DETAIL = 15;</code>
+     * <code>ASK_NODE_DETAIL = 5;</code>
      */
-    public static final int ASK_NODE_DETAIL_VALUE = 15;
+    public static final int ASK_NODE_DETAIL_VALUE = 5;
     /**
-     * <code>UPDATE_PREDECESSOR = 16;</code>
+     * <code>UPDATE_PREDECESSOR = 6;</code>
      */
-    public static final int UPDATE_PREDECESSOR_VALUE = 16;
+    public static final int UPDATE_PREDECESSOR_VALUE = 6;
+    /**
+     * <pre>
+     *LIST_NODE = 0;  // list all nodes in chord network
+     *DISK_SPACE = 1;  // check remaining disk space
+     *NUM_REQUESTS = 2;  // check number of total requests received
+     *LIST_FILES = 3;  // list all file name
+     *NUM_CHUNKS = 4;  // get total number of chunks of a particular file
+     *CHUNK_LOCATION = 5;  // get all chunk location of a particular file
+     *RETRIEVE_CHUNK = 6;  // retrieve a chunk
+     *FINGER = 7;  // finger table
+     *PREDECESSOR = 8;
+     * </pre>
+     *
+     * <code>UPDATE_FINGER_TABLE = 7;</code>
+     */
+    public static final int UPDATE_FINGER_TABLE_VALUE = 7;
 
 
     public final int getNumber() {
@@ -414,23 +294,14 @@ public final class StorageMessages {
 
     public static infoType forNumber(int value) {
       switch (value) {
-        case 0: return LIST_NODE;
-        case 1: return DISK_SPACE;
-        case 2: return NUM_REQUESTS;
-        case 3: return LIST_FILES;
-        case 4: return NUM_CHUNKS;
-        case 5: return CHUNK_LOCATION;
-        case 6: return RETRIEVE_CHUNK;
-        case 7: return FINGER;
-        case 8: return PREDECESSOR;
-        case 9: return UPDATE;
-        case 10: return CLOSEST_PRECEDING_FINGER;
-        case 11: return NODE;
-        case 12: return ASK_M;
-        case 13: return M;
-        case 14: return ASK_SUCCESSOR;
-        case 15: return ASK_NODE_DETAIL;
-        case 16: return UPDATE_PREDECESSOR;
+        case 0: return CLOSEST_PRECEDING_FINGER;
+        case 1: return NODE;
+        case 2: return ASK_M;
+        case 3: return M;
+        case 4: return ASK_SUCCESSOR;
+        case 5: return ASK_NODE_DETAIL;
+        case 6: return UPDATE_PREDECESSOR;
+        case 7: return UPDATE_FINGER_TABLE;
         default: return null;
       }
     }
@@ -1338,11 +1209,16 @@ public final class StorageMessages {
     com.google.protobuf.ByteString getData();
 
     /**
-     * <code>string time = 3;</code>
+     * <code>int32 integerData = 3;</code>
+     */
+    int getIntegerData();
+
+    /**
+     * <code>string time = 4;</code>
      */
     java.lang.String getTime();
     /**
-     * <code>string time = 3;</code>
+     * <code>string time = 4;</code>
      */
     com.google.protobuf.ByteString
         getTimeBytes();
@@ -1362,6 +1238,7 @@ public final class StorageMessages {
     private Info() {
       type_ = 0;
       data_ = com.google.protobuf.ByteString.EMPTY;
+      integerData_ = 0;
       time_ = "";
     }
 
@@ -1400,7 +1277,12 @@ public final class StorageMessages {
               data_ = input.readBytes();
               break;
             }
-            case 26: {
+            case 24: {
+
+              integerData_ = input.readInt32();
+              break;
+            }
+            case 34: {
               java.lang.String s = input.readStringRequireUtf8();
 
               time_ = s;
@@ -1464,10 +1346,19 @@ public final class StorageMessages {
       return data_;
     }
 
-    public static final int TIME_FIELD_NUMBER = 3;
+    public static final int INTEGERDATA_FIELD_NUMBER = 3;
+    private int integerData_;
+    /**
+     * <code>int32 integerData = 3;</code>
+     */
+    public int getIntegerData() {
+      return integerData_;
+    }
+
+    public static final int TIME_FIELD_NUMBER = 4;
     private volatile java.lang.Object time_;
     /**
-     * <code>string time = 3;</code>
+     * <code>string time = 4;</code>
      */
     public java.lang.String getTime() {
       java.lang.Object ref = time_;
@@ -1482,7 +1373,7 @@ public final class StorageMessages {
       }
     }
     /**
-     * <code>string time = 3;</code>
+     * <code>string time = 4;</code>
      */
     public com.google.protobuf.ByteString
         getTimeBytes() {
@@ -1512,14 +1403,17 @@ public final class StorageMessages {
     @java.lang.Override
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
-      if (type_ != edu.usfca.cs.dfs.StorageMessages.infoType.LIST_NODE.getNumber()) {
+      if (type_ != edu.usfca.cs.dfs.StorageMessages.infoType.CLOSEST_PRECEDING_FINGER.getNumber()) {
         output.writeEnum(1, type_);
       }
       if (!data_.isEmpty()) {
         output.writeBytes(2, data_);
       }
+      if (integerData_ != 0) {
+        output.writeInt32(3, integerData_);
+      }
       if (!getTimeBytes().isEmpty()) {
-        com.google.protobuf.GeneratedMessageV3.writeString(output, 3, time_);
+        com.google.protobuf.GeneratedMessageV3.writeString(output, 4, time_);
       }
       unknownFields.writeTo(output);
     }
@@ -1530,7 +1424,7 @@ public final class StorageMessages {
       if (size != -1) return size;
 
       size = 0;
-      if (type_ != edu.usfca.cs.dfs.StorageMessages.infoType.LIST_NODE.getNumber()) {
+      if (type_ != edu.usfca.cs.dfs.StorageMessages.infoType.CLOSEST_PRECEDING_FINGER.getNumber()) {
         size += com.google.protobuf.CodedOutputStream
           .computeEnumSize(1, type_);
       }
@@ -1538,8 +1432,12 @@ public final class StorageMessages {
         size += com.google.protobuf.CodedOutputStream
           .computeBytesSize(2, data_);
       }
+      if (integerData_ != 0) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeInt32Size(3, integerData_);
+      }
       if (!getTimeBytes().isEmpty()) {
-        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(3, time_);
+        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(4, time_);
       }
       size += unknownFields.getSerializedSize();
       memoizedSize = size;
@@ -1560,6 +1458,8 @@ public final class StorageMessages {
       result = result && type_ == other.type_;
       result = result && getData()
           .equals(other.getData());
+      result = result && (getIntegerData()
+          == other.getIntegerData());
       result = result && getTime()
           .equals(other.getTime());
       result = result && unknownFields.equals(other.unknownFields);
@@ -1577,6 +1477,8 @@ public final class StorageMessages {
       hash = (53 * hash) + type_;
       hash = (37 * hash) + DATA_FIELD_NUMBER;
       hash = (53 * hash) + getData().hashCode();
+      hash = (37 * hash) + INTEGERDATA_FIELD_NUMBER;
+      hash = (53 * hash) + getIntegerData();
       hash = (37 * hash) + TIME_FIELD_NUMBER;
       hash = (53 * hash) + getTime().hashCode();
       hash = (29 * hash) + unknownFields.hashCode();
@@ -1716,6 +1618,8 @@ public final class StorageMessages {
 
         data_ = com.google.protobuf.ByteString.EMPTY;
 
+        integerData_ = 0;
+
         time_ = "";
 
         return this;
@@ -1746,6 +1650,7 @@ public final class StorageMessages {
         edu.usfca.cs.dfs.StorageMessages.Info result = new edu.usfca.cs.dfs.StorageMessages.Info(this);
         result.type_ = type_;
         result.data_ = data_;
+        result.integerData_ = integerData_;
         result.time_ = time_;
         onBuilt();
         return result;
@@ -1800,6 +1705,9 @@ public final class StorageMessages {
         }
         if (other.getData() != com.google.protobuf.ByteString.EMPTY) {
           setData(other.getData());
+        }
+        if (other.getIntegerData() != 0) {
+          setIntegerData(other.getIntegerData());
         }
         if (!other.getTime().isEmpty()) {
           time_ = other.time_;
@@ -1908,9 +1816,35 @@ public final class StorageMessages {
         return this;
       }
 
+      private int integerData_ ;
+      /**
+       * <code>int32 integerData = 3;</code>
+       */
+      public int getIntegerData() {
+        return integerData_;
+      }
+      /**
+       * <code>int32 integerData = 3;</code>
+       */
+      public Builder setIntegerData(int value) {
+        
+        integerData_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>int32 integerData = 3;</code>
+       */
+      public Builder clearIntegerData() {
+        
+        integerData_ = 0;
+        onChanged();
+        return this;
+      }
+
       private java.lang.Object time_ = "";
       /**
-       * <code>string time = 3;</code>
+       * <code>string time = 4;</code>
        */
       public java.lang.String getTime() {
         java.lang.Object ref = time_;
@@ -1925,7 +1859,7 @@ public final class StorageMessages {
         }
       }
       /**
-       * <code>string time = 3;</code>
+       * <code>string time = 4;</code>
        */
       public com.google.protobuf.ByteString
           getTimeBytes() {
@@ -1941,7 +1875,7 @@ public final class StorageMessages {
         }
       }
       /**
-       * <code>string time = 3;</code>
+       * <code>string time = 4;</code>
        */
       public Builder setTime(
           java.lang.String value) {
@@ -1954,7 +1888,7 @@ public final class StorageMessages {
         return this;
       }
       /**
-       * <code>string time = 3;</code>
+       * <code>string time = 4;</code>
        */
       public Builder clearTime() {
         
@@ -1963,7 +1897,7 @@ public final class StorageMessages {
         return this;
       }
       /**
-       * <code>string time = 3;</code>
+       * <code>string time = 4;</code>
        */
       public Builder setTimeBytes(
           com.google.protobuf.ByteString value) {
@@ -3069,21 +3003,18 @@ public final class StorageMessages {
       "\n\026storage_messages.proto\"j\n\007Message\022\032\n\004t" +
       "ype\030\001 \001(\0162\014.messageType\022\020\n\010fileName\030\002 \001(" +
       "\t\022\022\n\ntotalChunk\030\003 \001(\005\022\017\n\007chunkId\030\004 \001(\005\022\014" +
-      "\n\004data\030\005 \001(\014\";\n\004Info\022\027\n\004type\030\001 \001(\0162\t.inf" +
-      "oType\022\014\n\004data\030\002 \001(\014\022\014\n\004time\030\003 \001(\t\"k\n\004Nod" +
-      "e\022\014\n\004host\030\001 \001(\t\022\014\n\004port\030\002 \001(\005\022\n\n\002id\030\003 \001(" +
-      "\005\022\021\n\tsuccessor\030\004 \001(\t\022\023\n\013successorId\030\005 \001(" +
-      "\005\022\023\n\013predecessor\030\006 \001(\t*9\n\013messageType\022\r\n" +
-      "\tFIND_HOST\020\000\022\010\n\004DATA\020\001\022\007\n\003ACK\020\002\022\010\n\004INFO\020" +
-      "\003*\246\002\n\010infoType\022\r\n\tLIST_NODE\020\000\022\016\n\nDISK_SP" +
-      "ACE\020\001\022\020\n\014NUM_REQUESTS\020\002\022\016\n\nLIST_FILES\020\003\022" +
-      "\016\n\nNUM_CHUNKS\020\004\022\022\n\016CHUNK_LOCATION\020\005\022\022\n\016R" +
-      "ETRIEVE_CHUNK\020\006\022\n\n\006FINGER\020\007\022\017\n\013PREDECESS" +
-      "OR\020\010\022\n\n\006UPDATE\020\t\022\034\n\030CLOSEST_PRECEDING_FI" +
-      "NGER\020\n\022\010\n\004NODE\020\013\022\t\n\005ASK_M\020\014\022\005\n\001M\020\r\022\021\n\rAS" +
-      "K_SUCCESSOR\020\016\022\023\n\017ASK_NODE_DETAIL\020\017\022\026\n\022UP" +
-      "DATE_PREDECESSOR\020\020B\022\n\020edu.usfca.cs.dfsb\006" +
-      "proto3"
+      "\n\004data\030\005 \001(\014\"P\n\004Info\022\027\n\004type\030\001 \001(\0162\t.inf" +
+      "oType\022\014\n\004data\030\002 \001(\014\022\023\n\013integerData\030\003 \001(\005" +
+      "\022\014\n\004time\030\004 \001(\t\"k\n\004Node\022\014\n\004host\030\001 \001(\t\022\014\n\004" +
+      "port\030\002 \001(\005\022\n\n\002id\030\003 \001(\005\022\021\n\tsuccessor\030\004 \001(" +
+      "\t\022\023\n\013successorId\030\005 \001(\005\022\023\n\013predecessor\030\006 " +
+      "\001(\t*9\n\013messageType\022\r\n\tFIND_HOST\020\000\022\010\n\004DAT" +
+      "A\020\001\022\007\n\003ACK\020\002\022\010\n\004INFO\020\003*\235\001\n\010infoType\022\034\n\030C" +
+      "LOSEST_PRECEDING_FINGER\020\000\022\010\n\004NODE\020\001\022\t\n\005A" +
+      "SK_M\020\002\022\005\n\001M\020\003\022\021\n\rASK_SUCCESSOR\020\004\022\023\n\017ASK_" +
+      "NODE_DETAIL\020\005\022\026\n\022UPDATE_PREDECESSOR\020\006\022\027\n" +
+      "\023UPDATE_FINGER_TABLE\020\007B\022\n\020edu.usfca.cs.d" +
+      "fsb\006proto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
@@ -3108,7 +3039,7 @@ public final class StorageMessages {
     internal_static_Info_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_Info_descriptor,
-        new java.lang.String[] { "Type", "Data", "Time", });
+        new java.lang.String[] { "Type", "Data", "IntegerData", "Time", });
     internal_static_Node_descriptor =
       getDescriptor().getMessageTypes().get(2);
     internal_static_Node_fieldAccessorTable = new

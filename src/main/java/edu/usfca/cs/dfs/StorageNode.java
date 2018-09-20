@@ -58,7 +58,7 @@ class StorageNode extends Asker {
         Node successor = askIdAndSuccessor(this.m, this.self, existingNode);
 
         this.finger = new FingerTable(this.m);
-        join(successor, this.self.getId());
+        join(successor);
     }
 
     /**
@@ -95,15 +95,8 @@ class StorageNode extends Asker {
      * @param id
      * @return Node - predecessor
      */
-    private Node findPredecessor(int id) {
+    Node findPredecessor(int id) {
         Node node = this.self;
-
-//        if (node.getId() != node.getSuccessorId()) {
-//            // id not in (node, node.successor]
-//            while (!(this.between.includesRight(id, node.getId(), node.getSuccessorId()))) {
-//                node = askClosestPrecedingFinger(id, node.getHost(), node.getPort());
-//            }
-//        }
 
         while (!(this.between.includesRight(id, node.getId(), node.getSuccessorId()))) {
             node = askClosestPrecedingFinger(id, node.getHost(), node.getPort());
@@ -130,72 +123,100 @@ class StorageNode extends Asker {
         return this.self;
     }
 
-    private void join(Node successor, int id) {
-        initFingerTable(successor, id);
-        // updateOthers();
+    /**
+     * Current node join to the network.
+     * Successor is an arbitrary node already in the network and is successor of current node.
+     *
+     * @param successor
+     */
+    private void join(Node successor) {
+        initFingerTable(successor);
+        updateOthers();
     }
 
-    private void initFingerTable(Node successor, int id) {
+    /**
+     * Initialize finger table of current node.
+     * Successor is an arbitrary node already in the network and is successor of current node.
+     *
+     * @param successor
+     */
+    private void initFingerTable(Node successor) {
         this.finger.setFinger(0, successor);
+        this.self.setSuccessor(successor.getAddress());
+        this.self.setSuccessorId(successor.getId());
         this.self.setPredecessor(successor.getPredecessor());
         successor.setPredecessor(this.self.getAddress());
 
-        // update the predecessor of successor
+        // tell successor to update the predecessor to current node
         InetSocketAddress address = new InetSocketAddress(successor.getHost(), successor.getPort());
         updatePredecessor(address, this.self);
 
         for (int i = 0; i < this.m - 1; i++) {
-            int startPoint = (id + (0b1 << (i + 1))) % (0b1 << this.m);
+            // finger􏰩[i + 1].􏰠􏰪􏰁start
+            int fingerStart = (this.self.getId() + (0b1 << (i + 1))) % this.capacity;
 
-            int previousId = this.finger.getFinger(i).getId();
-            if (previousId <= id) {
-                previousId += (0b1 << this.m);
-            }
-
-            System.out.println("startPoint = [" + startPoint + "], previousId = [" + previousId + "]");
-
-            // if finger[i + 1].start in [n, finger[i].node)
-            if (startPoint >= id && startPoint < previousId) {
+            if (this.between.includesLeft(fingerStart, this.self.getId(), this.finger.getFinger(i).getId())) {
                 this.finger.setFinger(i + 1, this.finger.getFinger(i));
             }
             else {
-                Node node = askSuccessor(startPoint, address);
-                this.finger.setFinger(i + 1, node);
+                this.finger.setFinger(i + 1, askSuccessor(fingerStart, address));
             }
         }
 
         System.out.println(this.finger.toString());
     }
 
-    void updateFingerTable(Node node) {
-        int id = this.self.getId();
-        System.out.println(id);
-
-        int s = node.getId();
-        if (s < id) {
-            s += (0b1 << this.m);
-        }
-        System.out.println(s);
-
+    void updateOthers() {
         for (int i = 0; i < this.m; i++) {
-            int fingerId = this.finger.getFinger(i).getId();
-            if (fingerId <= id) {
-                fingerId += (0b1 << this.m);
+            int ithId = this.self.getId() - (0b1 << i);
+            while (ithId < 0) {
+                ithId += this.capacity;
             }
-            System.out.println(fingerId);
 
-            // if s in [n, finger[i].node)
-            if (s >= id + (0b1 << i) && s < fingerId) {
-                this.finger.setFinger(i, node);
+            Node p = findPredecessor(ithId);
+            if (p.getId() != self.getId()) {
+                InetSocketAddress address = new InetSocketAddress(p.getHost(), p.getPort());
+                askToUpdateFingerTable(address, this.self, i);
+            }
+        }
+    }
 
-//                if (i == 0) {
-//                    this.self.setSuccessor(node.getAddress());
-//                    this.self.setSuccessorId(node.getId());
-//                }
+    void updateFingerTable(Node s, int i) {
+        System.out.println("updateFingerTable");
+        if (this.between.includesLeft(s.getId(), this.self.getId(), this.finger.getFinger(i).getId())) {
+            this.finger.setFinger(i, s);
+        }
+
+        //TODO: seems to be bug in the paper?
+        String[] p = self.getPredecessor().split(":");
+        if (p[0].equals(this.self.getHost()) && Integer.parseInt(p[1]) == this.self.getPort()) {
+            // the predecessor is current node
+            updateFingerTable(s, i);
+        }
+        else {
+            InetSocketAddress address = new InetSocketAddress(p[0], Integer.parseInt(p[1]));
+            askToUpdateFingerTable(address, this.self, i);
+        }
+
+        System.out.println("Finger table updated: " + this.finger.toString());
+    }
+
+    void selfUpdate(Node n) {
+        for (int i = 0; i < this.m; i++) {
+            // finger􏰩[i + 1].􏰠􏰪􏰁start
+            int fingerStart = (this.self.getId() + (0b1 << (i + 1))) % this.capacity;
+
+            if (this.between.includesRight(n.getId(), fingerStart, this.finger.getFinger(i).getId())) {
+                this.finger.setFinger(i, n);
+
+                if (i == 0) {
+                    this.self.setSuccessor(n.getAddress());
+                    this.self.setSuccessorId(n.getId());
+                }
             }
         }
 
-        System.out.println(this.finger.toString());
+        System.out.println("Finger table updated (self): " + this.finger.toString());
     }
 
     int getM() {
