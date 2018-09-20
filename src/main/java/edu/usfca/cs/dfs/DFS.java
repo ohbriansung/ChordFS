@@ -16,6 +16,7 @@ public class DFS {
     static Receiver receiver;
     static Sender sender;
     static StorageNode storageNode;
+    static int ID;
 
     public static void main(String[] args) {
         Map<String, String> arguments = parseArgs(args);
@@ -50,7 +51,9 @@ public class DFS {
             if (arguments.containsKey("node")) {
                 String[] address = arguments.get("node").split(":");
                 DFS.storageNode = new StorageNode(host, port);
-                DFS.storageNode.prepare(new InetSocketAddress(address[0], Integer.parseInt(address[1])));
+
+                InetSocketAddress existingNode = new InetSocketAddress(address[0], Integer.parseInt(address[1]));
+                DFS.storageNode.prepare(existingNode);
             }
             else {
                 DFS.storageNode = new StorageNode(host, port, m);
@@ -75,8 +78,9 @@ public class DFS {
         }
 
         map.put("run", "storage");
-        map.put("port", "13001");
-        map.put("node", "localhost:13000");
+        map.put("port", "13000");
+        //map.put("node", "localhost:13000");
+        DFS.ID = 5;
 
         return map;
     }
