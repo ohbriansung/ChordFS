@@ -58,6 +58,9 @@ public class DFS {
             else {
                 DFS.storageNode = new StorageNode(host, port, m);
             }
+
+            Thread stabilization = new Thread(new Stabilization(DFS.storageNode));
+            stabilization.start();
         }
     }
 
@@ -78,9 +81,9 @@ public class DFS {
         }
 
         map.put("run", "storage");
-        map.put("port", "13000");
-        //map.put("node", "localhost:13000");
-        DFS.ID = 5;
+        map.put("port", "13003");
+        map.put("node", "localhost:13000");
+        //DFS.ID = 5;
 
         return map;
     }

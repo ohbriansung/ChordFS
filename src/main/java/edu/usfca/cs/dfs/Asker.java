@@ -61,12 +61,12 @@ class Asker extends Serializer {
         return m;
     }
 
-    Node askIdAndSuccessor(int m, Node self, InetSocketAddress address) {
+    Node askIdAndSuccessor(int capacity, Node self, InetSocketAddress address) {
         Node successor;
         int id;
 
         do {
-            id = DFS.ID;
+            id = Math.abs(Long.hashCode(System.currentTimeMillis()) % capacity);
             successor = askSuccessor(id, address);
         } while (successor.getId() == id);  // if there exists a node with same id, regenerate the id and try again.
 
@@ -93,6 +93,24 @@ class Asker extends Serializer {
         return successor;
     }
 
+    Node askPredecessor(InetSocketAddress address) {
+        String time = setTaskAndGetTime();
+        createInfoAndSend(address, StorageMessages.infoType.ASK_PREDECESSOR, time);
+
+        try {
+            CountDownLatch signal = this.awaitTasks.get(time);
+            signal.await();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        Node predecessor = (Node) this.answers.get(time);
+        this.awaitTasks.remove(time);
+        this.answers.remove(time);
+
+        return predecessor;
+    }
+
     Node askNodeDetail(String host, int port) {
         String time = setTaskAndGetTime();
         createInfoAndSend(new InetSocketAddress(host, port), StorageMessages.infoType.ASK_NODE_DETAIL, time);
@@ -110,6 +128,21 @@ class Asker extends Serializer {
         this.answers.remove(time);
 
         return node;
+    }
+
+    void notify(InetSocketAddress address, Node n) {
+        String time = setTaskAndGetTime();
+        createInfoAndSend(address, StorageMessages.infoType.NOTIFY, time, n.serialize().toByteString());
+
+        try {
+            // wait for the reply from the node we just asked
+            CountDownLatch signal = this.awaitTasks.get(time);
+            signal.await();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        this.awaitTasks.remove(time);
     }
 
     void updatePredecessor(InetSocketAddress address, Node node) {

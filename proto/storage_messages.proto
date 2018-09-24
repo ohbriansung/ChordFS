@@ -29,9 +29,11 @@ enum infoType {
     ASK_M = 2;  // ask for the m parameter
     M = 3;  // m-bit ring
     ASK_SUCCESSOR = 4;  // find successor of particular id
-    ASK_NODE_DETAIL = 5;  // get the detail of the node been asked
-    UPDATE_PREDECESSOR = 6;
-    UPDATE_FINGER_TABLE = 7;
+    ASK_PREDECESSOR = 5;
+    ASK_NODE_DETAIL = 6;  // get the detail of the node been asked
+    NOTIFY = 7;
+    UPDATE_PREDECESSOR = 8;
+    UPDATE_FINGER_TABLE = 9;
     /*LIST_NODE = 0;  // list all nodes in chord network
     DISK_SPACE = 1;  // check remaining disk space
     NUM_REQUESTS = 2;  // check number of total requests received
@@ -50,4 +52,5 @@ message Node {
     string successor = 4;
     int32 successorId = 5;
     string predecessor = 6;
+    int32 predecessorId = 7;
 }

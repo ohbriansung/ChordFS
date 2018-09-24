@@ -25,26 +25,26 @@ class RequestHandler extends Serializer implements Runnable {
         try (ByteArrayInputStream inStream = new ByteArrayInputStream(receivedData)) {
             StorageMessages.Message request = StorageMessages.Message.parseDelimitedFrom(inStream);
 
-            System.out.println("Received request: " + request.getType().name());
-            parseRequest(request);
+            System.out.println("Received message from " + this.remoteAddress + ": " + request.getType().name());
+            parseMessage(request);
         }
         catch (IOException ioe) {
             ioe.printStackTrace();
         }
     }
 
-    private void parseRequest(StorageMessages.Message request) {
-        StorageMessages.messageType type = request.getType();
+    private void parseMessage(StorageMessages.Message message) {
+        StorageMessages.messageType type = message.getType();
 
         try {
             if (type == StorageMessages.messageType.INFO) {
-                StorageMessages.Info info = StorageMessages.Info.parseFrom(request.getData());
+                StorageMessages.Info info = StorageMessages.Info.parseFrom(message.getData());
 
                 System.out.println("Received info: " + info.getType().name());
                 parseInfo(info);
             }
             else if (type == StorageMessages.messageType.ACK) {
-                DFS.storageNode.awaitTasksCountDown(request.getData().toStringUtf8());
+                DFS.storageNode.awaitTasksCountDown(message.getData().toStringUtf8());
             }
         } catch (InvalidProtocolBufferException e) {
             e.printStackTrace();
@@ -75,8 +75,15 @@ class RequestHandler extends Serializer implements Runnable {
                 id = Integer.parseInt(info.getData().toStringUtf8());
                 responseNode(DFS.storageNode.findSuccessor(id), info.getTime());
                 break;
+            case ASK_PREDECESSOR:
+                responseNode(DFS.storageNode.predecessor(), info.getTime());
+                break;
             case ASK_NODE_DETAIL:
                 responseNode(DFS.storageNode.getSelf(), info.getTime());
+                break;
+            case NOTIFY:
+                DFS.storageNode.notify(parseNode(info.getData()));
+                ack(info.getTime());
                 break;
             case UPDATE_PREDECESSOR:
                 Node predecessor = parseNode(info.getData());

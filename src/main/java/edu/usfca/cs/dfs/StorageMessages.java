@@ -176,17 +176,25 @@ public final class StorageMessages {
      */
     ASK_SUCCESSOR(4),
     /**
+     * <code>ASK_PREDECESSOR = 5;</code>
+     */
+    ASK_PREDECESSOR(5),
+    /**
      * <pre>
      * get the detail of the node been asked
      * </pre>
      *
-     * <code>ASK_NODE_DETAIL = 5;</code>
+     * <code>ASK_NODE_DETAIL = 6;</code>
      */
-    ASK_NODE_DETAIL(5),
+    ASK_NODE_DETAIL(6),
     /**
-     * <code>UPDATE_PREDECESSOR = 6;</code>
+     * <code>NOTIFY = 7;</code>
      */
-    UPDATE_PREDECESSOR(6),
+    NOTIFY(7),
+    /**
+     * <code>UPDATE_PREDECESSOR = 8;</code>
+     */
+    UPDATE_PREDECESSOR(8),
     /**
      * <pre>
      *LIST_NODE = 0;  // list all nodes in chord network
@@ -200,9 +208,9 @@ public final class StorageMessages {
      *PREDECESSOR = 8;
      * </pre>
      *
-     * <code>UPDATE_FINGER_TABLE = 7;</code>
+     * <code>UPDATE_FINGER_TABLE = 9;</code>
      */
-    UPDATE_FINGER_TABLE(7),
+    UPDATE_FINGER_TABLE(9),
     UNRECOGNIZED(-1),
     ;
 
@@ -247,17 +255,25 @@ public final class StorageMessages {
      */
     public static final int ASK_SUCCESSOR_VALUE = 4;
     /**
+     * <code>ASK_PREDECESSOR = 5;</code>
+     */
+    public static final int ASK_PREDECESSOR_VALUE = 5;
+    /**
      * <pre>
      * get the detail of the node been asked
      * </pre>
      *
-     * <code>ASK_NODE_DETAIL = 5;</code>
+     * <code>ASK_NODE_DETAIL = 6;</code>
      */
-    public static final int ASK_NODE_DETAIL_VALUE = 5;
+    public static final int ASK_NODE_DETAIL_VALUE = 6;
     /**
-     * <code>UPDATE_PREDECESSOR = 6;</code>
+     * <code>NOTIFY = 7;</code>
      */
-    public static final int UPDATE_PREDECESSOR_VALUE = 6;
+    public static final int NOTIFY_VALUE = 7;
+    /**
+     * <code>UPDATE_PREDECESSOR = 8;</code>
+     */
+    public static final int UPDATE_PREDECESSOR_VALUE = 8;
     /**
      * <pre>
      *LIST_NODE = 0;  // list all nodes in chord network
@@ -271,9 +287,9 @@ public final class StorageMessages {
      *PREDECESSOR = 8;
      * </pre>
      *
-     * <code>UPDATE_FINGER_TABLE = 7;</code>
+     * <code>UPDATE_FINGER_TABLE = 9;</code>
      */
-    public static final int UPDATE_FINGER_TABLE_VALUE = 7;
+    public static final int UPDATE_FINGER_TABLE_VALUE = 9;
 
 
     public final int getNumber() {
@@ -299,9 +315,11 @@ public final class StorageMessages {
         case 2: return ASK_M;
         case 3: return M;
         case 4: return ASK_SUCCESSOR;
-        case 5: return ASK_NODE_DETAIL;
-        case 6: return UPDATE_PREDECESSOR;
-        case 7: return UPDATE_FINGER_TABLE;
+        case 5: return ASK_PREDECESSOR;
+        case 6: return ASK_NODE_DETAIL;
+        case 7: return NOTIFY;
+        case 8: return UPDATE_PREDECESSOR;
+        case 9: return UPDATE_FINGER_TABLE;
         default: return null;
       }
     }
@@ -2011,6 +2029,11 @@ public final class StorageMessages {
      */
     com.google.protobuf.ByteString
         getPredecessorBytes();
+
+    /**
+     * <code>int32 predecessorId = 7;</code>
+     */
+    int getPredecessorId();
   }
   /**
    * Protobuf type {@code Node}
@@ -2031,6 +2054,7 @@ public final class StorageMessages {
       successor_ = "";
       successorId_ = 0;
       predecessor_ = "";
+      predecessorId_ = 0;
     }
 
     @java.lang.Override
@@ -2088,6 +2112,11 @@ public final class StorageMessages {
               java.lang.String s = input.readStringRequireUtf8();
 
               predecessor_ = s;
+              break;
+            }
+            case 56: {
+
+              predecessorId_ = input.readInt32();
               break;
             }
             default: {
@@ -2251,6 +2280,15 @@ public final class StorageMessages {
       }
     }
 
+    public static final int PREDECESSORID_FIELD_NUMBER = 7;
+    private int predecessorId_;
+    /**
+     * <code>int32 predecessorId = 7;</code>
+     */
+    public int getPredecessorId() {
+      return predecessorId_;
+    }
+
     private byte memoizedIsInitialized = -1;
     @java.lang.Override
     public final boolean isInitialized() {
@@ -2283,6 +2321,9 @@ public final class StorageMessages {
       if (!getPredecessorBytes().isEmpty()) {
         com.google.protobuf.GeneratedMessageV3.writeString(output, 6, predecessor_);
       }
+      if (predecessorId_ != 0) {
+        output.writeInt32(7, predecessorId_);
+      }
       unknownFields.writeTo(output);
     }
 
@@ -2313,6 +2354,10 @@ public final class StorageMessages {
       if (!getPredecessorBytes().isEmpty()) {
         size += com.google.protobuf.GeneratedMessageV3.computeStringSize(6, predecessor_);
       }
+      if (predecessorId_ != 0) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeInt32Size(7, predecessorId_);
+      }
       size += unknownFields.getSerializedSize();
       memoizedSize = size;
       return size;
@@ -2341,6 +2386,8 @@ public final class StorageMessages {
           == other.getSuccessorId());
       result = result && getPredecessor()
           .equals(other.getPredecessor());
+      result = result && (getPredecessorId()
+          == other.getPredecessorId());
       result = result && unknownFields.equals(other.unknownFields);
       return result;
     }
@@ -2364,6 +2411,8 @@ public final class StorageMessages {
       hash = (53 * hash) + getSuccessorId();
       hash = (37 * hash) + PREDECESSOR_FIELD_NUMBER;
       hash = (53 * hash) + getPredecessor().hashCode();
+      hash = (37 * hash) + PREDECESSORID_FIELD_NUMBER;
+      hash = (53 * hash) + getPredecessorId();
       hash = (29 * hash) + unknownFields.hashCode();
       memoizedHashCode = hash;
       return hash;
@@ -2509,6 +2558,8 @@ public final class StorageMessages {
 
         predecessor_ = "";
 
+        predecessorId_ = 0;
+
         return this;
       }
 
@@ -2541,6 +2592,7 @@ public final class StorageMessages {
         result.successor_ = successor_;
         result.successorId_ = successorId_;
         result.predecessor_ = predecessor_;
+        result.predecessorId_ = predecessorId_;
         onBuilt();
         return result;
       }
@@ -2609,6 +2661,9 @@ public final class StorageMessages {
         if (!other.getPredecessor().isEmpty()) {
           predecessor_ = other.predecessor_;
           onChanged();
+        }
+        if (other.getPredecessorId() != 0) {
+          setPredecessorId(other.getPredecessorId());
         }
         this.mergeUnknownFields(other.unknownFields);
         onChanged();
@@ -2923,6 +2978,32 @@ public final class StorageMessages {
         onChanged();
         return this;
       }
+
+      private int predecessorId_ ;
+      /**
+       * <code>int32 predecessorId = 7;</code>
+       */
+      public int getPredecessorId() {
+        return predecessorId_;
+      }
+      /**
+       * <code>int32 predecessorId = 7;</code>
+       */
+      public Builder setPredecessorId(int value) {
+        
+        predecessorId_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>int32 predecessorId = 7;</code>
+       */
+      public Builder clearPredecessorId() {
+        
+        predecessorId_ = 0;
+        onChanged();
+        return this;
+      }
       @java.lang.Override
       public final Builder setUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
@@ -3005,16 +3086,17 @@ public final class StorageMessages {
       "\t\022\022\n\ntotalChunk\030\003 \001(\005\022\017\n\007chunkId\030\004 \001(\005\022\014" +
       "\n\004data\030\005 \001(\014\"P\n\004Info\022\027\n\004type\030\001 \001(\0162\t.inf" +
       "oType\022\014\n\004data\030\002 \001(\014\022\023\n\013integerData\030\003 \001(\005" +
-      "\022\014\n\004time\030\004 \001(\t\"k\n\004Node\022\014\n\004host\030\001 \001(\t\022\014\n\004" +
-      "port\030\002 \001(\005\022\n\n\002id\030\003 \001(\005\022\021\n\tsuccessor\030\004 \001(" +
-      "\t\022\023\n\013successorId\030\005 \001(\005\022\023\n\013predecessor\030\006 " +
-      "\001(\t*9\n\013messageType\022\r\n\tFIND_HOST\020\000\022\010\n\004DAT" +
-      "A\020\001\022\007\n\003ACK\020\002\022\010\n\004INFO\020\003*\235\001\n\010infoType\022\034\n\030C" +
-      "LOSEST_PRECEDING_FINGER\020\000\022\010\n\004NODE\020\001\022\t\n\005A" +
-      "SK_M\020\002\022\005\n\001M\020\003\022\021\n\rASK_SUCCESSOR\020\004\022\023\n\017ASK_" +
-      "NODE_DETAIL\020\005\022\026\n\022UPDATE_PREDECESSOR\020\006\022\027\n" +
-      "\023UPDATE_FINGER_TABLE\020\007B\022\n\020edu.usfca.cs.d" +
-      "fsb\006proto3"
+      "\022\014\n\004time\030\004 \001(\t\"\202\001\n\004Node\022\014\n\004host\030\001 \001(\t\022\014\n" +
+      "\004port\030\002 \001(\005\022\n\n\002id\030\003 \001(\005\022\021\n\tsuccessor\030\004 \001" +
+      "(\t\022\023\n\013successorId\030\005 \001(\005\022\023\n\013predecessor\030\006" +
+      " \001(\t\022\025\n\rpredecessorId\030\007 \001(\005*9\n\013messageTy" +
+      "pe\022\r\n\tFIND_HOST\020\000\022\010\n\004DATA\020\001\022\007\n\003ACK\020\002\022\010\n\004" +
+      "INFO\020\003*\276\001\n\010infoType\022\034\n\030CLOSEST_PRECEDING" +
+      "_FINGER\020\000\022\010\n\004NODE\020\001\022\t\n\005ASK_M\020\002\022\005\n\001M\020\003\022\021\n" +
+      "\rASK_SUCCESSOR\020\004\022\023\n\017ASK_PREDECESSOR\020\005\022\023\n" +
+      "\017ASK_NODE_DETAIL\020\006\022\n\n\006NOTIFY\020\007\022\026\n\022UPDATE" +
+      "_PREDECESSOR\020\010\022\027\n\023UPDATE_FINGER_TABLE\020\tB" +
+      "\022\n\020edu.usfca.cs.dfsb\006proto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
@@ -3045,7 +3127,7 @@ public final class StorageMessages {
     internal_static_Node_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_Node_descriptor,
-        new java.lang.String[] { "Host", "Port", "Id", "Successor", "SuccessorId", "Predecessor", });
+        new java.lang.String[] { "Host", "Port", "Id", "Successor", "SuccessorId", "Predecessor", "PredecessorId", });
   }
 
   // @@protoc_insertion_point(outer_class_scope)
