@@ -145,36 +145,6 @@ class Asker extends Serializer {
         this.awaitTasks.remove(time);
     }
 
-    void updatePredecessor(InetSocketAddress address, Node node) {
-        String time = setTaskAndGetTime();
-        createInfoAndSend(address, StorageMessages.infoType.UPDATE_PREDECESSOR, time, node.serialize().toByteString());
-
-        try {
-            // wait for the reply from the node we just asked
-            CountDownLatch signal = this.awaitTasks.get(time);
-            signal.await();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-
-        this.awaitTasks.remove(time);
-    }
-
-    void askToUpdateFingerTable(InetSocketAddress address, Node s, int i) {
-        String time = setTaskAndGetTime();
-        createInfoAndSend(address, StorageMessages.infoType.UPDATE_FINGER_TABLE, s.serialize().toByteString(), i, time);
-
-        try {
-            // wait for the reply from the node we just asked
-            CountDownLatch signal = this.awaitTasks.get(time);
-            signal.await();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-
-        this.awaitTasks.remove(time);
-    }
-
     private String setTaskAndGetTime() {
         String time = String.valueOf(System.currentTimeMillis());
         this.awaitTasks.put(time, new CountDownLatch(1));

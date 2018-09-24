@@ -15,6 +15,7 @@ class FingerTable {
 
     /**
      * Initialize the first node in the ring.
+     * All fingers will be self if it is the first node in the ring.
      *
      * @param m - the capacity of the ring = 2^m
      */

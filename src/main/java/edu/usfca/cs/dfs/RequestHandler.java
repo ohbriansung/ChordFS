@@ -85,19 +85,6 @@ class RequestHandler extends Serializer implements Runnable {
                 DFS.storageNode.notify(parseNode(info.getData()));
                 ack(info.getTime());
                 break;
-            case UPDATE_PREDECESSOR:
-                Node predecessor = parseNode(info.getData());
-                if (predecessor != null) {
-                    DFS.storageNode.getSelf().setPredecessor(predecessor.getAddress());
-                    DFS.storageNode.selfUpdate(predecessor);
-                    ack(info.getTime());
-                }
-                break;
-            case UPDATE_FINGER_TABLE:
-                Node s = parseNode(info.getData());
-                DFS.storageNode.updateFingerTable(s, info.getIntegerData());
-                ack(info.getTime());
-                break;
         }
     }
 
