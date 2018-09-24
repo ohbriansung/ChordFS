@@ -81,8 +81,8 @@ public class DFS {
         }
 
         map.put("run", "storage");
-        map.put("port", "13000");
-        //map.put("node", "localhost:13000");
+        map.put("port", "13002");
+        map.put("node", "localhost:13000");
         //DFS.ID = 5;
 
         return map;

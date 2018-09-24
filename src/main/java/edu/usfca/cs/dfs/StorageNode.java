@@ -147,6 +147,11 @@ class StorageNode extends Asker {
      * and tell the successor about self.
      */
     void stabilize() {
+        if (this.self.getSuccessorId() == this.self.getId() && this.self.getPredecessorId() == this.self.getId()) {
+            // no need to update anything if there is only one node in ring
+            return;
+        }
+
         // x = successor.predecessor
         String[] address = this.self.getSuccessor().split(":");
         InetSocketAddress successor = new InetSocketAddress(address[0], Integer.parseInt(address[1]));
@@ -172,6 +177,8 @@ class StorageNode extends Asker {
                 this.between.in(p.getId(), this.self.getPredecessorId(), this.self.getId())) {
             this.self.setPredecessor(p.getAddress());
             this.self.setPredecessorId(p.getId());
+
+            System.out.println("Updated predecessor to " + p.getId());
         }
     }
 
@@ -181,10 +188,10 @@ class StorageNode extends Asker {
     void fixFingers(){
         Random random = new Random();
         int i = 1 + random.nextInt(this.m - 1);
-
         Node successor = findSuccessor(start(i));
         this.finger.setFinger(i, successor);
 
+        System.out.println("Fixed finger " + i + " to " + successor.getId());
         // print current finger table after fixing fingers
         System.out.println(this.finger.toString());
     }
@@ -193,6 +200,8 @@ class StorageNode extends Asker {
         this.finger.setFinger(0, successor);
         this.self.setSuccessor(successor.getAddress());
         this.self.setSuccessorId(successor.getId());
+
+        System.out.println("Updated successor to " + successor.getId());
     }
 
     int getM() {
@@ -204,8 +213,13 @@ class StorageNode extends Asker {
     }
 
     Node predecessor() {
-        String[] address = this.self.getPredecessor().split(":");
-        return askNodeDetail(address[0], Integer.parseInt(address[1]));
+        if (this.self.getPredecessorId() == this.self.getId()) {
+            return this.self;
+        }
+        else {
+            String[] address = this.self.getPredecessor().split(":");
+            return askNodeDetail(address[0], Integer.parseInt(address[1]));
+        }
     }
 
     /**

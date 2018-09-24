@@ -74,7 +74,7 @@ class Asker extends Serializer {
         return successor;
     }
 
-    Node askSuccessor(int id, InetSocketAddress address) {
+    private Node askSuccessor(int id, InetSocketAddress address) {
         String time = setTaskAndGetTime();
         createInfoAndSend(address, StorageMessages.infoType.ASK_SUCCESSOR,
                 time, ByteString.copyFromUtf8(String.valueOf(id)));

@@ -25,7 +25,6 @@ class RequestHandler extends Serializer implements Runnable {
         try (ByteArrayInputStream inStream = new ByteArrayInputStream(receivedData)) {
             StorageMessages.Message request = StorageMessages.Message.parseDelimitedFrom(inStream);
 
-            System.out.println("Received message from " + this.remoteAddress + ": " + request.getType().name());
             parseMessage(request);
         }
         catch (IOException ioe) {
@@ -37,14 +36,16 @@ class RequestHandler extends Serializer implements Runnable {
         StorageMessages.messageType type = message.getType();
 
         try {
-            if (type == StorageMessages.messageType.INFO) {
-                StorageMessages.Info info = StorageMessages.Info.parseFrom(message.getData());
-
-                System.out.println("Received info: " + info.getType().name());
-                parseInfo(info);
-            }
-            else if (type == StorageMessages.messageType.ACK) {
-                DFS.storageNode.awaitTasksCountDown(message.getData().toStringUtf8());
+            switch (type) {
+                case INFO:
+                    StorageMessages.Info info = StorageMessages.Info.parseFrom(message.getData());
+                    System.out.println("Received " + info.getType().name() + " from " + this.remoteAddress);
+                    parseInfo(info);
+                    break;
+                case ACK:
+                    System.out.println("Received ack from " + this.remoteAddress);
+                    DFS.storageNode.awaitTasksCountDown(message.getData().toStringUtf8());
+                    break;
             }
         } catch (InvalidProtocolBufferException e) {
             e.printStackTrace();

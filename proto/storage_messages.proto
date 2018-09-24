@@ -32,8 +32,6 @@ enum infoType {
     ASK_PREDECESSOR = 5;
     ASK_NODE_DETAIL = 6;  // get the detail of the node been asked
     NOTIFY = 7;
-    UPDATE_PREDECESSOR = 8;
-    UPDATE_FINGER_TABLE = 9;
     /*LIST_NODE = 0;  // list all nodes in chord network
     DISK_SPACE = 1;  // check remaining disk space
     NUM_REQUESTS = 2;  // check number of total requests received

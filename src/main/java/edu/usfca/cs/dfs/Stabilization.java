@@ -13,7 +13,7 @@ class Stabilization implements Runnable {
             this.node.stabilize();
             this.node.fixFingers();
             try {
-                Thread.sleep(3000);
+                Thread.sleep(1000);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }

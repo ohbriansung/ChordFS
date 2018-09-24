@@ -188,14 +188,6 @@ public final class StorageMessages {
      */
     ASK_NODE_DETAIL(6),
     /**
-     * <code>NOTIFY = 7;</code>
-     */
-    NOTIFY(7),
-    /**
-     * <code>UPDATE_PREDECESSOR = 8;</code>
-     */
-    UPDATE_PREDECESSOR(8),
-    /**
      * <pre>
      *LIST_NODE = 0;  // list all nodes in chord network
      *DISK_SPACE = 1;  // check remaining disk space
@@ -208,9 +200,9 @@ public final class StorageMessages {
      *PREDECESSOR = 8;
      * </pre>
      *
-     * <code>UPDATE_FINGER_TABLE = 9;</code>
+     * <code>NOTIFY = 7;</code>
      */
-    UPDATE_FINGER_TABLE(9),
+    NOTIFY(7),
     UNRECOGNIZED(-1),
     ;
 
@@ -267,14 +259,6 @@ public final class StorageMessages {
      */
     public static final int ASK_NODE_DETAIL_VALUE = 6;
     /**
-     * <code>NOTIFY = 7;</code>
-     */
-    public static final int NOTIFY_VALUE = 7;
-    /**
-     * <code>UPDATE_PREDECESSOR = 8;</code>
-     */
-    public static final int UPDATE_PREDECESSOR_VALUE = 8;
-    /**
      * <pre>
      *LIST_NODE = 0;  // list all nodes in chord network
      *DISK_SPACE = 1;  // check remaining disk space
@@ -287,9 +271,9 @@ public final class StorageMessages {
      *PREDECESSOR = 8;
      * </pre>
      *
-     * <code>UPDATE_FINGER_TABLE = 9;</code>
+     * <code>NOTIFY = 7;</code>
      */
-    public static final int UPDATE_FINGER_TABLE_VALUE = 9;
+    public static final int NOTIFY_VALUE = 7;
 
 
     public final int getNumber() {
@@ -318,8 +302,6 @@ public final class StorageMessages {
         case 5: return ASK_PREDECESSOR;
         case 6: return ASK_NODE_DETAIL;
         case 7: return NOTIFY;
-        case 8: return UPDATE_PREDECESSOR;
-        case 9: return UPDATE_FINGER_TABLE;
         default: return null;
       }
     }
@@ -3091,12 +3073,11 @@ public final class StorageMessages {
       "(\t\022\023\n\013successorId\030\005 \001(\005\022\023\n\013predecessor\030\006" +
       " \001(\t\022\025\n\rpredecessorId\030\007 \001(\005*9\n\013messageTy" +
       "pe\022\r\n\tFIND_HOST\020\000\022\010\n\004DATA\020\001\022\007\n\003ACK\020\002\022\010\n\004" +
-      "INFO\020\003*\276\001\n\010infoType\022\034\n\030CLOSEST_PRECEDING" +
+      "INFO\020\003*\215\001\n\010infoType\022\034\n\030CLOSEST_PRECEDING" +
       "_FINGER\020\000\022\010\n\004NODE\020\001\022\t\n\005ASK_M\020\002\022\005\n\001M\020\003\022\021\n" +
       "\rASK_SUCCESSOR\020\004\022\023\n\017ASK_PREDECESSOR\020\005\022\023\n" +
-      "\017ASK_NODE_DETAIL\020\006\022\n\n\006NOTIFY\020\007\022\026\n\022UPDATE" +
-      "_PREDECESSOR\020\010\022\027\n\023UPDATE_FINGER_TABLE\020\tB" +
-      "\022\n\020edu.usfca.cs.dfsb\006proto3"
+      "\017ASK_NODE_DETAIL\020\006\022\n\n\006NOTIFY\020\007B\022\n\020edu.us" +
+      "fca.cs.dfsb\006proto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
