@@ -1,6 +1,7 @@
 package edu.usfca.cs.dfs;
 
 import com.google.protobuf.ByteString;
+import edu.usfca.cs.dfs.hash.SHA1;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
@@ -10,10 +11,15 @@ import java.nio.file.Paths;
 import java.util.List;
 import java.util.Scanner;
 
-class Client extends Serializer {
+class Client extends Asker {
+    private final SHA1 sha1;
     private InetSocketAddress storageNodeAddress;
 
-    Client() {
+    Client(InetSocketAddress storageNodeAddress) {
+        super();
+        this.sha1 = new SHA1();
+        this.storageNodeAddress = storageNodeAddress;
+
         try {
             // wait for receiver and sender
             DFS.READY.await();
@@ -28,17 +34,9 @@ class Client extends Serializer {
         String command;
         printInfo();
         while (!(command = scanner.nextLine()).equals("exit")) {
-            // serialize info
-            ByteString bytesCommand = ByteString.copyFromUtf8(command);
-            StorageMessages.Info info = serializeInfo(StorageMessages.infoType.ASK_SUCCESSOR, bytesCommand);
-
-            // serialize message
-            ByteString data = info.toByteString();
-            StorageMessages.Message message = serializeMessage(StorageMessages.messageType.INFO, data);
-
-            // TODO: detete debug
-            this.storageNodeAddress = new InetSocketAddress("localhost", 13000);
-            DFS.sender.send(message, this.storageNodeAddress);
+            System.out.println("asking " + this.storageNodeAddress);
+            Node p = askPredecessor(this.storageNodeAddress);
+            System.out.println(p.getId());
 
             printInfo();
         }

@@ -44,7 +44,8 @@ public class DFS {
         DFS.sender = new Sender();
 
         if (arguments.get("run").equals("client")) {
-            Client client = new Client();
+            String[] address = arguments.get("node").split(":");
+            Client client = new Client(new InetSocketAddress(address[0], Integer.parseInt(address[1])));
             client.startUI();
         }
         else {
@@ -80,8 +81,8 @@ public class DFS {
             map.put(key, args[i + 1]);
         }
 
-        map.put("run", "storage");
-        map.put("port", "13002");
+        map.put("run", "client");
+        map.put("port", "13001");
         map.put("node", "localhost:13000");
         //DFS.ID = 5;
 

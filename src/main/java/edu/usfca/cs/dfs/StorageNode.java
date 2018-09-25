@@ -96,7 +96,7 @@ class StorageNode extends Asker {
      * @param id
      * @return Node - predecessor
      */
-    Node findPredecessor(int id) {
+    private Node findPredecessor(int id) {
         Node node = this.self;
 
         while (!(this.between.includesRight(id, node.getId(), node.getSuccessorId()))) {
@@ -192,8 +192,7 @@ class StorageNode extends Asker {
         this.finger.setFinger(i, successor);
 
         System.out.println("Fixed finger " + i + " to " + successor.getId());
-        // print current finger table after fixing fingers
-        System.out.println(this.finger.toString());
+        System.out.println(this.finger.toString());  // print current finger table after fixing fingers
     }
 
     private void updateSuccessor(Node successor) {

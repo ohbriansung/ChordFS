@@ -10,10 +10,10 @@ class Asker extends Serializer {
     private Hashtable<String, CountDownLatch> awaitTasks;
     private Hashtable<String, Object> answers;
 
-   Asker() {
-       this.awaitTasks = new Hashtable<>();
-       this.answers = new Hashtable<>();
-   }
+    Asker() {
+        this.awaitTasks = new Hashtable<>();
+        this.answers = new Hashtable<>();
+    }
 
     /**
      * Identify the request by timestamp.
@@ -23,7 +23,7 @@ class Asker extends Serializer {
      * @param port
      * @return Node
      */
-     Node askClosestPrecedingFinger(int id, String host, int port) {
+    Node askClosestPrecedingFinger(int id, String host, int port) {
         String time = setTaskAndGetTime();
         createInfoAndSend(new InetSocketAddress(host, port), StorageMessages.infoType.CLOSEST_PRECEDING_FINGER,
                 time, ByteString.copyFromUtf8(String.valueOf(id)));
