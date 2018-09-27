@@ -1,7 +1,9 @@
 package edu.usfca.cs.dfs;
 
 import java.io.IOException;
+import java.math.BigInteger;
 import java.net.InetSocketAddress;
+import java.util.Map;
 
 /**
  * Reference: https://en.wikipedia.org/wiki/Chord_(peer-to-peer)
@@ -16,6 +18,8 @@ class StorageNode extends Sender {
     private Node predecessor;
     private FingerTable fingers;
     private Utility util;
+
+    private Map<Integer, String> currentStorage;
 
     StorageNode(String host, int port) {
         this.n = new Node(host, port);
@@ -186,6 +190,16 @@ class StorageNode extends Sender {
                 this.predecessor = null;
             }
         }
+    }
+
+    /**
+     * Find the host (successor) that is responsible for the particular hashcode.
+     * @param hash
+     * @return Node
+     */
+    Node findHost(BigInteger hash) {
+        int key = this.util.getKey(hash);
+        return findSuccessor(key);
     }
 
     int getM() {

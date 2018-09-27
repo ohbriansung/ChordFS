@@ -1,5 +1,7 @@
 package edu.usfca.cs.dfs;
 
+import java.math.BigInteger;
+
 class Utility {
     private final int capacity;
 
@@ -43,5 +45,10 @@ class Utility {
 
     int start(int id, int i) {
         return (id + (0b1 << i)) % this.capacity;
+    }
+
+    int getKey(BigInteger hash) {
+        BigInteger rem = hash.remainder(new BigInteger(String.valueOf(this.capacity)));
+        return rem.intValue();
     }
 }

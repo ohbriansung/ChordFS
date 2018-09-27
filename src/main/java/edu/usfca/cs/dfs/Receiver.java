@@ -25,6 +25,10 @@ public class Receiver implements Runnable {
         } catch (IOException e) {
             e.printStackTrace();
         }
+
+        if (this.pool != null && !this.pool.isShutdown()) {
+            this.pool.shutdown();
+        }
     }
 
     @Override

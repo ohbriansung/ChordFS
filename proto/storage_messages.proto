@@ -20,7 +20,6 @@ message Info {
     infoType type = 1;
     bytes data = 2;
     int32 integerData = 3;
-    string time = 4;
 }
 
 enum infoType {

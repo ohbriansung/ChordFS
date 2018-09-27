@@ -3,13 +3,13 @@ package edu.usfca.cs.dfs;
 import java.net.InetSocketAddress;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
-class Node {
+public class Node {
     private final ReentrantReadWriteLock lock;
     private final String host;
     private final int port;
     private Integer id;
 
-    Node(String host, int port) {
+    public Node(String host, int port) {
         this.host = host;
         this.port = port;
         this.lock = new ReentrantReadWriteLock();
@@ -20,7 +20,7 @@ class Node {
      *
      * @param node
      */
-    Node(StorageMessages.Node node) {
+    public Node(StorageMessages.Node node) {
         this(node.getHost(), node.getPort());
         this.id = node.getId();
     }
@@ -57,7 +57,7 @@ class Node {
         return id;
     }
 
-    InetSocketAddress getAddress() {
+    public InetSocketAddress getAddress() {
         this.lock.readLock().lock();
         InetSocketAddress address = new InetSocketAddress(this.host, this.port);
         this.lock.readLock().unlock();

@@ -1,5 +1,7 @@
 package edu.usfca.cs.dfs;
 
+import com.sun.javafx.binding.StringFormatter;
+
 import java.io.IOException;
 import java.net.*;
 import java.util.HashMap;
@@ -15,6 +17,7 @@ public class DFS {
     static ServerSocket socket;
     static Receiver receiver;
     static Sender currentNode;
+    static String volume;
 
     public static void main(String[] args) {
         Map<String, String> arguments = parseArgs(args);
@@ -25,6 +28,7 @@ public class DFS {
             System.exit(1);
         }*/
 
+        // default arguments
         String host = "";
         int port = 13000;
         int m = 4;
@@ -94,6 +98,8 @@ public class DFS {
             ((Client) DFS.currentNode).startUI();
         }
         else {
+            DFS.volume = arguments.getOrDefault("volume", "~/Downloads/");
+
             if (arguments.containsKey("node")) {
                 DFS.currentNode = new StorageNode(host, port);
 

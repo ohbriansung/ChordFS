@@ -1,12 +1,29 @@
 package edu.usfca.cs.dfs;
 
+import edu.usfca.cs.dfs.FileTransfer.Upload;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.math.BigInteger;
 import java.net.InetSocketAddress;
 import java.net.Socket;
+import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 class Sender extends Serializer {
+    private final ExecutorService pool;
+
+    Sender() {
+        this.pool = Executors.newFixedThreadPool(DFS.THREAD);
+    }
+
+    void close() {
+        if (this.pool != null && !this.pool.isShutdown()) {
+            this.pool.shutdown();
+        }
+    }
 
     Node ask(InetSocketAddress addr, StorageMessages.infoType type, Integer... id) throws IOException {
         // create socket and stream
@@ -80,5 +97,14 @@ class Sender extends Serializer {
 
         // close socket
         socket.close();
+    }
+
+    void upload(String filename, List<byte[]> chunks, List<BigInteger> hashcode, InetSocketAddress addr) {
+        int size = chunks.size();
+
+        // a thread for a chunk
+        for (int i = 0; i < size; i++) {
+            this.pool.submit(new Upload(filename, size, i, chunks.get(i), hashcode.get(i), addr));
+        }
     }
 }

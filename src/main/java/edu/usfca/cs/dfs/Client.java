@@ -95,13 +95,13 @@ class Client extends Sender {
         try {
             List<byte[]> chunks = this.dp.breakFile(filename);
             List<BigInteger> hashcode = hashChunks(filename, chunks);
+            upload(filename, chunks, hashcode, this.storageNodeAddress);
+            System.out.println("Upload process has finished.");
         } catch (NoSuchFileException ignore) {
             System.out.println("The file \"" + filename + "\" does not exist.");
         } catch (HashException | IOException e) {
             e.printStackTrace();
         }
-
-        //TODO: send chunks
     }
 
     private void download(String fileName, List<byte[]> chunks) {

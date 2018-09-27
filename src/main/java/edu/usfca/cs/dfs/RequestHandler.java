@@ -2,10 +2,12 @@ package edu.usfca.cs.dfs;
 
 import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
+import edu.usfca.cs.dfs.FileTransfer.StoreProcess;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.math.BigInteger;
 import java.net.Socket;
 
 
@@ -42,6 +44,13 @@ class RequestHandler extends Serializer implements Runnable {
                     break;
                 case HEARTBEAT:
                     break;  // no action
+                case FIND_HOST:
+                    BigInteger hash = new BigInteger(message.getData().toByteArray());
+                    responseNode(((StorageNode) DFS.currentNode).findHost(hash));
+                    break;
+                case DATA:
+                    StoreProcess process = new StoreProcess(message);
+                    process.store();
             }
         } catch (InvalidProtocolBufferException e) {
             e.printStackTrace();
@@ -72,7 +81,6 @@ class RequestHandler extends Serializer implements Runnable {
                 break;
             case ASK_M:
                 responseM(((StorageNode) DFS.currentNode).getM());
-                break;
         }
     }
 
