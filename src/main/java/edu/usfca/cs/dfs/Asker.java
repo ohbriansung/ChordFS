@@ -2,6 +2,7 @@ package edu.usfca.cs.dfs;
 
 import com.google.protobuf.ByteString;
 
+import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.util.Hashtable;
 import java.util.concurrent.CountDownLatch;
@@ -19,13 +20,12 @@ class Asker extends Serializer {
      * Identify the request by timestamp.
      *
      * @param id
-     * @param host
-     * @param port
+     * @param address
      * @return Node
      */
-    Node askClosestPrecedingFinger(int id, String host, int port) {
+    Node askClosestPrecedingFinger(InetSocketAddress address, int id) {
         String time = setTaskAndGetTime();
-        createInfoAndSend(new InetSocketAddress(host, port), StorageMessages.infoType.CLOSEST_PRECEDING_FINGER,
+        createInfoAndSend(address, StorageMessages.infoType.CLOSEST_PRECEDING_FINGER,
                 time, ByteString.copyFromUtf8(String.valueOf(id)));
 
         try {
@@ -61,22 +61,9 @@ class Asker extends Serializer {
         return m;
     }
 
-    Node askIdAndSuccessor(int capacity, Node self, InetSocketAddress address) {
-        Node successor;
-        int id;
-
-        do {
-            id = Math.abs(Long.hashCode(System.currentTimeMillis()) % capacity);
-            successor = askSuccessor(id, address);
-        } while (successor.getId() == id);  // if there exists a node with same id, regenerate the id and try again.
-
-        self.setId(id);
-        return successor;
-    }
-
-    private Node askSuccessor(int id, InetSocketAddress address) {
+    Node askSuccessor(InetSocketAddress np, int id) {
         String time = setTaskAndGetTime();
-        createInfoAndSend(address, StorageMessages.infoType.ASK_SUCCESSOR,
+        createInfoAndSend(np, StorageMessages.infoType.ASK_SUCCESSOR,
                 time, ByteString.copyFromUtf8(String.valueOf(id)));
 
         try {
@@ -143,6 +130,11 @@ class Asker extends Serializer {
         }
 
         this.awaitTasks.remove(time);
+    }
+
+    void heartbeat(InetSocketAddress address) throws IOException {
+        StorageMessages.Message messages = serializeMessage(StorageMessages.messageType.HEARTBEAT);
+        DFS.sender.heartbeat(messages, address);
     }
 
     private String setTaskAndGetTime() {

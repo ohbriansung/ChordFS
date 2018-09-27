@@ -1,233 +1,198 @@
 package edu.usfca.cs.dfs;
 
+import java.io.IOException;
 import java.net.InetSocketAddress;
-import java.util.Random;
 
+/**
+ * Reference: https://en.wikipedia.org/wiki/Chord_(peer-to-peer)
+ * successor = fingers[0]
+ */
 class StorageNode extends Asker {
-    private Node self;
     private int m;
-    private int capacity;
-    private Between between;
-    private FingerTable finger;
+    private int next;
+    private Node n;
+    private Node predecessor;
+    private FingerTable fingers;
+    private Utility util;
 
-    /**
-     * General constructor for storage node, initialize data structures and self node.
-     *
-     * @param host
-     * @param port
-     */
     StorageNode(String host, int port) {
         super();
-        this.self = new Node(host, port);
+        this.n = new Node(host, port);
+        this.next = 0;
     }
 
-    /**
-     * Initialize the m bits identifier ring.
-     * The predecessor will be self when it is the first node in the ring.
-     *
-     * @param host
-     * @param port
-     * @param m
-     */
     StorageNode(String host, int port, int m) {
         this(host, port);
-
         this.m = m;
-        this.capacity = (0b1 << this.m);
-        this.between = new Between(this.capacity);
-        this.finger = new FingerTable(this.m, this.self);
-
-        selfInit();
+        prepare();
     }
 
-    private void selfInit() {
-        this.self.setId(generateId(this.capacity));
-        this.self.setSuccessor(this.self.getAddress());
-        this.self.setSuccessorId(this.self.getId());
-        this.self.setPredecessor(this.self.getAddress());
-        this.self.setPredecessorId(this.self.getId());
+    private void prepare() {
+        this.fingers = new FingerTable(this.m);
+        this.util = new Utility(0b1 << this.m);
     }
 
     /**
-     * Ask existingNode for finer table and predecessor.
-     *
-     * @param existingNode
-     */
-    void prepare(InetSocketAddress existingNode) {
-        this.m = askM(existingNode);
-        this.capacity = (0b1 << this.m);
-        this.between = new Between(this.capacity);
-        this.finger = new FingerTable(this.m);
-
-        join(existingNode);
-    }
-
-    /**
-     * Randomly generate id for node by current timestamp in the range of the capacity.
-     *
-     * @param capacity
-     * @return int
-     */
-    private int generateId(int capacity) {
-        return Math.abs(Long.hashCode(System.currentTimeMillis()) % capacity);
-    }
-
-    /**
-     * Ask current node to find id's successor.
+     * Ask n to find the successor of id.
      *
      * @param id
-     * @return Node - successor
+     * @return Node
      */
     Node findSuccessor(int id) {
-        Node node = findPredecessor(id);
+        Node successor = this.fingers.getFinger(0);
 
-        if (node.getSuccessorId() == this.self.getId()) {
-            // if successor of predecessor is self, no need to send message to retrieve detail of successor
-            return this.self;
+        if (this.util.includesRight(id, this.n.getId(), successor.getId())) {
+            return successor;
         }
+        else {
+            Node n0;
 
-        String address[] = node.getSuccessor().split(":");
-        return askNodeDetail(address[0], Integer.parseInt(address[1]));
-    }
-
-    /**
-     * Ask current node to find id's predecessor.
-     *
-     * @param id
-     * @return Node - predecessor
-     */
-    private Node findPredecessor(int id) {
-        Node node = this.self;
-
-        while (!(this.between.includesRight(id, node.getId(), node.getSuccessorId()))) {
-            if (node.getId() != this.self.getId()) {
-                node = askClosestPrecedingFinger(id, node.getHost(), node.getPort());
+            if (successor.getId() == this.n.getId()) {
+                n0 = closestPrecedingNode(id);
             }
             else {
-                node = closestPrecedingFinger(id);
+                n0 = askClosestPrecedingFinger(successor.getAddress(), id);
+            }
+
+            if (n0.getId() == this.n.getId()) {
+                return findSuccessor(id);
+            }
+            else {
+                return askSuccessor(n0.getAddress(), id);
             }
         }
-
-        return node;
     }
 
     /**
-     * Ask current node to find id's closest preceding finger
+     * Search the local table for the highest predecessor of id.
      *
      * @param id
-     * @return Node - closest preceding finger
+     * @return Node
      */
-    Node closestPrecedingFinger(int id) {
-        // m down to 1 in the paper
+    Node closestPrecedingNode(int id) {
         for (int i = this.m - 1; i >= 0; i--) {
-            Node node = this.finger.getFinger(i);
+            Node fingerI = this.fingers.getFinger(i);
 
-            if (node != null && this.between.in(node.getId(), this.self.getId(), id)) {
-                return node;
+            if (fingerI != null && this.util.in(fingerI.getId(), this.n.getId(), id)) {
+                return fingerI;
             }
         }
 
-        return this.self;
+        return this.n;
     }
 
     /**
-     * Stabilized join for concurrent operations.
-     *
-     * @param existingNode
+     * Creating new Chord ring.
+     * Set current node as successor.
      */
-    private void join(InetSocketAddress existingNode) {
-        // predecessor is already null
-        // initial self id and get successor from existing node
-        Node successor = askIdAndSuccessor(this.capacity, this.self, existingNode);
-        updateSuccessor(successor);
+    void create() {
+        this.predecessor = null;
+        int id = this.util.genId();
+        this.n.setId(id);
+        this.fingers.setFinger(0, this.n);
     }
 
     /**
-     * Periodically verify self's immediate successor,
-     * and tell the successor about self.
+     * Join a Chord ring contains node np.
+     * Ask np the size of the Chord ring.
+     * Id of current node could be already existed in the Chord ring,
+     * keep generating new id until it is unique.
+     *
+     * @param np
+     */
+    void join(InetSocketAddress np) {
+        this.m = askM(np);
+        prepare();
+
+        this.predecessor = null;
+        do {
+            int id = this.util.genId();
+            this.n.setId(id);
+            Node successor = askSuccessor(np, this.n.getId());
+            this.fingers.setFinger(0, successor);
+        } while (this.n.getId() == this.fingers.getFinger(0).getId());
+    }
+
+    /**
+     * Called periodically.
+     * n asks the successor about its predecessor, verifies if n's immediate
+     * successor is consistent, and tells the successor about n.
      */
     void stabilize() {
-        if (this.self.getSuccessorId() == this.self.getId() && this.self.getPredecessorId() == this.self.getId()) {
-            // no need to update anything if there is only one node in ring
-            return;
+        Node successor = this.fingers.getFinger(0);
+        Node x;
+
+        if (successor.getId() == this.n.getId()) {
+            x = this.predecessor;
+        }
+        else {
+            x = askPredecessor(successor.getAddress());
         }
 
-        // x = successor.predecessor
-        String[] address = this.self.getSuccessor().split(":");
-        InetSocketAddress successor = new InetSocketAddress(address[0], Integer.parseInt(address[1]));
-        Node x = askPredecessor(successor);
-
-        if (this.between.in(x.getId(), this.self.getId(), this.self.getSuccessorId())) {
-            updateSuccessor(x);
-
-            address = this.self.getSuccessor().split(":");
-            successor = new InetSocketAddress(address[0], Integer.parseInt(address[1]));
+        if (x != null) {
+            if (this.util.in(x.getId(), this.n.getId(), successor.getId())) {
+                successor = x;
+                this.fingers.setFinger(0, successor);
+            }
         }
 
-        super.notify(successor, this.self);
+        if (successor.getId() == this.n.getId()) {
+            notify(this.n);
+        }
+        else {
+            notify(successor.getAddress(), this.n);
+        }
     }
 
     /**
-     * p thinks it might be the predecessor.
+     * np thinks it might be our predecessor.
      *
-     * @param p
+     * @param np
      */
-    void notify(Node p) {
-        if (this.self.getPredecessor() == null ||
-                this.between.in(p.getId(), this.self.getPredecessorId(), this.self.getId())) {
-            this.self.setPredecessor(p.getAddress());
-            this.self.setPredecessorId(p.getId());
-
-            System.out.println("Updated predecessor to " + p.getId());
+    void notify(Node np) {
+        if (this.predecessor == null || this.util.in(np.getId(), this.predecessor.getId(), this.n.getId())) {
+            this.predecessor = np;
+            System.out.println("predecessor = [" + np.getId() + "]");
         }
     }
 
     /**
-     * Periodically refresh finger table entries.
+     * Called periodically.
+     * Refreshes finger table entries.
+     * Next, stores the index of the finger to fix.
      */
-    void fixFingers(){
-        Random random = new Random();
-        int i = 1 + random.nextInt(this.m - 1);
-        Node successor = findSuccessor(start(i));
-        this.finger.setFinger(i, successor);
-
-        System.out.println("Fixed finger " + i + " to " + successor.getId());
-        System.out.println(this.finger.toString());  // print current finger table after fixing fingers
+    void fixFingers() {
+        this.next = (this.next + 1) % this.m;
+        Node np = findSuccessor(this.util.start(this.n.getId(), this.next));
+        this.fingers.setFinger(this.next, np);
+        System.out.println("finger[" + this.next + "] = [" + np.getId() + "]");
     }
 
-    private void updateSuccessor(Node successor) {
-        this.finger.setFinger(0, successor);
-        this.self.setSuccessor(successor.getAddress());
-        this.self.setSuccessorId(successor.getId());
-
-        System.out.println("Updated successor to " + successor.getId());
+    /**
+     * Called periodically.
+     * Checks whether predecessor has failed.
+     */
+    void checkPredecessor() {
+        if (this.predecessor != null) {
+            try {
+                heartbeat(this.predecessor.getAddress());
+            } catch (IOException ignore) {
+                // if the predecessor is unreachable, will catch IOException
+                System.out.println("Predecessor has failed, removing...");
+                this.predecessor = null;
+            }
+        }
     }
 
     int getM() {
         return this.m;
     }
 
-    Node getSelf() {
-        return this.self;
+    Node getN() {
+        return this.n;
     }
 
-    Node predecessor() {
-        if (this.self.getPredecessorId() == this.self.getId()) {
-            return this.self;
-        }
-        else {
-            String[] address = this.self.getPredecessor().split(":");
-            return askNodeDetail(address[0], Integer.parseInt(address[1]));
-        }
-    }
-
-    /**
-     * Start point of ith finger.
-     *
-     * @param i
-     * @return int
-     */
-    private int start(int i) {
-        return (this.self.getId() + (0b1 << i)) % this.capacity;
+    Node getPredecessor() {
+        return this.predecessor;
     }
 }

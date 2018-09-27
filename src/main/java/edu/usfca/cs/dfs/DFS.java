@@ -15,8 +15,7 @@ public class DFS {
     static DatagramSocket socket;
     static Receiver receiver;
     static Sender sender;
-    static StorageNode storageNode;
-    static int ID;
+    static StorageNode currentNode;
 
     public static void main(String[] args) {
         Map<String, String> arguments = parseArgs(args);
@@ -51,16 +50,16 @@ public class DFS {
         else {
             if (arguments.containsKey("node")) {
                 String[] address = arguments.get("node").split(":");
-                DFS.storageNode = new StorageNode(host, port);
-
-                InetSocketAddress existingNode = new InetSocketAddress(address[0], Integer.parseInt(address[1]));
-                DFS.storageNode.prepare(existingNode);
+                InetSocketAddress np = new InetSocketAddress(address[0], Integer.parseInt(address[1]));
+                DFS.currentNode = new StorageNode(host, port);
+                DFS.currentNode.join(np);
             }
             else {
-                DFS.storageNode = new StorageNode(host, port, m);
+                DFS.currentNode = new StorageNode(host, port, m);
+                DFS.currentNode.create();
             }
 
-            Thread stabilization = new Thread(new Stabilization(DFS.storageNode));
+            Thread stabilization = new Thread(new Stabilization(DFS.currentNode));
             stabilization.start();
         }
     }
@@ -81,10 +80,9 @@ public class DFS {
             map.put(key, args[i + 1]);
         }
 
-        map.put("run", "client");
-        map.put("port", "13001");
-        map.put("node", "localhost:13000");
-        //DFS.ID = 5;
+        map.put("run", "storage");
+        map.put("port", "13000");
+        //map.put("node", "localhost:13000");
 
         return map;
     }

@@ -14,6 +14,7 @@ enum messageType {
     DATA = 1;
     ACK = 2;
     INFO = 3;
+    HEARTBEAT = 4;
 }
 
 message Info {
@@ -47,8 +48,4 @@ message Node {
     string host = 1;
     int32 port = 2;
     int32 id = 3;
-    string successor = 4;
-    int32 successorId = 5;
-    string predecessor = 6;
-    int32 predecessorId = 7;
 }

@@ -44,8 +44,10 @@ class RequestHandler extends Serializer implements Runnable {
                     break;
                 case ACK:
                     System.out.println("Received ack from " + this.remoteAddress);
-                    DFS.storageNode.awaitTasksCountDown(message.getData().toStringUtf8());
+                    DFS.currentNode.awaitTasksCountDown(message.getData().toStringUtf8());
                     break;
+                case HEARTBEAT:
+                    break;  // no action
             }
         } catch (InvalidProtocolBufferException e) {
             e.printStackTrace();
@@ -59,31 +61,31 @@ class RequestHandler extends Serializer implements Runnable {
         switch (type) {
             case CLOSEST_PRECEDING_FINGER:
                 id = Integer.parseInt(info.getData().toStringUtf8());
-                responseNode(DFS.storageNode.closestPrecedingFinger(id), info.getTime());
+                responseNode(DFS.currentNode.closestPrecedingNode(id), info.getTime());
                 break;
             case NODE:
-                DFS.storageNode.addAnswer(info.getTime(), parseNode(info.getData()));
-                DFS.storageNode.awaitTasksCountDown(info.getTime());
+                DFS.currentNode.addAnswer(info.getTime(), parseNode(info.getData()));
+                DFS.currentNode.awaitTasksCountDown(info.getTime());
                 break;
             case ASK_M:
-                responseM(DFS.storageNode.getM(), info.getTime());
+                responseM(DFS.currentNode.getM(), info.getTime());
                 break;
             case M:
-                DFS.storageNode.addAnswer(info.getTime(), Integer.parseInt(info.getData().toStringUtf8()));
-                DFS.storageNode.awaitTasksCountDown(info.getTime());
+                DFS.currentNode.addAnswer(info.getTime(), Integer.parseInt(info.getData().toStringUtf8()));
+                DFS.currentNode.awaitTasksCountDown(info.getTime());
                 break;
             case ASK_SUCCESSOR:
                 id = Integer.parseInt(info.getData().toStringUtf8());
-                responseNode(DFS.storageNode.findSuccessor(id), info.getTime());
+                responseNode(DFS.currentNode.findSuccessor(id), info.getTime());
                 break;
             case ASK_PREDECESSOR:
-                responseNode(DFS.storageNode.predecessor(), info.getTime());
+                responseNode(DFS.currentNode.getPredecessor(), info.getTime());
                 break;
             case ASK_NODE_DETAIL:
-                responseNode(DFS.storageNode.getSelf(), info.getTime());
+                responseNode(DFS.currentNode.getN(), info.getTime());
                 break;
             case NOTIFY:
-                DFS.storageNode.notify(parseNode(info.getData()));
+                DFS.currentNode.notify(parseNode(info.getData()));
                 ack(info.getTime());
                 break;
         }

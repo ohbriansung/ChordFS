@@ -12,6 +12,7 @@ class Stabilization implements Runnable {
         while (DFS.alive) {
             this.node.stabilize();
             this.node.fixFingers();
+            this.node.checkPredecessor();
             try {
                 Thread.sleep(1000);
             } catch (InterruptedException e) {

@@ -27,6 +27,23 @@ class Sender {
         }
     }
 
+    void heartbeat(StorageMessages.Message message, InetSocketAddress address) throws IOException {
+        DatagramPacket packet = null;
+
+        try (ByteArrayOutputStream outStream = new ByteArrayOutputStream()) {
+            message.writeDelimitedTo(outStream);
+            byte[] bytes = outStream.toByteArray();
+            packet = new DatagramPacket(bytes, bytes.length, address);
+        }
+        catch (IOException ioe) {
+            ioe.printStackTrace();
+        }
+
+        if (packet != null) {
+            DFS.socket.send(packet);
+        }
+    }
+
     void close() {
         if (!this.pool.isShutdown()) {
             this.pool.shutdown();

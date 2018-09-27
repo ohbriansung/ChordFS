@@ -26,6 +26,10 @@ abstract class Serializer {
         return StorageMessages.Message.newBuilder().setType(type).setData(data).build();
     }
 
+    StorageMessages.Message serializeMessage(StorageMessages.messageType type) {
+        return StorageMessages.Message.newBuilder().setType(type).build();
+    }
+
     void createInfoAndSend(InetSocketAddress address, StorageMessages.infoType type, String time, ByteString... b) {
         // serialize info
         StorageMessages.Info info;

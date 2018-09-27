@@ -1,9 +1,9 @@
 package edu.usfca.cs.dfs;
 
-class Between {
+class Utility {
     private final int capacity;
 
-    Between(int capacity) {
+    Utility(int capacity) {
         this.capacity = capacity;
     }
 
@@ -35,5 +35,13 @@ class Between {
 
     boolean includesRight(int target, int left, int right) {
         return (target ^ right) == 0b0 || in(target, left, right);
+    }
+
+    int genId() {
+        return Math.abs(Long.hashCode(System.currentTimeMillis()) % this.capacity);
+    }
+
+    int start(int id, int i) {
+        return (id + (0b1 << i)) % this.capacity;
     }
 }

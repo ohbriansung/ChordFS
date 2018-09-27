@@ -35,6 +35,10 @@ public final class StorageMessages {
      * <code>INFO = 3;</code>
      */
     INFO(3),
+    /**
+     * <code>HEARTBEAT = 4;</code>
+     */
+    HEARTBEAT(4),
     UNRECOGNIZED(-1),
     ;
 
@@ -54,6 +58,10 @@ public final class StorageMessages {
      * <code>INFO = 3;</code>
      */
     public static final int INFO_VALUE = 3;
+    /**
+     * <code>HEARTBEAT = 4;</code>
+     */
+    public static final int HEARTBEAT_VALUE = 4;
 
 
     public final int getNumber() {
@@ -78,6 +86,7 @@ public final class StorageMessages {
         case 1: return DATA;
         case 2: return ACK;
         case 3: return INFO;
+        case 4: return HEARTBEAT;
         default: return null;
       }
     }
@@ -1986,36 +1995,6 @@ public final class StorageMessages {
      * <code>int32 id = 3;</code>
      */
     int getId();
-
-    /**
-     * <code>string successor = 4;</code>
-     */
-    java.lang.String getSuccessor();
-    /**
-     * <code>string successor = 4;</code>
-     */
-    com.google.protobuf.ByteString
-        getSuccessorBytes();
-
-    /**
-     * <code>int32 successorId = 5;</code>
-     */
-    int getSuccessorId();
-
-    /**
-     * <code>string predecessor = 6;</code>
-     */
-    java.lang.String getPredecessor();
-    /**
-     * <code>string predecessor = 6;</code>
-     */
-    com.google.protobuf.ByteString
-        getPredecessorBytes();
-
-    /**
-     * <code>int32 predecessorId = 7;</code>
-     */
-    int getPredecessorId();
   }
   /**
    * Protobuf type {@code Node}
@@ -2033,10 +2012,6 @@ public final class StorageMessages {
       host_ = "";
       port_ = 0;
       id_ = 0;
-      successor_ = "";
-      successorId_ = 0;
-      predecessor_ = "";
-      predecessorId_ = 0;
     }
 
     @java.lang.Override
@@ -2077,28 +2052,6 @@ public final class StorageMessages {
             case 24: {
 
               id_ = input.readInt32();
-              break;
-            }
-            case 34: {
-              java.lang.String s = input.readStringRequireUtf8();
-
-              successor_ = s;
-              break;
-            }
-            case 40: {
-
-              successorId_ = input.readInt32();
-              break;
-            }
-            case 50: {
-              java.lang.String s = input.readStringRequireUtf8();
-
-              predecessor_ = s;
-              break;
-            }
-            case 56: {
-
-              predecessorId_ = input.readInt32();
               break;
             }
             default: {
@@ -2185,92 +2138,6 @@ public final class StorageMessages {
       return id_;
     }
 
-    public static final int SUCCESSOR_FIELD_NUMBER = 4;
-    private volatile java.lang.Object successor_;
-    /**
-     * <code>string successor = 4;</code>
-     */
-    public java.lang.String getSuccessor() {
-      java.lang.Object ref = successor_;
-      if (ref instanceof java.lang.String) {
-        return (java.lang.String) ref;
-      } else {
-        com.google.protobuf.ByteString bs = 
-            (com.google.protobuf.ByteString) ref;
-        java.lang.String s = bs.toStringUtf8();
-        successor_ = s;
-        return s;
-      }
-    }
-    /**
-     * <code>string successor = 4;</code>
-     */
-    public com.google.protobuf.ByteString
-        getSuccessorBytes() {
-      java.lang.Object ref = successor_;
-      if (ref instanceof java.lang.String) {
-        com.google.protobuf.ByteString b = 
-            com.google.protobuf.ByteString.copyFromUtf8(
-                (java.lang.String) ref);
-        successor_ = b;
-        return b;
-      } else {
-        return (com.google.protobuf.ByteString) ref;
-      }
-    }
-
-    public static final int SUCCESSORID_FIELD_NUMBER = 5;
-    private int successorId_;
-    /**
-     * <code>int32 successorId = 5;</code>
-     */
-    public int getSuccessorId() {
-      return successorId_;
-    }
-
-    public static final int PREDECESSOR_FIELD_NUMBER = 6;
-    private volatile java.lang.Object predecessor_;
-    /**
-     * <code>string predecessor = 6;</code>
-     */
-    public java.lang.String getPredecessor() {
-      java.lang.Object ref = predecessor_;
-      if (ref instanceof java.lang.String) {
-        return (java.lang.String) ref;
-      } else {
-        com.google.protobuf.ByteString bs = 
-            (com.google.protobuf.ByteString) ref;
-        java.lang.String s = bs.toStringUtf8();
-        predecessor_ = s;
-        return s;
-      }
-    }
-    /**
-     * <code>string predecessor = 6;</code>
-     */
-    public com.google.protobuf.ByteString
-        getPredecessorBytes() {
-      java.lang.Object ref = predecessor_;
-      if (ref instanceof java.lang.String) {
-        com.google.protobuf.ByteString b = 
-            com.google.protobuf.ByteString.copyFromUtf8(
-                (java.lang.String) ref);
-        predecessor_ = b;
-        return b;
-      } else {
-        return (com.google.protobuf.ByteString) ref;
-      }
-    }
-
-    public static final int PREDECESSORID_FIELD_NUMBER = 7;
-    private int predecessorId_;
-    /**
-     * <code>int32 predecessorId = 7;</code>
-     */
-    public int getPredecessorId() {
-      return predecessorId_;
-    }
-
     private byte memoizedIsInitialized = -1;
     @java.lang.Override
     public final boolean isInitialized() {
@@ -2294,18 +2161,6 @@ public final class StorageMessages {
       if (id_ != 0) {
         output.writeInt32(3, id_);
       }
-      if (!getSuccessorBytes().isEmpty()) {
-        com.google.protobuf.GeneratedMessageV3.writeString(output, 4, successor_);
-      }
-      if (successorId_ != 0) {
-        output.writeInt32(5, successorId_);
-      }
-      if (!getPredecessorBytes().isEmpty()) {
-        com.google.protobuf.GeneratedMessageV3.writeString(output, 6, predecessor_);
-      }
-      if (predecessorId_ != 0) {
-        output.writeInt32(7, predecessorId_);
-      }
       unknownFields.writeTo(output);
     }
 
@@ -2325,20 +2180,6 @@ public final class StorageMessages {
       if (id_ != 0) {
         size += com.google.protobuf.CodedOutputStream
           .computeInt32Size(3, id_);
-      }
-      if (!getSuccessorBytes().isEmpty()) {
-        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(4, successor_);
-      }
-      if (successorId_ != 0) {
-        size += com.google.protobuf.CodedOutputStream
-          .computeInt32Size(5, successorId_);
-      }
-      if (!getPredecessorBytes().isEmpty()) {
-        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(6, predecessor_);
-      }
-      if (predecessorId_ != 0) {
-        size += com.google.protobuf.CodedOutputStream
-          .computeInt32Size(7, predecessorId_);
       }
       size += unknownFields.getSerializedSize();
       memoizedSize = size;
@@ -2362,14 +2203,6 @@ public final class StorageMessages {
           == other.getPort());
       result = result && (getId()
           == other.getId());
-      result = result && getSuccessor()
-          .equals(other.getSuccessor());
-      result = result && (getSuccessorId()
-          == other.getSuccessorId());
-      result = result && getPredecessor()
-          .equals(other.getPredecessor());
-      result = result && (getPredecessorId()
-          == other.getPredecessorId());
       result = result && unknownFields.equals(other.unknownFields);
       return result;
     }
@@ -2387,14 +2220,6 @@ public final class StorageMessages {
       hash = (53 * hash) + getPort();
       hash = (37 * hash) + ID_FIELD_NUMBER;
       hash = (53 * hash) + getId();
-      hash = (37 * hash) + SUCCESSOR_FIELD_NUMBER;
-      hash = (53 * hash) + getSuccessor().hashCode();
-      hash = (37 * hash) + SUCCESSORID_FIELD_NUMBER;
-      hash = (53 * hash) + getSuccessorId();
-      hash = (37 * hash) + PREDECESSOR_FIELD_NUMBER;
-      hash = (53 * hash) + getPredecessor().hashCode();
-      hash = (37 * hash) + PREDECESSORID_FIELD_NUMBER;
-      hash = (53 * hash) + getPredecessorId();
       hash = (29 * hash) + unknownFields.hashCode();
       memoizedHashCode = hash;
       return hash;
@@ -2534,14 +2359,6 @@ public final class StorageMessages {
 
         id_ = 0;
 
-        successor_ = "";
-
-        successorId_ = 0;
-
-        predecessor_ = "";
-
-        predecessorId_ = 0;
-
         return this;
       }
 
@@ -2571,10 +2388,6 @@ public final class StorageMessages {
         result.host_ = host_;
         result.port_ = port_;
         result.id_ = id_;
-        result.successor_ = successor_;
-        result.successorId_ = successorId_;
-        result.predecessor_ = predecessor_;
-        result.predecessorId_ = predecessorId_;
         onBuilt();
         return result;
       }
@@ -2632,20 +2445,6 @@ public final class StorageMessages {
         }
         if (other.getId() != 0) {
           setId(other.getId());
-        }
-        if (!other.getSuccessor().isEmpty()) {
-          successor_ = other.successor_;
-          onChanged();
-        }
-        if (other.getSuccessorId() != 0) {
-          setSuccessorId(other.getSuccessorId());
-        }
-        if (!other.getPredecessor().isEmpty()) {
-          predecessor_ = other.predecessor_;
-          onChanged();
-        }
-        if (other.getPredecessorId() != 0) {
-          setPredecessorId(other.getPredecessorId());
         }
         this.mergeUnknownFields(other.unknownFields);
         onChanged();
@@ -2796,196 +2595,6 @@ public final class StorageMessages {
         onChanged();
         return this;
       }
-
-      private java.lang.Object successor_ = "";
-      /**
-       * <code>string successor = 4;</code>
-       */
-      public java.lang.String getSuccessor() {
-        java.lang.Object ref = successor_;
-        if (!(ref instanceof java.lang.String)) {
-          com.google.protobuf.ByteString bs =
-              (com.google.protobuf.ByteString) ref;
-          java.lang.String s = bs.toStringUtf8();
-          successor_ = s;
-          return s;
-        } else {
-          return (java.lang.String) ref;
-        }
-      }
-      /**
-       * <code>string successor = 4;</code>
-       */
-      public com.google.protobuf.ByteString
-          getSuccessorBytes() {
-        java.lang.Object ref = successor_;
-        if (ref instanceof String) {
-          com.google.protobuf.ByteString b = 
-              com.google.protobuf.ByteString.copyFromUtf8(
-                  (java.lang.String) ref);
-          successor_ = b;
-          return b;
-        } else {
-          return (com.google.protobuf.ByteString) ref;
-        }
-      }
-      /**
-       * <code>string successor = 4;</code>
-       */
-      public Builder setSuccessor(
-          java.lang.String value) {
-        if (value == null) {
-    throw new NullPointerException();
-  }
-  
-        successor_ = value;
-        onChanged();
-        return this;
-      }
-      /**
-       * <code>string successor = 4;</code>
-       */
-      public Builder clearSuccessor() {
-        
-        successor_ = getDefaultInstance().getSuccessor();
-        onChanged();
-        return this;
-      }
-      /**
-       * <code>string successor = 4;</code>
-       */
-      public Builder setSuccessorBytes(
-          com.google.protobuf.ByteString value) {
-        if (value == null) {
-    throw new NullPointerException();
-  }
-  checkByteStringIsUtf8(value);
-        
-        successor_ = value;
-        onChanged();
-        return this;
-      }
-
-      private int successorId_ ;
-      /**
-       * <code>int32 successorId = 5;</code>
-       */
-      public int getSuccessorId() {
-        return successorId_;
-      }
-      /**
-       * <code>int32 successorId = 5;</code>
-       */
-      public Builder setSuccessorId(int value) {
-        
-        successorId_ = value;
-        onChanged();
-        return this;
-      }
-      /**
-       * <code>int32 successorId = 5;</code>
-       */
-      public Builder clearSuccessorId() {
-        
-        successorId_ = 0;
-        onChanged();
-        return this;
-      }
-
-      private java.lang.Object predecessor_ = "";
-      /**
-       * <code>string predecessor = 6;</code>
-       */
-      public java.lang.String getPredecessor() {
-        java.lang.Object ref = predecessor_;
-        if (!(ref instanceof java.lang.String)) {
-          com.google.protobuf.ByteString bs =
-              (com.google.protobuf.ByteString) ref;
-          java.lang.String s = bs.toStringUtf8();
-          predecessor_ = s;
-          return s;
-        } else {
-          return (java.lang.String) ref;
-        }
-      }
-      /**
-       * <code>string predecessor = 6;</code>
-       */
-      public com.google.protobuf.ByteString
-          getPredecessorBytes() {
-        java.lang.Object ref = predecessor_;
-        if (ref instanceof String) {
-          com.google.protobuf.ByteString b = 
-              com.google.protobuf.ByteString.copyFromUtf8(
-                  (java.lang.String) ref);
-          predecessor_ = b;
-          return b;
-        } else {
-          return (com.google.protobuf.ByteString) ref;
-        }
-      }
-      /**
-       * <code>string predecessor = 6;</code>
-       */
-      public Builder setPredecessor(
-          java.lang.String value) {
-        if (value == null) {
-    throw new NullPointerException();
-  }
-  
-        predecessor_ = value;
-        onChanged();
-        return this;
-      }
-      /**
-       * <code>string predecessor = 6;</code>
-       */
-      public Builder clearPredecessor() {
-        
-        predecessor_ = getDefaultInstance().getPredecessor();
-        onChanged();
-        return this;
-      }
-      /**
-       * <code>string predecessor = 6;</code>
-       */
-      public Builder setPredecessorBytes(
-          com.google.protobuf.ByteString value) {
-        if (value == null) {
-    throw new NullPointerException();
-  }
-  checkByteStringIsUtf8(value);
-        
-        predecessor_ = value;
-        onChanged();
-        return this;
-      }
-
-      private int predecessorId_ ;
-      /**
-       * <code>int32 predecessorId = 7;</code>
-       */
-      public int getPredecessorId() {
-        return predecessorId_;
-      }
-      /**
-       * <code>int32 predecessorId = 7;</code>
-       */
-      public Builder setPredecessorId(int value) {
-        
-        predecessorId_ = value;
-        onChanged();
-        return this;
-      }
-      /**
-       * <code>int32 predecessorId = 7;</code>
-       */
-      public Builder clearPredecessorId() {
-        
-        predecessorId_ = 0;
-        onChanged();
-        return this;
-      }
       @java.lang.Override
       public final Builder setUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
@@ -3068,16 +2677,14 @@ public final class StorageMessages {
       "\t\022\022\n\ntotalChunk\030\003 \001(\005\022\017\n\007chunkId\030\004 \001(\005\022\014" +
       "\n\004data\030\005 \001(\014\"P\n\004Info\022\027\n\004type\030\001 \001(\0162\t.inf" +
       "oType\022\014\n\004data\030\002 \001(\014\022\023\n\013integerData\030\003 \001(\005" +
-      "\022\014\n\004time\030\004 \001(\t\"\202\001\n\004Node\022\014\n\004host\030\001 \001(\t\022\014\n" +
-      "\004port\030\002 \001(\005\022\n\n\002id\030\003 \001(\005\022\021\n\tsuccessor\030\004 \001" +
-      "(\t\022\023\n\013successorId\030\005 \001(\005\022\023\n\013predecessor\030\006" +
-      " \001(\t\022\025\n\rpredecessorId\030\007 \001(\005*9\n\013messageTy" +
-      "pe\022\r\n\tFIND_HOST\020\000\022\010\n\004DATA\020\001\022\007\n\003ACK\020\002\022\010\n\004" +
-      "INFO\020\003*\215\001\n\010infoType\022\034\n\030CLOSEST_PRECEDING" +
-      "_FINGER\020\000\022\010\n\004NODE\020\001\022\t\n\005ASK_M\020\002\022\005\n\001M\020\003\022\021\n" +
-      "\rASK_SUCCESSOR\020\004\022\023\n\017ASK_PREDECESSOR\020\005\022\023\n" +
-      "\017ASK_NODE_DETAIL\020\006\022\n\n\006NOTIFY\020\007B\022\n\020edu.us" +
-      "fca.cs.dfsb\006proto3"
+      "\022\014\n\004time\030\004 \001(\t\".\n\004Node\022\014\n\004host\030\001 \001(\t\022\014\n\004" +
+      "port\030\002 \001(\005\022\n\n\002id\030\003 \001(\005*H\n\013messageType\022\r\n" +
+      "\tFIND_HOST\020\000\022\010\n\004DATA\020\001\022\007\n\003ACK\020\002\022\010\n\004INFO\020" +
+      "\003\022\r\n\tHEARTBEAT\020\004*\215\001\n\010infoType\022\034\n\030CLOSEST" +
+      "_PRECEDING_FINGER\020\000\022\010\n\004NODE\020\001\022\t\n\005ASK_M\020\002" +
+      "\022\005\n\001M\020\003\022\021\n\rASK_SUCCESSOR\020\004\022\023\n\017ASK_PREDEC" +
+      "ESSOR\020\005\022\023\n\017ASK_NODE_DETAIL\020\006\022\n\n\006NOTIFY\020\007" +
+      "B\022\n\020edu.usfca.cs.dfsb\006proto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
@@ -3108,7 +2715,7 @@ public final class StorageMessages {
     internal_static_Node_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_Node_descriptor,
-        new java.lang.String[] { "Host", "Port", "Id", "Successor", "SuccessorId", "Predecessor", "PredecessorId", });
+        new java.lang.String[] { "Host", "Port", "Id", });
   }
 
   // @@protoc_insertion_point(outer_class_scope)
