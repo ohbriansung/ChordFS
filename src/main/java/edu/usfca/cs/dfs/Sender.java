@@ -17,7 +17,7 @@ class Sender extends Serializer {
 
         // send message
         StorageMessages.Info info;
-        if (id != null) {
+        if (id != null && id.length > 0) {
             info = serializeInfo(type, id[0]);
         }
         else {

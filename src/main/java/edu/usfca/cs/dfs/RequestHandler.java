@@ -96,7 +96,6 @@ class RequestHandler extends Serializer implements Runnable {
     private void responseM(int m) throws IOException {
         OutputStream out = this.listening.getOutputStream();
         StorageMessages.Info info = serializeInfo(StorageMessages.infoType.M, m);
-        StorageMessages.Message message = serializeMessage(StorageMessages.messageType.INFO, info.toByteString());
-        message.writeDelimitedTo(out);
+        info.writeDelimitedTo(out);
     }
 }
