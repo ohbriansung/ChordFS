@@ -66,4 +66,5 @@ Retrieving files in parallel. Each chunk in the file being retrieved will be req
 ## References
 
 * [1] [University of San Francisco](https://www.usfca.edu)
-* [2] [Chord](https://www.cs.usfca.edu/~mmalensek/cs677/schedule/papers/stoica2001chord.pdf)
+* [2] [Chord paper](https://www.cs.usfca.edu/~mmalensek/cs677/schedule/papers/stoica2001chord.pdf)
+* [3] [Chord WiKi](https://en.wikipedia.org/wiki/Chord_(peer-to-peer))

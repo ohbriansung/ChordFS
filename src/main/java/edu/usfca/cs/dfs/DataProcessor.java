@@ -19,13 +19,13 @@ class DataProcessor {
      * FileChannel to stream bytes so we can read files larger than 2Gb.
      * Deep copy into ArrayList for later usage.
      *
-     * @param fileName
+     * @param filename
      * @return List
      * @throws IOException
      */
-    List<byte[]> breakFile(String fileName) throws IOException {
+    List<byte[]> breakFile(String filename) throws IOException {
         List<byte[]> chunks = new ArrayList<>();
-        Path path = Paths.get(fileName);
+        Path path = Paths.get(filename);
         FileChannel channel = (FileChannel) Files.newByteChannel(path);
         ByteBuffer buffer = ByteBuffer.allocate(DFS.MAX_CHUNK_SIZE);
 

@@ -6,6 +6,8 @@ import java.net.InetSocketAddress;
 /**
  * Reference: https://en.wikipedia.org/wiki/Chord_(peer-to-peer)
  * successor = fingers[0]
+ * np = n'
+ * @author Brian Sung
  */
 class StorageNode extends Asker {
     private int m;
@@ -34,7 +36,6 @@ class StorageNode extends Asker {
 
     /**
      * Ask n to find the successor of id.
-     *
      * @param id
      * @return Node
      */
@@ -65,7 +66,6 @@ class StorageNode extends Asker {
 
     /**
      * Search the local table for the highest predecessor of id.
-     *
      * @param id
      * @return Node
      */
@@ -97,7 +97,6 @@ class StorageNode extends Asker {
      * Ask np the size of the Chord ring.
      * Id of current node could be already existed in the Chord ring,
      * keep generating new id until it is unique.
-     *
      * @param np
      */
     void join(InetSocketAddress np) {
@@ -146,7 +145,6 @@ class StorageNode extends Asker {
 
     /**
      * np thinks it might be our predecessor.
-     *
      * @param np
      */
     void notify(Node np) {

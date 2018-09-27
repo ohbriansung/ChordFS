@@ -44,6 +44,8 @@ class Sender {
         }
     }
 
+    void upload() {}
+
     void close() {
         if (!this.pool.isShutdown()) {
             this.pool.shutdown();

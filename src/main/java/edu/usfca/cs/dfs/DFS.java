@@ -7,7 +7,6 @@ import java.util.concurrent.CountDownLatch;
 
 public class DFS {
     static final int MAX_CHUNK_SIZE = 64 * 1024 * 1024;
-    static final int UDP_PACKET_SIZE = 64 * 1024;
     static final int THREAD = 16;
     static final CountDownLatch READY = new CountDownLatch(1);  // ui waits for receiver and sender
     static volatile boolean alive = true;
@@ -15,7 +14,7 @@ public class DFS {
     static DatagramSocket socket;
     static Receiver receiver;
     static Sender sender;
-    static StorageNode currentNode;
+    static Asker currentNode;
 
     public static void main(String[] args) {
         Map<String, String> arguments = parseArgs(args);
@@ -41,27 +40,7 @@ public class DFS {
 
         DFS.receiver = startReceiver(host, port);
         DFS.sender = new Sender();
-
-        if (arguments.get("run").equals("client")) {
-            String[] address = arguments.get("node").split(":");
-            Client client = new Client(new InetSocketAddress(address[0], Integer.parseInt(address[1])));
-            client.startUI();
-        }
-        else {
-            if (arguments.containsKey("node")) {
-                String[] address = arguments.get("node").split(":");
-                InetSocketAddress np = new InetSocketAddress(address[0], Integer.parseInt(address[1]));
-                DFS.currentNode = new StorageNode(host, port);
-                DFS.currentNode.join(np);
-            }
-            else {
-                DFS.currentNode = new StorageNode(host, port, m);
-                DFS.currentNode.create();
-            }
-
-            Thread stabilization = new Thread(new Stabilization(DFS.currentNode));
-            stabilization.start();
-        }
+        startNode(arguments, host, port, m);
     }
 
     private static Map<String, String> parseArgs(String[] args) {
@@ -80,9 +59,13 @@ public class DFS {
             map.put(key, args[i + 1]);
         }
 
-        map.put("run", "storage");
-        map.put("port", "13000");
-        //map.put("node", "localhost:13000");
+//        map.put("run", "storage");
+//        map.put("port", "13000");
+//        //map.put("node", "localhost:13000");
+
+        map.put("run", "client");
+        map.put("port", "13099");
+        map.put("node", "localhost:13000");
 
         return map;
     }
@@ -103,5 +86,28 @@ public class DFS {
         listen.start();
 
         return receiver;
+    }
+
+    private static void startNode(Map<String, String> arguments, String host, int port, int m) {
+        if (arguments.get("run").equals("client")) {
+            String[] address = arguments.get("node").split(":");
+            DFS.currentNode = new Client(new InetSocketAddress(address[0], Integer.parseInt(address[1])));
+            ((Client) DFS.currentNode).startUI();
+        }
+        else {
+            if (arguments.containsKey("node")) {
+                String[] address = arguments.get("node").split(":");
+                InetSocketAddress np = new InetSocketAddress(address[0], Integer.parseInt(address[1]));
+                DFS.currentNode = new StorageNode(host, port);
+                ((StorageNode) DFS.currentNode).join(np);
+            }
+            else {
+                DFS.currentNode = new StorageNode(host, port, m);
+                ((StorageNode) DFS.currentNode).create();
+            }
+
+            Thread stabilization = new Thread(new Stabilization(((StorageNode) DFS.currentNode)));
+            stabilization.start();
+        }
     }
 }
