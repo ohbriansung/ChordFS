@@ -13,20 +13,6 @@ class FingerTable {
         this.lock = new ReentrantReadWriteLock();
     }
 
-    /**
-     * Initialize the first node in the ring.
-     * All fingers will be self if it is the first node in the ring.
-     *
-     * @param m - the capacity of the ring = 2^m
-     */
-    FingerTable(int m, Node self) {
-        this(m);
-
-        for (int i = 0; i < m; i++) {
-            this.finger[i] = self;
-        }
-    }
-
     void setFinger(int i, Node node) {
         this.lock.writeLock().lock();
         this.finger[i] = node;

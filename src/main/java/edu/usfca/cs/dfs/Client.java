@@ -17,7 +17,7 @@ import java.util.Scanner;
 /**
  * @author Brian Sung
  */
-class Client extends Asker {
+class Client extends Sender {
     private final SHA1 sha1;
     private final DataProcessor dp;
     private InetSocketAddress storageNodeAddress;
@@ -60,9 +60,13 @@ class Client extends Asker {
                 upload(command[1]);
                 break;
             default:
-                System.out.println("asking " + this.storageNodeAddress);
-                Node p = askPredecessor(this.storageNodeAddress);
-                System.out.println(p.getId());
+                try {
+                    System.out.println("asking " + this.storageNodeAddress);
+                    Node p = ask(this.storageNodeAddress, StorageMessages.infoType.ASK_PREDECESSOR);
+                    System.out.println(p.getId());
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
         }
     }
 

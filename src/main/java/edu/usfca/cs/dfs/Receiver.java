@@ -20,8 +20,10 @@ public class Receiver implements Runnable {
      * Usage: for closing socket.
      */
     void close() {
-        if (!DFS.socket.isClosed()) {
+        try {
             DFS.socket.close();
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 
@@ -32,17 +34,16 @@ public class Receiver implements Runnable {
             DFS.READY.countDown();
 
             while (DFS.alive) {
-                byte[] bytes = new byte[DFS.UDP_PACKET_SIZE];
-                DatagramPacket packet = new DatagramPacket(bytes, bytes.length);
-
-                DFS.socket.receive(packet);
-                this.pool.submit(new RequestHandler(packet));
+                Socket listening = DFS.socket.accept();
+                this.pool.submit(new RequestHandler(listening));
             }
         } catch (IOException ignore) {
-            // IOException will be caused by closing DatagramSocket or UnknownHostException
+            // IOException will be caused by closing ServerSocket or UnknownHostException
         } finally {
-            if (!DFS.socket.isClosed()) {
+            try {
                 DFS.socket.close();
+            } catch (IOException e) {
+                e.printStackTrace();
             }
 
             if (!this.pool.isShutdown()) {

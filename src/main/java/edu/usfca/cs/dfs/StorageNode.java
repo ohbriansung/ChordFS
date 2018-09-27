@@ -9,7 +9,7 @@ import java.net.InetSocketAddress;
  * np = n'
  * @author Brian Sung
  */
-class StorageNode extends Asker {
+class StorageNode extends Sender {
     private int m;
     private int next;
     private Node n;
@@ -18,7 +18,6 @@ class StorageNode extends Asker {
     private Utility util;
 
     StorageNode(String host, int port) {
-        super();
         this.n = new Node(host, port);
         this.next = 0;
     }
@@ -42,26 +41,29 @@ class StorageNode extends Asker {
     Node findSuccessor(int id) {
         Node successor = this.fingers.getFinger(0);
 
-        if (this.util.includesRight(id, this.n.getId(), successor.getId())) {
-            return successor;
-        }
-        else {
-            Node n0;
+        try {
+            if (this.util.includesRight(id, this.n.getId(), successor.getId())) {
+                return successor;
+            } else {
+                Node n0;
 
-            if (successor.getId() == this.n.getId()) {
-                n0 = closestPrecedingNode(id);
-            }
-            else {
-                n0 = askClosestPrecedingFinger(successor.getAddress(), id);
-            }
+                if (successor.getId() == this.n.getId()) {
+                    n0 = closestPrecedingNode(id);
+                } else {
+                    n0 = ask(successor.getAddress(), StorageMessages.infoType.CLOSEST_PRECEDING_NODE, id);
+                }
 
-            if (n0.getId() == this.n.getId()) {
-                return findSuccessor(id);
+                if (n0.getId() == this.n.getId()) {
+                    return findSuccessor(id);
+                } else {
+                    return ask(n0.getAddress(), StorageMessages.infoType.ASK_SUCCESSOR, id);
+                }
             }
-            else {
-                return askSuccessor(n0.getAddress(), id);
-            }
+        } catch (IOException e) {
+            e.printStackTrace();
         }
+
+        return successor;
     }
 
     /**
@@ -99,7 +101,7 @@ class StorageNode extends Asker {
      * keep generating new id until it is unique.
      * @param np
      */
-    void join(InetSocketAddress np) {
+    void join(InetSocketAddress np) throws IOException {
         this.m = askM(np);
         prepare();
 
@@ -107,7 +109,7 @@ class StorageNode extends Asker {
         do {
             int id = this.util.genId();
             this.n.setId(id);
-            Node successor = askSuccessor(np, this.n.getId());
+            Node successor = ask(np, StorageMessages.infoType.ASK_SUCCESSOR, this.n.getId());
             this.fingers.setFinger(0, successor);
         } while (this.n.getId() == this.fingers.getFinger(0).getId());
     }
@@ -121,25 +123,29 @@ class StorageNode extends Asker {
         Node successor = this.fingers.getFinger(0);
         Node x;
 
-        if (successor.getId() == this.n.getId()) {
-            x = this.predecessor;
-        }
-        else {
-            x = askPredecessor(successor.getAddress());
-        }
-
-        if (x != null) {
-            if (this.util.in(x.getId(), this.n.getId(), successor.getId())) {
-                successor = x;
-                this.fingers.setFinger(0, successor);
+        try {
+            if (successor.getId() == this.n.getId()) {
+                x = this.predecessor;
             }
-        }
+            else {
+                x = ask(successor.getAddress(), StorageMessages.infoType.ASK_PREDECESSOR);
+            }
 
-        if (successor.getId() == this.n.getId()) {
-            notify(this.n);
-        }
-        else {
-            notify(successor.getAddress(), this.n);
+            if (x != null) {
+                if (this.util.in(x.getId(), this.n.getId(), successor.getId())) {
+                    successor = x;
+                    this.fingers.setFinger(0, successor);
+                }
+            }
+
+            if (successor.getId() == this.n.getId()) {
+                notify(this.n);
+            }
+            else {
+                notify(successor.getAddress(), this.n);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 

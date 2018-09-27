@@ -1,5 +1,6 @@
 package edu.usfca.cs.dfs;
 
+import java.io.IOException;
 import java.net.*;
 import java.util.HashMap;
 import java.util.Map;
@@ -11,10 +12,9 @@ public class DFS {
     static final CountDownLatch READY = new CountDownLatch(1);  // ui waits for receiver and sender
     static volatile boolean alive = true;
 
-    static DatagramSocket socket;
+    static ServerSocket socket;
     static Receiver receiver;
-    static Sender sender;
-    static Asker currentNode;
+    static Sender currentNode;
 
     public static void main(String[] args) {
         Map<String, String> arguments = parseArgs(args);
@@ -32,14 +32,13 @@ public class DFS {
             host = InetAddress.getLocalHost().getHostAddress();
             port = (arguments.containsKey("port") ? Integer.parseInt(arguments.get("port")) : port);
             m = (arguments.containsKey("m") ? Integer.parseInt(arguments.get("m")) : m);
-            DFS.socket = new DatagramSocket(port);
-        } catch (UnknownHostException | NumberFormatException | SocketException e) {
+            DFS.socket = new ServerSocket(port);
+        } catch (NumberFormatException | IOException e) {
             e.printStackTrace();
             System.exit(1);
         }
 
         DFS.receiver = startReceiver(host, port);
-        DFS.sender = new Sender();
         startNode(arguments, host, port, m);
     }
 
@@ -59,13 +58,13 @@ public class DFS {
             map.put(key, args[i + 1]);
         }
 
-//        map.put("run", "storage");
-//        map.put("port", "13000");
-//        //map.put("node", "localhost:13000");
-
-        map.put("run", "client");
-        map.put("port", "13099");
+        map.put("run", "storage");
+        map.put("port", "13001");
         map.put("node", "localhost:13000");
+
+//        map.put("run", "client");
+//        map.put("port", "13099");
+//        map.put("node", "localhost:13000");
 
         return map;
     }
@@ -96,10 +95,17 @@ public class DFS {
         }
         else {
             if (arguments.containsKey("node")) {
+                DFS.currentNode = new StorageNode(host, port);
+
                 String[] address = arguments.get("node").split(":");
                 InetSocketAddress np = new InetSocketAddress(address[0], Integer.parseInt(address[1]));
-                DFS.currentNode = new StorageNode(host, port);
-                ((StorageNode) DFS.currentNode).join(np);
+                try {
+                    ((StorageNode) DFS.currentNode).join(np);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    System.out.println("Node " + np.toString() + "is unreachable, please try again.");
+                    System.exit(-1);
+                }
             }
             else {
                 DFS.currentNode = new StorageNode(host, port, m);

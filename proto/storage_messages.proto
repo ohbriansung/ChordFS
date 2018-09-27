@@ -12,9 +12,8 @@ message Message {
 enum messageType {
     FIND_HOST = 0;
     DATA = 1;
-    ACK = 2;
-    INFO = 3;
-    HEARTBEAT = 4;
+    INFO = 2;
+    HEARTBEAT = 3;
 }
 
 message Info {
@@ -25,7 +24,7 @@ message Info {
 }
 
 enum infoType {
-    CLOSEST_PRECEDING_FINGER = 0;  // ask for the closest preceding finger
+    CLOSEST_PRECEDING_NODE = 0;  // ask for the closest preceding finger
     NODE = 1;  // reply closest preceding finger
     ASK_M = 2;  // ask for the m parameter
     M = 3;  // m-bit ring

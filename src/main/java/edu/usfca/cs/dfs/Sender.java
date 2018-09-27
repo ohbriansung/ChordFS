@@ -1,72 +1,84 @@
 package edu.usfca.cs.dfs;
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.net.DatagramPacket;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.InetSocketAddress;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import java.net.Socket;
 
-class Sender {
-    private final ExecutorService pool;
+class Sender extends Serializer {
 
-    Sender() {
-        this.pool = Executors.newFixedThreadPool(DFS.THREAD);
+    Node ask(InetSocketAddress addr, StorageMessages.infoType type, Integer... id) throws IOException {
+        // create socket and stream
+        Socket socket = new Socket();
+        socket.connect(addr);
+        OutputStream out = socket.getOutputStream();
+        InputStream in = socket.getInputStream();
+
+        // send message
+        StorageMessages.Info info;
+        if (id != null) {
+            info = serializeInfo(type, id[0]);
+        }
+        else {
+            info = serializeInfo(type);
+        }
+        StorageMessages.Message message = serializeMessage(StorageMessages.messageType.INFO, info.toByteString());
+        message.writeDelimitedTo(out);
+
+        // receive response and close socket
+        StorageMessages.Node n = StorageMessages.Node.parseDelimitedFrom(in);
+        socket.close();
+
+        return new Node(n);
     }
 
-    void send(StorageMessages.Message message, InetSocketAddress address) {
-        try (ByteArrayOutputStream outStream = new ByteArrayOutputStream()) {
-            message.writeDelimitedTo(outStream);
-            byte[] bytes = outStream.toByteArray();
-            DatagramPacket packet = new DatagramPacket(bytes, bytes.length, address);
+    int askM(InetSocketAddress addr) throws IOException {
+        // create socket and stream
+        Socket socket = new Socket();
+        socket.connect(addr);
+        OutputStream out = socket.getOutputStream();
+        InputStream in = socket.getInputStream();
 
-            this.pool.submit(new Task(packet));
-        }
-        catch (IOException ioe) {
-            ioe.printStackTrace();
-        }
+        // send message
+        StorageMessages.Info info = serializeInfo(StorageMessages.infoType.ASK_M);
+        StorageMessages.Message message = serializeMessage(StorageMessages.messageType.INFO, info.toByteString());
+        message.writeDelimitedTo(out);
+
+        // receive response and close socket
+        StorageMessages.Info response = StorageMessages.Info.parseDelimitedFrom(in);
+        socket.close();
+
+        return response.getIntegerData();
     }
 
-    void heartbeat(StorageMessages.Message message, InetSocketAddress address) throws IOException {
-        DatagramPacket packet = null;
+    void notify(InetSocketAddress addr, Node n) throws IOException {
+        // create socket and stream
+        Socket socket = new Socket();
+        socket.connect(addr);
+        OutputStream out = socket.getOutputStream();
 
-        try (ByteArrayOutputStream outStream = new ByteArrayOutputStream()) {
-            message.writeDelimitedTo(outStream);
-            byte[] bytes = outStream.toByteArray();
-            packet = new DatagramPacket(bytes, bytes.length, address);
-        }
-        catch (IOException ioe) {
-            ioe.printStackTrace();
-        }
+        // send message
+        StorageMessages.Node node = n.serialize();
+        StorageMessages.Info info = serializeInfo(StorageMessages.infoType.NOTIFY, node.toByteString());
+        StorageMessages.Message message = serializeMessage(StorageMessages.messageType.INFO, info.toByteString());
+        message.writeDelimitedTo(out);
 
-        if (packet != null) {
-            DFS.socket.send(packet);
-        }
+        // close socket
+        socket.close();
     }
 
-    void upload() {}
+    void heartbeat(InetSocketAddress addr) throws IOException {
+        // create socket and stream
+        Socket socket = new Socket();
+        socket.connect(addr);
+        OutputStream out = socket.getOutputStream();
 
-    void close() {
-        if (!this.pool.isShutdown()) {
-            this.pool.shutdown();
-        }
-    }
+        // send message
+        StorageMessages.Message message = serializeMessage(StorageMessages.messageType.HEARTBEAT);
+        message.writeDelimitedTo(out);
 
-    private class Task implements Runnable {
-        private final DatagramPacket packet;
-
-        private Task(DatagramPacket packet) {
-            this.packet = packet;
-        }
-
-        @Override
-        public void run() {
-            try {
-                DFS.socket.send(this.packet);
-            }
-            catch (IOException ioe) {
-                ioe.printStackTrace();
-            }
-        }
+        // close socket
+        socket.close();
     }
 }

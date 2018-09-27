@@ -28,17 +28,13 @@ public final class StorageMessages {
      */
     DATA(1),
     /**
-     * <code>ACK = 2;</code>
+     * <code>INFO = 2;</code>
      */
-    ACK(2),
+    INFO(2),
     /**
-     * <code>INFO = 3;</code>
+     * <code>HEARTBEAT = 3;</code>
      */
-    INFO(3),
-    /**
-     * <code>HEARTBEAT = 4;</code>
-     */
-    HEARTBEAT(4),
+    HEARTBEAT(3),
     UNRECOGNIZED(-1),
     ;
 
@@ -51,17 +47,13 @@ public final class StorageMessages {
      */
     public static final int DATA_VALUE = 1;
     /**
-     * <code>ACK = 2;</code>
+     * <code>INFO = 2;</code>
      */
-    public static final int ACK_VALUE = 2;
+    public static final int INFO_VALUE = 2;
     /**
-     * <code>INFO = 3;</code>
+     * <code>HEARTBEAT = 3;</code>
      */
-    public static final int INFO_VALUE = 3;
-    /**
-     * <code>HEARTBEAT = 4;</code>
-     */
-    public static final int HEARTBEAT_VALUE = 4;
+    public static final int HEARTBEAT_VALUE = 3;
 
 
     public final int getNumber() {
@@ -84,9 +76,8 @@ public final class StorageMessages {
       switch (value) {
         case 0: return FIND_HOST;
         case 1: return DATA;
-        case 2: return ACK;
-        case 3: return INFO;
-        case 4: return HEARTBEAT;
+        case 2: return INFO;
+        case 3: return HEARTBEAT;
         default: return null;
       }
     }
@@ -149,9 +140,9 @@ public final class StorageMessages {
      * ask for the closest preceding finger
      * </pre>
      *
-     * <code>CLOSEST_PRECEDING_FINGER = 0;</code>
+     * <code>CLOSEST_PRECEDING_NODE = 0;</code>
      */
-    CLOSEST_PRECEDING_FINGER(0),
+    CLOSEST_PRECEDING_NODE(0),
     /**
      * <pre>
      * reply closest preceding finger
@@ -220,9 +211,9 @@ public final class StorageMessages {
      * ask for the closest preceding finger
      * </pre>
      *
-     * <code>CLOSEST_PRECEDING_FINGER = 0;</code>
+     * <code>CLOSEST_PRECEDING_NODE = 0;</code>
      */
-    public static final int CLOSEST_PRECEDING_FINGER_VALUE = 0;
+    public static final int CLOSEST_PRECEDING_NODE_VALUE = 0;
     /**
      * <pre>
      * reply closest preceding finger
@@ -303,7 +294,7 @@ public final class StorageMessages {
 
     public static infoType forNumber(int value) {
       switch (value) {
-        case 0: return CLOSEST_PRECEDING_FINGER;
+        case 0: return CLOSEST_PRECEDING_NODE;
         case 1: return NODE;
         case 2: return ASK_M;
         case 3: return M;
@@ -1412,7 +1403,7 @@ public final class StorageMessages {
     @java.lang.Override
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
-      if (type_ != edu.usfca.cs.dfs.StorageMessages.infoType.CLOSEST_PRECEDING_FINGER.getNumber()) {
+      if (type_ != edu.usfca.cs.dfs.StorageMessages.infoType.CLOSEST_PRECEDING_NODE.getNumber()) {
         output.writeEnum(1, type_);
       }
       if (!data_.isEmpty()) {
@@ -1433,7 +1424,7 @@ public final class StorageMessages {
       if (size != -1) return size;
 
       size = 0;
-      if (type_ != edu.usfca.cs.dfs.StorageMessages.infoType.CLOSEST_PRECEDING_FINGER.getNumber()) {
+      if (type_ != edu.usfca.cs.dfs.StorageMessages.infoType.CLOSEST_PRECEDING_NODE.getNumber()) {
         size += com.google.protobuf.CodedOutputStream
           .computeEnumSize(1, type_);
       }
@@ -2678,13 +2669,13 @@ public final class StorageMessages {
       "\n\004data\030\005 \001(\014\"P\n\004Info\022\027\n\004type\030\001 \001(\0162\t.inf" +
       "oType\022\014\n\004data\030\002 \001(\014\022\023\n\013integerData\030\003 \001(\005" +
       "\022\014\n\004time\030\004 \001(\t\".\n\004Node\022\014\n\004host\030\001 \001(\t\022\014\n\004" +
-      "port\030\002 \001(\005\022\n\n\002id\030\003 \001(\005*H\n\013messageType\022\r\n" +
-      "\tFIND_HOST\020\000\022\010\n\004DATA\020\001\022\007\n\003ACK\020\002\022\010\n\004INFO\020" +
-      "\003\022\r\n\tHEARTBEAT\020\004*\215\001\n\010infoType\022\034\n\030CLOSEST" +
-      "_PRECEDING_FINGER\020\000\022\010\n\004NODE\020\001\022\t\n\005ASK_M\020\002" +
-      "\022\005\n\001M\020\003\022\021\n\rASK_SUCCESSOR\020\004\022\023\n\017ASK_PREDEC" +
-      "ESSOR\020\005\022\023\n\017ASK_NODE_DETAIL\020\006\022\n\n\006NOTIFY\020\007" +
-      "B\022\n\020edu.usfca.cs.dfsb\006proto3"
+      "port\030\002 \001(\005\022\n\n\002id\030\003 \001(\005*?\n\013messageType\022\r\n" +
+      "\tFIND_HOST\020\000\022\010\n\004DATA\020\001\022\010\n\004INFO\020\002\022\r\n\tHEAR" +
+      "TBEAT\020\003*\213\001\n\010infoType\022\032\n\026CLOSEST_PRECEDIN" +
+      "G_NODE\020\000\022\010\n\004NODE\020\001\022\t\n\005ASK_M\020\002\022\005\n\001M\020\003\022\021\n\r" +
+      "ASK_SUCCESSOR\020\004\022\023\n\017ASK_PREDECESSOR\020\005\022\023\n\017" +
+      "ASK_NODE_DETAIL\020\006\022\n\n\006NOTIFY\020\007B\022\n\020edu.usf" +
+      "ca.cs.dfsb\006proto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
