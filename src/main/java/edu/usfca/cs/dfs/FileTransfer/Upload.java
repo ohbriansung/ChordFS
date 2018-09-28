@@ -51,7 +51,7 @@ public class Upload implements Runnable {
                 .setType(StorageMessages.messageType.FIND_HOST).setData(b).build();
         message.writeDelimitedTo(out);
 
-        StorageMessages.Node node = StorageMessages.Node.parseFrom(in);
+        StorageMessages.Node node = StorageMessages.Node.parseDelimitedFrom(in);
         Node n = new Node(node);
         socket.close();
 

@@ -19,7 +19,7 @@ public class Receiver implements Runnable {
     /**
      * Usage: for closing socket.
      */
-    void close() {
+    public void close() {
         try {
             DFS.socket.close();
         } catch (IOException e) {

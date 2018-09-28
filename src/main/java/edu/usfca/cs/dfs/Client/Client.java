@@ -1,5 +1,6 @@
-package edu.usfca.cs.dfs;
+package edu.usfca.cs.dfs.Client;
 
+import edu.usfca.cs.dfs.*;
 import edu.usfca.cs.dfs.hash.HashException;
 import edu.usfca.cs.dfs.hash.SHA1;
 
@@ -17,12 +18,12 @@ import java.util.Scanner;
 /**
  * @author Brian Sung
  */
-class Client extends Sender {
+public class Client extends Command {
     private final SHA1 sha1;
     private final DataProcessor dp;
     private InetSocketAddress storageNodeAddress;
 
-    Client(InetSocketAddress storageNodeAddress) {
+    public Client(InetSocketAddress storageNodeAddress) {
         super();
         this.sha1 = new SHA1();
         this.dp = new DataProcessor();
@@ -36,7 +37,7 @@ class Client extends Sender {
         }
     }
 
-    void startUI() {
+    public void startUI() {
         Scanner scanner = new Scanner(System.in);
 
         String str;
@@ -59,6 +60,9 @@ class Client extends Sender {
             case "upload":
                 upload(command[1]);
                 break;
+            case "exit":
+                exit();
+                break;
             default:
                 try {
                     System.out.println("asking " + this.storageNodeAddress);
@@ -70,35 +74,30 @@ class Client extends Sender {
         }
     }
 
-    private void help() {
-        StringBuilder sb = new StringBuilder();
 
-        sb.append("Commands").append(System.lineSeparator());
-        sb.append("upload <file_name>\t\tUpload the file to file system.").append(System.lineSeparator());
-        sb.append("exit\t\t\tTerminate the program.");
-
-        System.out.println(sb.toString());
-    }
 
     private void printInfo() {
-        System.out.print("Please input command or type \"help\": ");
+        System.out.print("> ");
     }
 
     private void upload(String filename) {
         Path path = Paths.get(filename);
+        if (filename.contains("/")) {
+            filename = filename.substring(filename.lastIndexOf('/') + 1);
+        }
 
         if (Files.isDirectory(path)) {
-            System.out.println("The path indicated a directory, please compress it then try again.");
+            System.out.println("The path indicates a directory, please compress it then try again.");
             return;
         }
 
         try {
-            List<byte[]> chunks = this.dp.breakFile(filename);
+            List<byte[]> chunks = this.dp.breakFile(path);
             List<BigInteger> hashcode = hashChunks(filename, chunks);
             upload(filename, chunks, hashcode, this.storageNodeAddress);
-            System.out.println("Upload process has finished.");
+            System.out.println("Upload request has been sent.");
         } catch (NoSuchFileException ignore) {
-            System.out.println("The file \"" + filename + "\" does not exist.");
+            System.out.println("The file [" + path + "] does not exist.");
         } catch (HashException | IOException e) {
             e.printStackTrace();
         }
@@ -117,11 +116,11 @@ class Client extends Sender {
         System.out.println("Converted file into [" + size + "] chunks:");
 
         List<BigInteger> hashcode = new ArrayList<>();
-        for (int i = 1; i < size - 1; i++) {
+        for (int i = 0; i < size; i++) {
             String chunkName = filename + i;
             BigInteger hash = this.sha1.hash(chunkName.getBytes());
             hashcode.add(hash);
-            System.out.println("Chunk [" + i + "] name = [" + chunkName + "], hash = [" + hash + "]");
+            System.out.println("Chunk [" + i + "] = [" + chunkName + "], hash = [" + hash + "]");
         }
 
         return hashcode;

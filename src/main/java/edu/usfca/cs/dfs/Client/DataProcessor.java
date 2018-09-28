@@ -1,4 +1,6 @@
-package edu.usfca.cs.dfs;
+package edu.usfca.cs.dfs.Client;
+
+import edu.usfca.cs.dfs.DFS;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -19,13 +21,12 @@ class DataProcessor {
      * FileChannel to stream bytes so we can read files larger than 2Gb.
      * Deep copy into ArrayList for later usage.
      *
-     * @param filename
+     * @param path
      * @return List
      * @throws IOException
      */
-    List<byte[]> breakFile(String filename) throws IOException {
+    List<byte[]> breakFile(Path path) throws IOException {
         List<byte[]> chunks = new ArrayList<>();
-        Path path = Paths.get(filename);
         FileChannel channel = (FileChannel) Files.newByteChannel(path);
         ByteBuffer buffer = ByteBuffer.allocate(DFS.MAX_CHUNK_SIZE);
 
@@ -39,12 +40,12 @@ class DataProcessor {
         return chunks;
     }
 
-    void restoreFile(String fileName, List<byte[]> chunks) throws IOException {
+    void restoreFile(String filename, List<byte[]> chunks) throws IOException {
         if (chunks.size() == 0) {
             return;
         }
 
-        File file = new File(fileName);
+        File file = new File(filename);
         FileChannel channel = new FileOutputStream(file).getChannel();
         for (byte[] bytes : chunks) {
             channel.write(ByteBuffer.wrap(bytes));

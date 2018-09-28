@@ -1,7 +1,8 @@
 package edu.usfca.cs.dfs;
 
-import com.sun.javafx.binding.StringFormatter;
+import edu.usfca.cs.dfs.Client.Client;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.*;
 import java.util.HashMap;
@@ -9,24 +10,27 @@ import java.util.Map;
 import java.util.concurrent.CountDownLatch;
 
 public class DFS {
-    static final int MAX_CHUNK_SIZE = 64 * 1024 * 1024;
+    public static final int MAX_CHUNK_SIZE = 64 * 1024 * 1024;
     static final int THREAD = 16;
-    static final CountDownLatch READY = new CountDownLatch(1);  // ui waits for receiver and sender
+    public static final CountDownLatch READY = new CountDownLatch(1);  // ui waits for receiver and sender
     static volatile boolean alive = true;
 
     static ServerSocket socket;
-    static Receiver receiver;
     static Sender currentNode;
-    static String volume;
+    public static Receiver receiver;
+    public static String volume;
 
     public static void main(String[] args) {
         Map<String, String> arguments = parseArgs(args);
 
-        // TODO: uncomment
-        /*if (!checkArgs(arguments)) {
-            System.out.println("Usage: java dfs.jar --run <storage/client> ...");
-            System.exit(1);
-        }*/
+        if (!checkArgs(arguments)) {
+            StringBuilder sb = new StringBuilder();
+            sb.append("Usage: java dfs.jar ");
+            sb.append("--run <storage/client> --port <port> ");
+            sb.append("[--m <m_bits_ring>] [--node <existing_node_address:port>]");
+            System.out.println(sb.toString());
+            System.exit(-1);
+        }
 
         // default arguments
         String host = "";
@@ -62,14 +66,6 @@ public class DFS {
             map.put(key, args[i + 1]);
         }
 
-        map.put("run", "storage");
-        map.put("port", "13000");
-        //map.put("node", "localhost:13000");
-
-//        map.put("run", "client");
-//        map.put("port", "13099");
-//        map.put("node", "localhost:13000");
-
         return map;
     }
 
@@ -77,6 +73,9 @@ public class DFS {
         boolean checked = true;
 
         if (!arguments.containsKey("run")) {
+            checked = false;
+        }
+        else if (!arguments.containsKey("port")) {
             checked = false;
         }
 
@@ -98,7 +97,8 @@ public class DFS {
             ((Client) DFS.currentNode).startUI();
         }
         else {
-            DFS.volume = arguments.getOrDefault("volume", "~/Downloads/");
+            DFS.volume = arguments.getOrDefault("volume", System.getProperty("user.home") + '/');
+            checkVolume(DFS.volume);
 
             if (arguments.containsKey("node")) {
                 DFS.currentNode = new StorageNode(host, port);
@@ -120,6 +120,16 @@ public class DFS {
 
             Thread stabilization = new Thread(new Stabilization(((StorageNode) DFS.currentNode)));
             stabilization.start();
+        }
+    }
+
+    private static void checkVolume(String volume) {
+        File temp = new File(volume);
+        if (temp.exists() && temp.isDirectory()) {
+            System.out.println("Set volume = [" + temp + "]");
+        } else {
+            System.out.println("Volume [" + temp + "] dose not exist or is not a directory.");
+            System.exit(-1);
         }
     }
 }

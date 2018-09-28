@@ -49,7 +49,7 @@ public class Node {
         return port;
     }
 
-    int getId() {
+    public int getId() {
         this.lock.readLock().lock();
         int id = this.id;
         this.lock.readLock().unlock();

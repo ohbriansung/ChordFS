@@ -12,20 +12,20 @@ import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-class Sender extends Serializer {
+public class Sender extends Serializer {
     private final ExecutorService pool;
 
-    Sender() {
+    public Sender() {
         this.pool = Executors.newFixedThreadPool(DFS.THREAD);
     }
 
-    void close() {
+    public void close() {
         if (this.pool != null && !this.pool.isShutdown()) {
             this.pool.shutdown();
         }
     }
 
-    Node ask(InetSocketAddress addr, StorageMessages.infoType type, Integer... id) throws IOException {
+    protected Node ask(InetSocketAddress addr, StorageMessages.infoType type, Integer... id) throws IOException {
         // create socket and stream
         Socket socket = new Socket();
         socket.connect(addr);
@@ -99,7 +99,7 @@ class Sender extends Serializer {
         socket.close();
     }
 
-    void upload(String filename, List<byte[]> chunks, List<BigInteger> hashcode, InetSocketAddress addr) {
+    protected void upload(String filename, List<byte[]> chunks, List<BigInteger> hashcode, InetSocketAddress addr) {
         int size = chunks.size();
 
         // a thread for a chunk
