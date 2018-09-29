@@ -1,7 +1,7 @@
 package edu.usfca.cs.dfs.FileTransfer;
 
 import com.google.protobuf.ByteString;
-import edu.usfca.cs.dfs.Node;
+import edu.usfca.cs.dfs.Storage.Node;
 import edu.usfca.cs.dfs.StorageMessages;
 
 import java.io.IOException;

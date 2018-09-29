@@ -21,6 +21,7 @@ abstract class Command extends Sender {
 
     void exit() {
         System.out.println("Shutting down...");
+        DFS.alive = false;
         DFS.receiver.close();
         close();  // close sender thread pool
         System.exit(0);

@@ -1,6 +1,7 @@
 package edu.usfca.cs.dfs;
 
 import edu.usfca.cs.dfs.FileTransfer.Upload;
+import edu.usfca.cs.dfs.Storage.Node;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -19,7 +20,7 @@ public class Sender extends Serializer {
         this.pool = Executors.newFixedThreadPool(DFS.THREAD);
     }
 
-    public void close() {
+    protected void close() {
         if (this.pool != null && !this.pool.isShutdown()) {
             this.pool.shutdown();
         }
@@ -50,7 +51,7 @@ public class Sender extends Serializer {
         return new Node(n);
     }
 
-    int askM(InetSocketAddress addr) throws IOException {
+    protected int askM(InetSocketAddress addr) throws IOException {
         // create socket and stream
         Socket socket = new Socket();
         socket.connect(addr);
@@ -69,7 +70,7 @@ public class Sender extends Serializer {
         return response.getIntegerData();
     }
 
-    void notify(InetSocketAddress addr, Node n) throws IOException {
+    protected void notify(InetSocketAddress addr, Node n) throws IOException {
         // create socket and stream
         Socket socket = new Socket();
         socket.connect(addr);
@@ -85,7 +86,7 @@ public class Sender extends Serializer {
         socket.close();
     }
 
-    void heartbeat(InetSocketAddress addr) throws IOException {
+    protected void heartbeat(InetSocketAddress addr) throws IOException {
         // create socket and stream
         Socket socket = new Socket();
         socket.connect(addr);

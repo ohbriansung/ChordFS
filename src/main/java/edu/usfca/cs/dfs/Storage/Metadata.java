@@ -1,4 +1,4 @@
-package edu.usfca.cs.dfs;
+package edu.usfca.cs.dfs.Storage;
 
 import java.util.*;
 import java.util.concurrent.locks.ReentrantReadWriteLock;

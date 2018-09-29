@@ -1,9 +1,11 @@
-package edu.usfca.cs.dfs;
+package edu.usfca.cs.dfs.Storage;
 
-class Stabilization implements Runnable {
+import edu.usfca.cs.dfs.DFS;
+
+public class Stabilization implements Runnable {
     private final StorageNode node;
 
-    Stabilization(StorageNode node) {
+    public Stabilization(StorageNode node) {
         this.node = node;
     }
 

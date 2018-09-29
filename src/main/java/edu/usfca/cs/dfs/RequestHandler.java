@@ -3,6 +3,8 @@ package edu.usfca.cs.dfs;
 import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
 import edu.usfca.cs.dfs.FileTransfer.StoreProcess;
+import edu.usfca.cs.dfs.Storage.Node;
+import edu.usfca.cs.dfs.Storage.StorageNode;
 
 import java.io.IOException;
 import java.io.InputStream;

@@ -1,4 +1,6 @@
-package edu.usfca.cs.dfs;
+package edu.usfca.cs.dfs.Storage;
+
+import edu.usfca.cs.dfs.StorageMessages;
 
 import java.net.InetSocketAddress;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
@@ -33,7 +35,7 @@ public class Node {
         printId();
     }
 
-    String getHost() {
+    public String getHost() {
         this.lock.readLock().lock();
         String host = this.host;
         this.lock.readLock().unlock();
@@ -41,7 +43,7 @@ public class Node {
         return host;
     }
 
-    int getPort() {
+    public int getPort() {
         this.lock.readLock().lock();
         int port = this.port;
         this.lock.readLock().unlock();
@@ -70,7 +72,7 @@ public class Node {
      *
      * @return StorageMessages.Node
      */
-    StorageMessages.Node serialize() {
+    public StorageMessages.Node serialize() {
         this.lock.readLock().lock();
 
         // serialize node

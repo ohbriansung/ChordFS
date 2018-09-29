@@ -1,10 +1,10 @@
-package edu.usfca.cs.dfs;
+package edu.usfca.cs.dfs.Storage;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
-class FingerTable {
+public class FingerTable {
     private ReentrantReadWriteLock lock;
     private final Node[] finger;
 

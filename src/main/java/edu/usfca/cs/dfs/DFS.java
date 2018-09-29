@@ -1,6 +1,8 @@
 package edu.usfca.cs.dfs;
 
 import edu.usfca.cs.dfs.Client.Client;
+import edu.usfca.cs.dfs.Storage.Stabilization;
+import edu.usfca.cs.dfs.Storage.StorageNode;
 
 import java.io.File;
 import java.io.IOException;
@@ -10,10 +12,10 @@ import java.util.Map;
 import java.util.concurrent.CountDownLatch;
 
 public class DFS {
-    public static final int MAX_CHUNK_SIZE = 64 * 1024 * 1024;
     static final int THREAD = 16;
+    public static final int MAX_CHUNK_SIZE = 64 * 1024 * 1024;
     public static final CountDownLatch READY = new CountDownLatch(1);  // ui waits for receiver and sender
-    static volatile boolean alive = true;
+    public static volatile boolean alive = true;
 
     static ServerSocket socket;
     static Sender currentNode;
@@ -109,7 +111,7 @@ public class DFS {
                     ((StorageNode) DFS.currentNode).join(np);
                 } catch (IOException e) {
                     e.printStackTrace();
-                    System.out.println("Node " + np.toString() + "is unreachable, please try again.");
+                    System.out.println("Node " + np.toString() + " is unreachable, please try again.");
                     System.exit(-1);
                 }
             }

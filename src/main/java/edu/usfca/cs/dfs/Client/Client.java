@@ -1,6 +1,7 @@
 package edu.usfca.cs.dfs.Client;
 
 import edu.usfca.cs.dfs.*;
+import edu.usfca.cs.dfs.Storage.Node;
 import edu.usfca.cs.dfs.hash.HashException;
 import edu.usfca.cs.dfs.hash.SHA1;
 

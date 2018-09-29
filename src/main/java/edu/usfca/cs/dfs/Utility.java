@@ -2,10 +2,10 @@ package edu.usfca.cs.dfs;
 
 import java.math.BigInteger;
 
-class Utility {
+public class Utility {
     private final int capacity;
 
-    Utility(int capacity) {
+    public Utility(int capacity) {
         this.capacity = capacity;
     }
 
@@ -17,7 +17,7 @@ class Utility {
      * @param right
      * @return boolean - in the range
      */
-    boolean in(int target, int left, int right) {
+    public boolean in(int target, int left, int right) {
         if (left < right) {
             return target > left && target < right;
         }
@@ -31,23 +31,23 @@ class Utility {
         }
     }
 
-    boolean includesLeft(int target, int left, int right) {
+    public boolean includesLeft(int target, int left, int right) {
         return (target ^ left) == 0b0 || in(target, left, right);
     }
 
-    boolean includesRight(int target, int left, int right) {
+    public boolean includesRight(int target, int left, int right) {
         return (target ^ right) == 0b0 || in(target, left, right);
     }
 
-    int genId() {
+    public int genId() {
         return Math.abs(Long.hashCode(System.currentTimeMillis()) % this.capacity);
     }
 
-    int start(int id, int i) {
+    public int start(int id, int i) {
         return (id + (0b1 << i)) % this.capacity;
     }
 
-    int getKey(BigInteger hash) {
+    public int getKey(BigInteger hash) {
         BigInteger rem = hash.remainder(new BigInteger(String.valueOf(this.capacity)));
         return rem.intValue();
     }

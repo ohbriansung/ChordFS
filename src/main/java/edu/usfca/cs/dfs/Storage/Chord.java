@@ -1,9 +1,9 @@
-package edu.usfca.cs.dfs;
+package edu.usfca.cs.dfs.Storage;
+
+import edu.usfca.cs.dfs.*;
 
 import java.io.IOException;
-import java.math.BigInteger;
 import java.net.InetSocketAddress;
-import java.util.Hashtable;
 
 /**
  * Chord Reference: https://en.wikipedia.org/wiki/Chord_(peer-to-peer)
@@ -11,23 +11,20 @@ import java.util.Hashtable;
  * np = n'
  * @author Brian Sung
  */
-class StorageNode extends Sender {
+abstract class Chord extends Sender {
     private int m;
     private int next;
     private Node n;
     private Node predecessor;
     private FingerTable fingers;
-    private Utility util;
+    Utility util;
 
-    private Hashtable<Integer, Metadata> currentStorage;
-
-    StorageNode(String host, int port) {
+    Chord(String host, int port) {
         this.n = new Node(host, port);
         this.next = 0;
-        this.currentStorage = new Hashtable<>();
     }
 
-    StorageNode(String host, int port, int m) {
+    Chord(String host, int port, int m) {
         this(host, port);
         this.m = m;
         prepare();
@@ -43,7 +40,7 @@ class StorageNode extends Sender {
      * @param id
      * @return Node
      */
-    Node findSuccessor(int id) {
+    public Node findSuccessor(int id) {
         Node successor = this.fingers.getFinger(0);
 
         try {
@@ -76,7 +73,7 @@ class StorageNode extends Sender {
      * @param id
      * @return Node
      */
-    Node closestPrecedingNode(int id) {
+    public Node closestPrecedingNode(int id) {
         for (int i = this.m - 1; i >= 0; i--) {
             Node fingerI = this.fingers.getFinger(i);
 
@@ -92,7 +89,7 @@ class StorageNode extends Sender {
      * Creating new Chord ring.
      * Set current node as successor.
      */
-    void create() {
+    public void create() {
         this.predecessor = null;
         int id = this.util.genId();
         this.n.setId(id);
@@ -106,7 +103,7 @@ class StorageNode extends Sender {
      * keep generating new id until it is unique.
      * @param np
      */
-    void join(InetSocketAddress np) throws IOException {
+    public void join(InetSocketAddress np) throws IOException {
         this.m = askM(np);
         prepare();
 
@@ -158,7 +155,7 @@ class StorageNode extends Sender {
      * np thinks it might be our predecessor.
      * @param np
      */
-    void notify(Node np) {
+    public void notify(Node np) {
         if (this.predecessor == null || this.util.in(np.getId(), this.predecessor.getId(), this.n.getId())) {
             this.predecessor = np;
             System.out.println("predecessor = [" + np.getId() + "]");
@@ -193,41 +190,15 @@ class StorageNode extends Sender {
         }
     }
 
-    /**
-     * Find the host (successor) that is responsible for the particular hashcode.
-     * @param hash
-     * @return Node
-     */
-    Node findHost(BigInteger hash) {
-        int key = this.util.getKey(hash);
-        return findSuccessor(key);
-    }
-
-    int getM() {
+    public int getM() {
         return this.m;
     }
 
-    Node getN() {
+    public Node getN() {
         return this.n;
     }
 
-    Node getPredecessor() {
+    public Node getPredecessor() {
         return this.predecessor;
-    }
-
-    void recordMetadata(StorageMessages.Message message) {
-        String filename = message.getFileName();
-        int total = message.getTotalChunk();
-        int i = message.getChunkId();
-        BigInteger hash = new BigInteger(message.getHash().toByteArray());
-        int key = this.util.getKey(hash);
-
-        if (!this.currentStorage.containsKey(key)) {
-            this.currentStorage.put(key, new Metadata());
-        }
-
-        Metadata md = this.currentStorage.get(key);
-        md.add(filename, total, i);
-        System.out.println("Metadata of file [" + filename + i + "] has been recorded.");
     }
 }
