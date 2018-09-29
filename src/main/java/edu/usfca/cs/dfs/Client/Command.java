@@ -25,4 +25,8 @@ abstract class Command extends Sender {
         close();  // close sender thread pool
         System.exit(0);
     }
+
+    void printInfo() {
+        System.out.print("> ");
+    }
 }

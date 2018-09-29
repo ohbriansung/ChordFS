@@ -22,7 +22,6 @@ public class StoreProcess {
 
     public void store() {
         String filename = this.message.getFileName();
-        int total = this.message.getTotalChunk();
         int i = this.message.getChunkId();
         byte[] chunk = this.message.getData().toByteArray();
 
@@ -42,7 +41,5 @@ public class StoreProcess {
         } catch (IOException e) {
             e.printStackTrace();
         }
-
-        //TODO: store metadata
     }
 }

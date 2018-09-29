@@ -391,6 +391,11 @@ public final class StorageMessages {
      * <code>bytes data = 5;</code>
      */
     com.google.protobuf.ByteString getData();
+
+    /**
+     * <code>bytes hash = 6;</code>
+     */
+    com.google.protobuf.ByteString getHash();
   }
   /**
    * Protobuf type {@code Message}
@@ -410,6 +415,7 @@ public final class StorageMessages {
       totalChunk_ = 0;
       chunkId_ = 0;
       data_ = com.google.protobuf.ByteString.EMPTY;
+      hash_ = com.google.protobuf.ByteString.EMPTY;
     }
 
     @java.lang.Override
@@ -461,6 +467,11 @@ public final class StorageMessages {
             case 42: {
 
               data_ = input.readBytes();
+              break;
+            }
+            case 50: {
+
+              hash_ = input.readBytes();
               break;
             }
             default: {
@@ -573,6 +584,15 @@ public final class StorageMessages {
       return data_;
     }
 
+    public static final int HASH_FIELD_NUMBER = 6;
+    private com.google.protobuf.ByteString hash_;
+    /**
+     * <code>bytes hash = 6;</code>
+     */
+    public com.google.protobuf.ByteString getHash() {
+      return hash_;
+    }
+
     private byte memoizedIsInitialized = -1;
     @java.lang.Override
     public final boolean isInitialized() {
@@ -602,6 +622,9 @@ public final class StorageMessages {
       if (!data_.isEmpty()) {
         output.writeBytes(5, data_);
       }
+      if (!hash_.isEmpty()) {
+        output.writeBytes(6, hash_);
+      }
       unknownFields.writeTo(output);
     }
 
@@ -630,6 +653,10 @@ public final class StorageMessages {
         size += com.google.protobuf.CodedOutputStream
           .computeBytesSize(5, data_);
       }
+      if (!hash_.isEmpty()) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeBytesSize(6, hash_);
+      }
       size += unknownFields.getSerializedSize();
       memoizedSize = size;
       return size;
@@ -655,6 +682,8 @@ public final class StorageMessages {
           == other.getChunkId());
       result = result && getData()
           .equals(other.getData());
+      result = result && getHash()
+          .equals(other.getHash());
       result = result && unknownFields.equals(other.unknownFields);
       return result;
     }
@@ -676,6 +705,8 @@ public final class StorageMessages {
       hash = (53 * hash) + getChunkId();
       hash = (37 * hash) + DATA_FIELD_NUMBER;
       hash = (53 * hash) + getData().hashCode();
+      hash = (37 * hash) + HASH_FIELD_NUMBER;
+      hash = (53 * hash) + getHash().hashCode();
       hash = (29 * hash) + unknownFields.hashCode();
       memoizedHashCode = hash;
       return hash;
@@ -819,6 +850,8 @@ public final class StorageMessages {
 
         data_ = com.google.protobuf.ByteString.EMPTY;
 
+        hash_ = com.google.protobuf.ByteString.EMPTY;
+
         return this;
       }
 
@@ -850,6 +883,7 @@ public final class StorageMessages {
         result.totalChunk_ = totalChunk_;
         result.chunkId_ = chunkId_;
         result.data_ = data_;
+        result.hash_ = hash_;
         onBuilt();
         return result;
       }
@@ -913,6 +947,9 @@ public final class StorageMessages {
         }
         if (other.getData() != com.google.protobuf.ByteString.EMPTY) {
           setData(other.getData());
+        }
+        if (other.getHash() != com.google.protobuf.ByteString.EMPTY) {
+          setHash(other.getHash());
         }
         this.mergeUnknownFields(other.unknownFields);
         onChanged();
@@ -1134,6 +1171,35 @@ public final class StorageMessages {
       public Builder clearData() {
         
         data_ = getDefaultInstance().getData();
+        onChanged();
+        return this;
+      }
+
+      private com.google.protobuf.ByteString hash_ = com.google.protobuf.ByteString.EMPTY;
+      /**
+       * <code>bytes hash = 6;</code>
+       */
+      public com.google.protobuf.ByteString getHash() {
+        return hash_;
+      }
+      /**
+       * <code>bytes hash = 6;</code>
+       */
+      public Builder setHash(com.google.protobuf.ByteString value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  
+        hash_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>bytes hash = 6;</code>
+       */
+      public Builder clearHash() {
+        
+        hash_ = getDefaultInstance().getHash();
         onChanged();
         return this;
       }
@@ -2526,19 +2592,19 @@ public final class StorageMessages {
       descriptor;
   static {
     java.lang.String[] descriptorData = {
-      "\n\026storage_messages.proto\"j\n\007Message\022\032\n\004t" +
+      "\n\026storage_messages.proto\"x\n\007Message\022\032\n\004t" +
       "ype\030\001 \001(\0162\014.messageType\022\020\n\010fileName\030\002 \001(" +
       "\t\022\022\n\ntotalChunk\030\003 \001(\005\022\017\n\007chunkId\030\004 \001(\005\022\014" +
-      "\n\004data\030\005 \001(\014\"B\n\004Info\022\027\n\004type\030\001 \001(\0162\t.inf" +
-      "oType\022\014\n\004data\030\002 \001(\014\022\023\n\013integerData\030\003 \001(\005" +
-      "\".\n\004Node\022\014\n\004host\030\001 \001(\t\022\014\n\004port\030\002 \001(\005\022\n\n\002" +
-      "id\030\003 \001(\005*?\n\013messageType\022\r\n\tFIND_HOST\020\000\022\010" +
-      "\n\004DATA\020\001\022\010\n\004INFO\020\002\022\r\n\tHEARTBEAT\020\003*\213\001\n\010in" +
-      "foType\022\032\n\026CLOSEST_PRECEDING_NODE\020\000\022\010\n\004NO" +
-      "DE\020\001\022\t\n\005ASK_M\020\002\022\005\n\001M\020\003\022\021\n\rASK_SUCCESSOR\020" +
-      "\004\022\023\n\017ASK_PREDECESSOR\020\005\022\023\n\017ASK_NODE_DETAI" +
-      "L\020\006\022\n\n\006NOTIFY\020\007B\022\n\020edu.usfca.cs.dfsb\006pro" +
-      "to3"
+      "\n\004data\030\005 \001(\014\022\014\n\004hash\030\006 \001(\014\"B\n\004Info\022\027\n\004ty" +
+      "pe\030\001 \001(\0162\t.infoType\022\014\n\004data\030\002 \001(\014\022\023\n\013int" +
+      "egerData\030\003 \001(\005\".\n\004Node\022\014\n\004host\030\001 \001(\t\022\014\n\004" +
+      "port\030\002 \001(\005\022\n\n\002id\030\003 \001(\005*?\n\013messageType\022\r\n" +
+      "\tFIND_HOST\020\000\022\010\n\004DATA\020\001\022\010\n\004INFO\020\002\022\r\n\tHEAR" +
+      "TBEAT\020\003*\213\001\n\010infoType\022\032\n\026CLOSEST_PRECEDIN" +
+      "G_NODE\020\000\022\010\n\004NODE\020\001\022\t\n\005ASK_M\020\002\022\005\n\001M\020\003\022\021\n\r" +
+      "ASK_SUCCESSOR\020\004\022\023\n\017ASK_PREDECESSOR\020\005\022\023\n\017" +
+      "ASK_NODE_DETAIL\020\006\022\n\n\006NOTIFY\020\007B\022\n\020edu.usf" +
+      "ca.cs.dfsb\006proto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
@@ -2557,7 +2623,7 @@ public final class StorageMessages {
     internal_static_Message_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_Message_descriptor,
-        new java.lang.String[] { "Type", "FileName", "TotalChunk", "ChunkId", "Data", });
+        new java.lang.String[] { "Type", "FileName", "TotalChunk", "ChunkId", "Data", "Hash", });
     internal_static_Info_descriptor =
       getDescriptor().getMessageTypes().get(1);
     internal_static_Info_fieldAccessorTable = new

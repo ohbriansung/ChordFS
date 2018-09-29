@@ -74,12 +74,6 @@ public class Client extends Command {
         }
     }
 
-
-
-    private void printInfo() {
-        System.out.print("> ");
-    }
-
     private void upload(String filename) {
         Path path = Paths.get(filename);
         if (filename.contains("/")) {

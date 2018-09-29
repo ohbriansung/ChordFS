@@ -8,7 +8,6 @@ import java.io.IOException;
 import java.nio.ByteBuffer;  // https://docs.oracle.com/javase/10/docs/api/java/nio/ByteBuffer.html
 import java.nio.channels.FileChannel;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -21,9 +20,9 @@ class DataProcessor {
      * FileChannel to stream bytes so we can read files larger than 2Gb.
      * Deep copy into ArrayList for later usage.
      *
-     * @param path
+     * @param path - Object path to the file.
      * @return List
-     * @throws IOException
+     * @throws IOException - If the file is missing.
      */
     List<byte[]> breakFile(Path path) throws IOException {
         List<byte[]> chunks = new ArrayList<>();

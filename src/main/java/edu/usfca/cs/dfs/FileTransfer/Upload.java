@@ -32,7 +32,7 @@ public class Upload implements Runnable {
     public void run() {
         try {
             InetSocketAddress remote = getRemoteNode(this.hash, this.addr);
-            StorageMessages.Message message = serialize(this.filename, this.totalSize, this.i, this.chunk);
+            StorageMessages.Message message = serialize(this.filename, this.totalSize, this.i, this.chunk, this.hash);
             send(remote, message);
         } catch (IOException e) {
             System.out.println("Failed to upload chunk [" + this.i + "] of file [" + this.filename + "].");
@@ -58,11 +58,10 @@ public class Upload implements Runnable {
         return n.getAddress();
     }
 
-    private StorageMessages.Message serialize(String filename, int total, int i, byte[] chunk) {
-        StorageMessages.Message message = StorageMessages.Message.newBuilder()
-                .setType(StorageMessages.messageType.DATA).setFileName(filename).setTotalChunk(total)
-                .setChunkId(i).setData(ByteString.copyFrom(chunk)).build();
-        return message;
+    private StorageMessages.Message serialize(String filename, int total, int i, byte[] chunk, BigInteger hash) {
+        return StorageMessages.Message.newBuilder().setType(StorageMessages.messageType.DATA)
+                .setFileName(filename).setTotalChunk(total).setChunkId(i).setData(ByteString.copyFrom(chunk))
+                .setHash(ByteString.copyFrom(hash.toByteArray())).build();
     }
 
     private void send(InetSocketAddress addr, StorageMessages.Message message) throws IOException {

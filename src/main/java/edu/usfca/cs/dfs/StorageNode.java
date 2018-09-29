@@ -3,10 +3,10 @@ package edu.usfca.cs.dfs;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.net.InetSocketAddress;
-import java.util.Map;
+import java.util.Hashtable;
 
 /**
- * Reference: https://en.wikipedia.org/wiki/Chord_(peer-to-peer)
+ * Chord Reference: https://en.wikipedia.org/wiki/Chord_(peer-to-peer)
  * successor = fingers[0]
  * np = n'
  * @author Brian Sung
@@ -19,11 +19,12 @@ class StorageNode extends Sender {
     private FingerTable fingers;
     private Utility util;
 
-    private Map<Integer, String> currentStorage;
+    private Hashtable<Integer, Metadata> currentStorage;
 
     StorageNode(String host, int port) {
         this.n = new Node(host, port);
         this.next = 0;
+        this.currentStorage = new Hashtable<>();
     }
 
     StorageNode(String host, int port, int m) {
@@ -212,5 +213,21 @@ class StorageNode extends Sender {
 
     Node getPredecessor() {
         return this.predecessor;
+    }
+
+    void recordMetadata(StorageMessages.Message message) {
+        String filename = message.getFileName();
+        int total = message.getTotalChunk();
+        int i = message.getChunkId();
+        BigInteger hash = new BigInteger(message.getHash().toByteArray());
+        int key = this.util.getKey(hash);
+
+        if (!this.currentStorage.containsKey(key)) {
+            this.currentStorage.put(key, new Metadata());
+        }
+
+        Metadata md = this.currentStorage.get(key);
+        md.add(filename, total, i);
+        System.out.println("Metadata of file [" + filename + i + "] has been recorded.");
     }
 }

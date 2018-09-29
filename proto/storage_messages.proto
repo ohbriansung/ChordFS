@@ -7,6 +7,7 @@ message Message {
     int32 totalChunk = 3;
     int32 chunkId = 4;
     bytes data = 5;
+    bytes hash = 6;
 }
 
 enum messageType {

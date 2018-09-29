@@ -51,6 +51,7 @@ class RequestHandler extends Serializer implements Runnable {
                 case DATA:
                     StoreProcess process = new StoreProcess(message);
                     process.store();
+                    ((StorageNode) DFS.currentNode).recordMetadata(message);
             }
         } catch (InvalidProtocolBufferException e) {
             e.printStackTrace();
