@@ -20,48 +20,72 @@ public final class StorageMessages {
   public enum messageType
       implements com.google.protobuf.ProtocolMessageEnum {
     /**
-     * <code>FIND_HOST = 0;</code>
+     * <code>REQUEST = 0;</code>
      */
-    FIND_HOST(0),
+    REQUEST(0),
     /**
-     * <code>REQUEST = 1;</code>
+     * <code>DATA = 1;</code>
      */
-    REQUEST(1),
+    DATA(1),
     /**
-     * <code>DATA = 2;</code>
+     * <code>INFO = 2;</code>
      */
-    DATA(2),
+    INFO(2),
     /**
-     * <code>INFO = 3;</code>
+     * <code>HEARTBEAT = 3;</code>
      */
-    INFO(3),
+    HEARTBEAT(3),
     /**
-     * <code>HEARTBEAT = 4;</code>
+     * <pre>
+     * get the node that is responsible for a particular key
+     * </pre>
+     *
+     * <code>FIND_HOST = 4;</code>
      */
-    HEARTBEAT(4),
+    FIND_HOST(4),
+    /**
+     * <pre>
+     * get total number of chunks of a particular file
+     * </pre>
+     *
+     * <code>NUM_CHUNKS = 5;</code>
+     */
+    NUM_CHUNKS(5),
     UNRECOGNIZED(-1),
     ;
 
     /**
-     * <code>FIND_HOST = 0;</code>
+     * <code>REQUEST = 0;</code>
      */
-    public static final int FIND_HOST_VALUE = 0;
+    public static final int REQUEST_VALUE = 0;
     /**
-     * <code>REQUEST = 1;</code>
+     * <code>DATA = 1;</code>
      */
-    public static final int REQUEST_VALUE = 1;
+    public static final int DATA_VALUE = 1;
     /**
-     * <code>DATA = 2;</code>
+     * <code>INFO = 2;</code>
      */
-    public static final int DATA_VALUE = 2;
+    public static final int INFO_VALUE = 2;
     /**
-     * <code>INFO = 3;</code>
+     * <code>HEARTBEAT = 3;</code>
      */
-    public static final int INFO_VALUE = 3;
+    public static final int HEARTBEAT_VALUE = 3;
     /**
-     * <code>HEARTBEAT = 4;</code>
+     * <pre>
+     * get the node that is responsible for a particular key
+     * </pre>
+     *
+     * <code>FIND_HOST = 4;</code>
      */
-    public static final int HEARTBEAT_VALUE = 4;
+    public static final int FIND_HOST_VALUE = 4;
+    /**
+     * <pre>
+     * get total number of chunks of a particular file
+     * </pre>
+     *
+     * <code>NUM_CHUNKS = 5;</code>
+     */
+    public static final int NUM_CHUNKS_VALUE = 5;
 
 
     public final int getNumber() {
@@ -82,11 +106,12 @@ public final class StorageMessages {
 
     public static messageType forNumber(int value) {
       switch (value) {
-        case 0: return FIND_HOST;
-        case 1: return REQUEST;
-        case 2: return DATA;
-        case 3: return INFO;
-        case 4: return HEARTBEAT;
+        case 0: return REQUEST;
+        case 1: return DATA;
+        case 2: return INFO;
+        case 3: return HEARTBEAT;
+        case 4: return FIND_HOST;
+        case 5: return NUM_CHUNKS;
         default: return null;
       }
     }
@@ -200,14 +225,6 @@ public final class StorageMessages {
      * <code>NOTIFY = 7;</code>
      */
     NOTIFY(7),
-    /**
-     * <pre>
-     * get total number of chunks of a particular file
-     * </pre>
-     *
-     * <code>NUM_CHUNKS = 8;</code>
-     */
-    NUM_CHUNKS(8),
     UNRECOGNIZED(-1),
     ;
 
@@ -267,14 +284,6 @@ public final class StorageMessages {
      * <code>NOTIFY = 7;</code>
      */
     public static final int NOTIFY_VALUE = 7;
-    /**
-     * <pre>
-     * get total number of chunks of a particular file
-     * </pre>
-     *
-     * <code>NUM_CHUNKS = 8;</code>
-     */
-    public static final int NUM_CHUNKS_VALUE = 8;
 
 
     public final int getNumber() {
@@ -303,7 +312,6 @@ public final class StorageMessages {
         case 5: return ASK_PREDECESSOR;
         case 6: return ASK_NODE_DETAIL;
         case 7: return NOTIFY;
-        case 8: return NUM_CHUNKS;
         default: return null;
       }
     }
@@ -609,7 +617,7 @@ public final class StorageMessages {
     @java.lang.Override
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
-      if (type_ != edu.usfca.cs.dfs.StorageMessages.messageType.FIND_HOST.getNumber()) {
+      if (type_ != edu.usfca.cs.dfs.StorageMessages.messageType.REQUEST.getNumber()) {
         output.writeEnum(1, type_);
       }
       if (!getFileNameBytes().isEmpty()) {
@@ -636,7 +644,7 @@ public final class StorageMessages {
       if (size != -1) return size;
 
       size = 0;
-      if (type_ != edu.usfca.cs.dfs.StorageMessages.messageType.FIND_HOST.getNumber()) {
+      if (type_ != edu.usfca.cs.dfs.StorageMessages.messageType.REQUEST.getNumber()) {
         size += com.google.protobuf.CodedOutputStream
           .computeEnumSize(1, type_);
       }
@@ -2600,13 +2608,13 @@ public final class StorageMessages {
       "\n\004data\030\005 \001(\014\022\014\n\004hash\030\006 \001(\014\"B\n\004Info\022\027\n\004ty" +
       "pe\030\001 \001(\0162\t.infoType\022\014\n\004data\030\002 \001(\014\022\023\n\013int" +
       "egerData\030\003 \001(\005\".\n\004Node\022\014\n\004host\030\001 \001(\t\022\014\n\004" +
-      "port\030\002 \001(\005\022\n\n\002id\030\003 \001(\005*L\n\013messageType\022\r\n" +
-      "\tFIND_HOST\020\000\022\013\n\007REQUEST\020\001\022\010\n\004DATA\020\002\022\010\n\004I" +
-      "NFO\020\003\022\r\n\tHEARTBEAT\020\004*\233\001\n\010infoType\022\032\n\026CLO" +
-      "SEST_PRECEDING_NODE\020\000\022\010\n\004NODE\020\001\022\t\n\005ASK_M" +
-      "\020\002\022\005\n\001M\020\003\022\021\n\rASK_SUCCESSOR\020\004\022\023\n\017ASK_PRED" +
-      "ECESSOR\020\005\022\023\n\017ASK_NODE_DETAIL\020\006\022\n\n\006NOTIFY" +
-      "\020\007\022\016\n\nNUM_CHUNKS\020\010B\022\n\020edu.usfca.cs.dfsb\006" +
+      "port\030\002 \001(\005\022\n\n\002id\030\003 \001(\005*\\\n\013messageType\022\013\n" +
+      "\007REQUEST\020\000\022\010\n\004DATA\020\001\022\010\n\004INFO\020\002\022\r\n\tHEARTB" +
+      "EAT\020\003\022\r\n\tFIND_HOST\020\004\022\016\n\nNUM_CHUNKS\020\005*\213\001\n" +
+      "\010infoType\022\032\n\026CLOSEST_PRECEDING_NODE\020\000\022\010\n" +
+      "\004NODE\020\001\022\t\n\005ASK_M\020\002\022\005\n\001M\020\003\022\021\n\rASK_SUCCESS" +
+      "OR\020\004\022\023\n\017ASK_PREDECESSOR\020\005\022\023\n\017ASK_NODE_DE" +
+      "TAIL\020\006\022\n\n\006NOTIFY\020\007B\022\n\020edu.usfca.cs.dfsb\006" +
       "proto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =

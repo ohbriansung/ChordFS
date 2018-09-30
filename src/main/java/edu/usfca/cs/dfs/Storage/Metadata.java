@@ -25,4 +25,8 @@ class Metadata {
         this.chunks.put(filename, chunks);
         this.lock.writeLock().unlock();
     }
+
+    int getTotalChunk(String filename) {
+        return this.size.getOrDefault(filename, 0);
+    }
 }

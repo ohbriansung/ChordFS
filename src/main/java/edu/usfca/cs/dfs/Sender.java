@@ -57,7 +57,7 @@ public abstract class Sender extends Serializer {
         return new Node(n);
     }
 
-    protected StorageMessages.Message ask(InetSocketAddress addr, StorageMessages.infoType type, ByteString data) throws IOException {
+    protected StorageMessages.Message ask(InetSocketAddress addr, StorageMessages.Message message) throws IOException {
         // create socket and stream
         Socket socket = new Socket();
         socket.connect(addr);
@@ -65,8 +65,6 @@ public abstract class Sender extends Serializer {
         InputStream in = socket.getInputStream();
 
         // send message
-        StorageMessages.Info info = serializeInfo(type, data);
-        StorageMessages.Message message = serializeMessage(StorageMessages.messageType.INFO, info.toByteString());
         message.writeDelimitedTo(out);
 
         // receive response and close socket

@@ -1,6 +1,5 @@
 package edu.usfca.cs.dfs.Client;
 
-import com.google.protobuf.ByteString;
 import edu.usfca.cs.dfs.*;
 import edu.usfca.cs.dfs.Storage.Node;
 import edu.usfca.cs.dfs.hash.HashException;
@@ -63,6 +62,7 @@ public class Client extends Command {
                 break;
             case "download":
                 download(command[1]);
+                break;
             case "exit":
                 exit();
                 break;
@@ -117,10 +117,15 @@ public class Client extends Command {
         try {
             // get total chunk number
             BigInteger firstHash = this.sha1.hash((filename + 0).getBytes());
+            System.out.println("firstHash = [" + firstHash + "]");
             InetSocketAddress firstKeyNode = getRemoteNode(firstHash, this.storageNodeAddress);
-            ByteString b = ByteString.copyFrom(firstHash.toByteArray());
-            StorageMessages.Message m = ask(firstKeyNode, StorageMessages.infoType.NUM_CHUNKS, b);
-            int totalChunk = m.getTotalChunk();
+            StorageMessages.Message message = serializeMessage(filename, firstHash);
+            StorageMessages.Message response = ask(firstKeyNode, message);
+            int totalChunk = response.getTotalChunk();
+
+            if (totalChunk == 0) {
+                throw new NullPointerException();
+            }
 
             // download each chunk and wait for download to finish
             byte[][] chunks = new byte[totalChunk][DFS.MAX_CHUNK_SIZE];

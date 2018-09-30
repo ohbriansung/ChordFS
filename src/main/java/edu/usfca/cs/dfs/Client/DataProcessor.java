@@ -45,9 +45,10 @@ class DataProcessor {
         }
 
         File file = new File(filename);
+        int dot = filename.lastIndexOf('.');
         int temp = 0;
         while (file.exists()) {
-            file = new File(filename + ++temp);
+            file = new File(filename.substring(0, dot) + "(" + ++temp + ")" + filename.substring(dot));
         }
 
         FileChannel channel = new FileOutputStream(file).getChannel();

@@ -47,10 +47,6 @@ class RequestHandler extends Serializer implements Runnable {
                     break;
                 case HEARTBEAT:
                     break;  // no action
-                case FIND_HOST:
-                    BigInteger hash = new BigInteger(message.getData().toByteArray());
-                    responseNode(((StorageNode) DFS.currentNode).findHost(hash));
-                    break;
                 case DATA:
                     process = new StorageProcess(message);
                     process.store();
@@ -59,6 +55,16 @@ class RequestHandler extends Serializer implements Runnable {
                 case REQUEST:
                     process = new StorageProcess(message);
                     StorageMessages.Message data = process.retrieve();
+                    response(data);
+                    break;
+                case FIND_HOST:
+                    BigInteger hash = new BigInteger(message.getData().toByteArray());
+                    responseNode(((StorageNode) DFS.currentNode).findHost(hash));
+                    break;
+                case NUM_CHUNKS:
+                    System.out.println("Received " + message.getType().name() + " from " + this.addr);
+                    int total = ((StorageNode) DFS.currentNode).getTotalChunk(message);
+                    response(serializeMessage(total));
             }
         } catch (InvalidProtocolBufferException e) {
             e.printStackTrace();
@@ -113,5 +119,10 @@ class RequestHandler extends Serializer implements Runnable {
         OutputStream out = this.listening.getOutputStream();
         StorageMessages.Info info = serializeInfo(StorageMessages.infoType.M, m);
         info.writeDelimitedTo(out);
+    }
+
+    private void response(StorageMessages.Message data) throws IOException {
+        OutputStream out = this.listening.getOutputStream();
+        data.writeDelimitedTo(out);
     }
 }

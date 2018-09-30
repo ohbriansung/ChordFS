@@ -21,6 +21,7 @@ public class StorageNode extends Chord {
 
     public StorageNode(String host, int port, int m) {
         super(host, port, m);
+        this.currentStorage = new Hashtable<>();
     }
 
     /**
@@ -47,5 +48,18 @@ public class StorageNode extends Chord {
         Metadata md = this.currentStorage.get(key);
         md.add(filename, total, i);
         System.out.println("Metadata of file [" + filename + i + "] has been recorded.");
+    }
+
+    public int getTotalChunk(StorageMessages.Message message) {
+        String filename = message.getFileName();
+        BigInteger hash = new BigInteger(message.getHash().toByteArray());
+        int key = this.util.getKey(hash);
+
+        if (this.currentStorage.containsKey(key)) {
+            Metadata m = this.currentStorage.get(key);
+            return m.getTotalChunk(filename);
+        }
+
+        return 0;
     }
 }
