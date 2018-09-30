@@ -1,6 +1,7 @@
 package edu.usfca.cs.dfs.FileTransfer;
 
 import edu.usfca.cs.dfs.DFS;
+import edu.usfca.cs.dfs.Serializer;
 import edu.usfca.cs.dfs.StorageMessages;
 
 import java.io.File;
@@ -13,10 +14,10 @@ import java.nio.channels.FileChannel;
  * Called by RequestHandler. Thus, it's already multi-threaded.
  * Responsible for storing file chunks on disk.
  */
-public class StoreProcess {
+public class StorageProcess extends Serializer {
     private final StorageMessages.Message message;
 
-    public StoreProcess(StorageMessages.Message message) {
+    public StorageProcess(StorageMessages.Message message) {
         this.message = message;
     }
 
@@ -33,7 +34,7 @@ public class StoreProcess {
             }
             file.createNewFile();
 
-            FileChannel channel = new FileOutputStream(file, false).getChannel();
+            FileChannel channel = new FileOutputStream(file).getChannel();
             channel.write(ByteBuffer.wrap(chunk));
 
             System.out.println("File [" + filename + i + "] has been stored into [" + DFS.volume + "]");
@@ -41,5 +42,9 @@ public class StoreProcess {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    public StorageMessages.Message retrieve() {
+        return null;
     }
 }

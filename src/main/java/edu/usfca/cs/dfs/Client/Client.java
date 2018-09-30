@@ -1,5 +1,6 @@
 package edu.usfca.cs.dfs.Client;
 
+import com.google.protobuf.ByteString;
 import edu.usfca.cs.dfs.*;
 import edu.usfca.cs.dfs.Storage.Node;
 import edu.usfca.cs.dfs.hash.HashException;
@@ -12,9 +13,8 @@ import java.nio.file.Files;
 import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Scanner;
+import java.util.*;
+import java.util.concurrent.CountDownLatch;
 
 /**
  * @author Brian Sung
@@ -61,6 +61,8 @@ public class Client extends Command {
             case "upload":
                 upload(command[1]);
                 break;
+            case "download":
+                download(command[1]);
             case "exit":
                 exit();
                 break;
@@ -75,9 +77,16 @@ public class Client extends Command {
         }
     }
 
+    /**
+     * Break files into chunks with 64 Mb maximum size.
+     * Use SHA1 to hash the filename with chunk id.
+     * Create thread for each chunk and send them to the correct storage node.
+     * @param filename
+     */
     private void upload(String filename) {
         Path path = Paths.get(filename);
         if (filename.contains("/")) {
+            // if the file is in other directory, use only the file name without path.
             filename = filename.substring(filename.lastIndexOf('/') + 1);
         }
 
@@ -92,17 +101,44 @@ public class Client extends Command {
             upload(filename, chunks, hashcode, this.storageNodeAddress);
             System.out.println("Upload request has been sent.");
         } catch (NoSuchFileException ignore) {
-            System.out.println("The file [" + path + "] does not exist.");
+            System.out.println("File [" + path + "] does not exist.");
         } catch (HashException | IOException e) {
             e.printStackTrace();
         }
     }
 
-    private void download(String fileName, List<byte[]> chunks) {
+    /**
+     * Hash the file name with first chunk id (0) to find a node currently storing it,
+     * and get the total number of chunks.
+     * Create thread for each chunk and retrieve the chunks from the correct storage node.
+     * @param filename
+     */
+    private void download(String filename) {
         try {
-            this.dp.restoreFile(fileName, chunks);
-        } catch (IOException ioe) {
-            ioe.printStackTrace();
+            // get total chunk number
+            BigInteger firstHash = this.sha1.hash((filename + 0).getBytes());
+            InetSocketAddress firstKeyNode = getRemoteNode(firstHash, this.storageNodeAddress);
+            ByteString b = ByteString.copyFrom(firstHash.toByteArray());
+            StorageMessages.Message m = ask(firstKeyNode, StorageMessages.infoType.NUM_CHUNKS, b);
+            int totalChunk = m.getTotalChunk();
+
+            // download each chunk and wait for download to finish
+            byte[][] chunks = new byte[totalChunk][DFS.MAX_CHUNK_SIZE];
+            CountDownLatch count = new CountDownLatch(totalChunk);
+            boolean success = download(filename, chunks, count, firstKeyNode);
+
+            // restore it if download process successes.
+            if (success) {
+                this.dp.restoreFile(filename, chunks);
+                System.out.println("Download process has been completed.");
+            }
+            else {
+                System.out.println("Download process did not finish in time, aborted.");
+            }
+        } catch (NullPointerException ignore) {
+            System.out.println("File [" + filename + "] does not exist in the file system.");
+        } catch (HashException | IOException e) {
+            e.printStackTrace();
         }
     }
 

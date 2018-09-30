@@ -12,9 +12,10 @@ message Message {
 
 enum messageType {
     FIND_HOST = 0;
-    DATA = 1;
-    INFO = 2;
-    HEARTBEAT = 3;
+    REQUEST = 1;
+    DATA = 2;
+    INFO = 3;
+    HEARTBEAT = 4;
 }
 
 message Info {
@@ -32,11 +33,11 @@ enum infoType {
     ASK_PREDECESSOR = 5;
     ASK_NODE_DETAIL = 6;  // get the detail of the node been asked
     NOTIFY = 7;
+    NUM_CHUNKS = 8;  // get total number of chunks of a particular file
     /*LIST_NODE = 0;  // list all nodes in chord network
     DISK_SPACE = 1;  // check remaining disk space
     NUM_REQUESTS = 2;  // check number of total requests received
     LIST_FILES = 3;  // list all file name
-    NUM_CHUNKS = 4;  // get total number of chunks of a particular file
     CHUNK_LOCATION = 5;  // get all chunk location of a particular file
     RETRIEVE_CHUNK = 6;  // retrieve a chunk
     FINGER = 7;  // finger table

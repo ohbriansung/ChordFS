@@ -24,17 +24,21 @@ public final class StorageMessages {
      */
     FIND_HOST(0),
     /**
-     * <code>DATA = 1;</code>
+     * <code>REQUEST = 1;</code>
      */
-    DATA(1),
+    REQUEST(1),
     /**
-     * <code>INFO = 2;</code>
+     * <code>DATA = 2;</code>
      */
-    INFO(2),
+    DATA(2),
     /**
-     * <code>HEARTBEAT = 3;</code>
+     * <code>INFO = 3;</code>
      */
-    HEARTBEAT(3),
+    INFO(3),
+    /**
+     * <code>HEARTBEAT = 4;</code>
+     */
+    HEARTBEAT(4),
     UNRECOGNIZED(-1),
     ;
 
@@ -43,17 +47,21 @@ public final class StorageMessages {
      */
     public static final int FIND_HOST_VALUE = 0;
     /**
-     * <code>DATA = 1;</code>
+     * <code>REQUEST = 1;</code>
      */
-    public static final int DATA_VALUE = 1;
+    public static final int REQUEST_VALUE = 1;
     /**
-     * <code>INFO = 2;</code>
+     * <code>DATA = 2;</code>
      */
-    public static final int INFO_VALUE = 2;
+    public static final int DATA_VALUE = 2;
     /**
-     * <code>HEARTBEAT = 3;</code>
+     * <code>INFO = 3;</code>
      */
-    public static final int HEARTBEAT_VALUE = 3;
+    public static final int INFO_VALUE = 3;
+    /**
+     * <code>HEARTBEAT = 4;</code>
+     */
+    public static final int HEARTBEAT_VALUE = 4;
 
 
     public final int getNumber() {
@@ -75,9 +83,10 @@ public final class StorageMessages {
     public static messageType forNumber(int value) {
       switch (value) {
         case 0: return FIND_HOST;
-        case 1: return DATA;
-        case 2: return INFO;
-        case 3: return HEARTBEAT;
+        case 1: return REQUEST;
+        case 2: return DATA;
+        case 3: return INFO;
+        case 4: return HEARTBEAT;
         default: return null;
       }
     }
@@ -188,21 +197,17 @@ public final class StorageMessages {
      */
     ASK_NODE_DETAIL(6),
     /**
-     * <pre>
-     *LIST_NODE = 0;  // list all nodes in chord network
-     *DISK_SPACE = 1;  // check remaining disk space
-     *NUM_REQUESTS = 2;  // check number of total requests received
-     *LIST_FILES = 3;  // list all file name
-     *NUM_CHUNKS = 4;  // get total number of chunks of a particular file
-     *CHUNK_LOCATION = 5;  // get all chunk location of a particular file
-     *RETRIEVE_CHUNK = 6;  // retrieve a chunk
-     *FINGER = 7;  // finger table
-     *PREDECESSOR = 8;
-     * </pre>
-     *
      * <code>NOTIFY = 7;</code>
      */
     NOTIFY(7),
+    /**
+     * <pre>
+     * get total number of chunks of a particular file
+     * </pre>
+     *
+     * <code>NUM_CHUNKS = 8;</code>
+     */
+    NUM_CHUNKS(8),
     UNRECOGNIZED(-1),
     ;
 
@@ -259,21 +264,17 @@ public final class StorageMessages {
      */
     public static final int ASK_NODE_DETAIL_VALUE = 6;
     /**
-     * <pre>
-     *LIST_NODE = 0;  // list all nodes in chord network
-     *DISK_SPACE = 1;  // check remaining disk space
-     *NUM_REQUESTS = 2;  // check number of total requests received
-     *LIST_FILES = 3;  // list all file name
-     *NUM_CHUNKS = 4;  // get total number of chunks of a particular file
-     *CHUNK_LOCATION = 5;  // get all chunk location of a particular file
-     *RETRIEVE_CHUNK = 6;  // retrieve a chunk
-     *FINGER = 7;  // finger table
-     *PREDECESSOR = 8;
-     * </pre>
-     *
      * <code>NOTIFY = 7;</code>
      */
     public static final int NOTIFY_VALUE = 7;
+    /**
+     * <pre>
+     * get total number of chunks of a particular file
+     * </pre>
+     *
+     * <code>NUM_CHUNKS = 8;</code>
+     */
+    public static final int NUM_CHUNKS_VALUE = 8;
 
 
     public final int getNumber() {
@@ -302,6 +303,7 @@ public final class StorageMessages {
         case 5: return ASK_PREDECESSOR;
         case 6: return ASK_NODE_DETAIL;
         case 7: return NOTIFY;
+        case 8: return NUM_CHUNKS;
         default: return null;
       }
     }
@@ -2598,13 +2600,14 @@ public final class StorageMessages {
       "\n\004data\030\005 \001(\014\022\014\n\004hash\030\006 \001(\014\"B\n\004Info\022\027\n\004ty" +
       "pe\030\001 \001(\0162\t.infoType\022\014\n\004data\030\002 \001(\014\022\023\n\013int" +
       "egerData\030\003 \001(\005\".\n\004Node\022\014\n\004host\030\001 \001(\t\022\014\n\004" +
-      "port\030\002 \001(\005\022\n\n\002id\030\003 \001(\005*?\n\013messageType\022\r\n" +
-      "\tFIND_HOST\020\000\022\010\n\004DATA\020\001\022\010\n\004INFO\020\002\022\r\n\tHEAR" +
-      "TBEAT\020\003*\213\001\n\010infoType\022\032\n\026CLOSEST_PRECEDIN" +
-      "G_NODE\020\000\022\010\n\004NODE\020\001\022\t\n\005ASK_M\020\002\022\005\n\001M\020\003\022\021\n\r" +
-      "ASK_SUCCESSOR\020\004\022\023\n\017ASK_PREDECESSOR\020\005\022\023\n\017" +
-      "ASK_NODE_DETAIL\020\006\022\n\n\006NOTIFY\020\007B\022\n\020edu.usf" +
-      "ca.cs.dfsb\006proto3"
+      "port\030\002 \001(\005\022\n\n\002id\030\003 \001(\005*L\n\013messageType\022\r\n" +
+      "\tFIND_HOST\020\000\022\013\n\007REQUEST\020\001\022\010\n\004DATA\020\002\022\010\n\004I" +
+      "NFO\020\003\022\r\n\tHEARTBEAT\020\004*\233\001\n\010infoType\022\032\n\026CLO" +
+      "SEST_PRECEDING_NODE\020\000\022\010\n\004NODE\020\001\022\t\n\005ASK_M" +
+      "\020\002\022\005\n\001M\020\003\022\021\n\rASK_SUCCESSOR\020\004\022\023\n\017ASK_PRED" +
+      "ECESSOR\020\005\022\023\n\017ASK_NODE_DETAIL\020\006\022\n\n\006NOTIFY" +
+      "\020\007\022\016\n\nNUM_CHUNKS\020\010B\022\n\020edu.usfca.cs.dfsb\006" +
+      "proto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {

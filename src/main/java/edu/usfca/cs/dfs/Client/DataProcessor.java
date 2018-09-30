@@ -39,12 +39,17 @@ class DataProcessor {
         return chunks;
     }
 
-    void restoreFile(String filename, List<byte[]> chunks) throws IOException {
-        if (chunks.size() == 0) {
+    void restoreFile(String filename, byte[][] chunks) throws IOException {
+        if (chunks.length == 0) {
             return;
         }
 
         File file = new File(filename);
+        int temp = 0;
+        while (file.exists()) {
+            file = new File(filename + ++temp);
+        }
+
         FileChannel channel = new FileOutputStream(file).getChannel();
         for (byte[] bytes : chunks) {
             channel.write(ByteBuffer.wrap(bytes));

@@ -2,7 +2,7 @@ package edu.usfca.cs.dfs;
 
 import com.google.protobuf.ByteString;
 
-abstract class Serializer {
+public abstract class Serializer {
 
     StorageMessages.Info serializeInfo(StorageMessages.infoType type, ByteString data) {
         return StorageMessages.Info.newBuilder().setType(type).setData(data).build();

@@ -1,23 +1,23 @@
 package edu.usfca.cs.dfs.FileTransfer;
 
 import com.google.protobuf.ByteString;
+import edu.usfca.cs.dfs.Sender;
 import edu.usfca.cs.dfs.Storage.Node;
 import edu.usfca.cs.dfs.StorageMessages;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.OutputStream;
 import java.math.BigInteger;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 
-public class Upload implements Runnable {
+public class Upload extends Sender implements Runnable {
     private final String filename;
     private final int totalSize;
     private final int i;
     private final byte[] chunk;
     private final BigInteger hash;
-    private InetSocketAddress addr;
+    private final InetSocketAddress addr;
 
     public Upload(String filename, int totalSize, int i, byte[] chunk, BigInteger hash, InetSocketAddress addr) {
         this.filename = filename;
@@ -38,24 +38,6 @@ public class Upload implements Runnable {
             System.out.println("Failed to upload chunk [" + this.i + "] of file [" + this.filename + "].");
             e.printStackTrace();
         }
-    }
-
-    private InetSocketAddress getRemoteNode(BigInteger hash, InetSocketAddress addr) throws IOException {
-        Socket socket = new Socket();
-        socket.connect(addr);
-        OutputStream out = socket.getOutputStream();
-        InputStream in = socket.getInputStream();
-
-        ByteString b = ByteString.copyFrom(hash.toByteArray());
-        StorageMessages.Message message = StorageMessages.Message.newBuilder()
-                .setType(StorageMessages.messageType.FIND_HOST).setData(b).build();
-        message.writeDelimitedTo(out);
-
-        StorageMessages.Node node = StorageMessages.Node.parseDelimitedFrom(in);
-        Node n = new Node(node);
-        socket.close();
-
-        return n.getAddress();
     }
 
     private StorageMessages.Message serialize(String filename, int total, int i, byte[] chunk, BigInteger hash) {

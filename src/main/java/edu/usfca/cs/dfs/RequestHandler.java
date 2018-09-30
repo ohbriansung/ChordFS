@@ -2,7 +2,7 @@ package edu.usfca.cs.dfs;
 
 import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
-import edu.usfca.cs.dfs.FileTransfer.StoreProcess;
+import edu.usfca.cs.dfs.FileTransfer.StorageProcess;
 import edu.usfca.cs.dfs.Storage.Node;
 import edu.usfca.cs.dfs.Storage.StorageNode;
 
@@ -36,6 +36,7 @@ class RequestHandler extends Serializer implements Runnable {
 
     private void parseMessage(StorageMessages.Message message) throws IOException {
         StorageMessages.messageType type = message.getType();
+        StorageProcess process;
 
         try {
             switch (type) {
@@ -51,9 +52,13 @@ class RequestHandler extends Serializer implements Runnable {
                     responseNode(((StorageNode) DFS.currentNode).findHost(hash));
                     break;
                 case DATA:
-                    StoreProcess process = new StoreProcess(message);
+                    process = new StorageProcess(message);
                     process.store();
                     ((StorageNode) DFS.currentNode).recordMetadata(message);
+                    break;
+                case REQUEST:
+                    process = new StorageProcess(message);
+                    StorageMessages.Message data = process.retrieve();
             }
         } catch (InvalidProtocolBufferException e) {
             e.printStackTrace();
