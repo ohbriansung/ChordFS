@@ -50,6 +50,27 @@ public class StorageNode extends Chord {
         System.out.println("Metadata of file [" + filename + i + "] has been recorded.");
     }
 
+    /**
+     * The first node replicates the data to its successor,
+     * and the successor will replicates the data again to its successor.
+     * Check the replica variable in the message, replicate 3 times.
+     * @param message
+     */
+    public void replicate(StorageMessages.Message message) {
+        int replica = message.getReplica();
+        message = message.toBuilder().setReplica(replica + 1).build();  // increase the replicate time after storing
+        Node successor = this.fingers.getFinger(0);
+
+        if (message.getReplica() >= 3 || successor.getId() == this.n.getId()) {
+            // if there are 3 replicas already or if the successor is self, stop replicating.
+            System.out.println("Replication completed.");
+            return;
+        }
+
+        Thread task = new Thread(new Replicate(message, successor.getAddress()));
+        task.start();
+    }
+
     public int getTotalChunk(StorageMessages.Message message) {
         String filename = message.getFileName();
         BigInteger hash = new BigInteger(message.getHash().toByteArray());

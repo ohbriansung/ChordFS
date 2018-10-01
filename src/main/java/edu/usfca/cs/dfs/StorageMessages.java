@@ -225,6 +225,14 @@ public final class StorageMessages {
      * <code>NOTIFY = 7;</code>
      */
     NOTIFY(7),
+    /**
+     * <pre>
+     * get the list of node in the ring and their free space
+     * </pre>
+     *
+     * <code>LIST_NODE = 8;</code>
+     */
+    LIST_NODE(8),
     UNRECOGNIZED(-1),
     ;
 
@@ -284,6 +292,14 @@ public final class StorageMessages {
      * <code>NOTIFY = 7;</code>
      */
     public static final int NOTIFY_VALUE = 7;
+    /**
+     * <pre>
+     * get the list of node in the ring and their free space
+     * </pre>
+     *
+     * <code>LIST_NODE = 8;</code>
+     */
+    public static final int LIST_NODE_VALUE = 8;
 
 
     public final int getNumber() {
@@ -312,6 +328,7 @@ public final class StorageMessages {
         case 5: return ASK_PREDECESSOR;
         case 6: return ASK_NODE_DETAIL;
         case 7: return NOTIFY;
+        case 8: return LIST_NODE;
         default: return null;
       }
     }
@@ -406,6 +423,11 @@ public final class StorageMessages {
      * <code>bytes hash = 6;</code>
      */
     com.google.protobuf.ByteString getHash();
+
+    /**
+     * <code>int32 replica = 7;</code>
+     */
+    int getReplica();
   }
   /**
    * Protobuf type {@code Message}
@@ -426,6 +448,7 @@ public final class StorageMessages {
       chunkId_ = 0;
       data_ = com.google.protobuf.ByteString.EMPTY;
       hash_ = com.google.protobuf.ByteString.EMPTY;
+      replica_ = 0;
     }
 
     @java.lang.Override
@@ -482,6 +505,11 @@ public final class StorageMessages {
             case 50: {
 
               hash_ = input.readBytes();
+              break;
+            }
+            case 56: {
+
+              replica_ = input.readInt32();
               break;
             }
             default: {
@@ -603,6 +631,15 @@ public final class StorageMessages {
       return hash_;
     }
 
+    public static final int REPLICA_FIELD_NUMBER = 7;
+    private int replica_;
+    /**
+     * <code>int32 replica = 7;</code>
+     */
+    public int getReplica() {
+      return replica_;
+    }
+
     private byte memoizedIsInitialized = -1;
     @java.lang.Override
     public final boolean isInitialized() {
@@ -634,6 +671,9 @@ public final class StorageMessages {
       }
       if (!hash_.isEmpty()) {
         output.writeBytes(6, hash_);
+      }
+      if (replica_ != 0) {
+        output.writeInt32(7, replica_);
       }
       unknownFields.writeTo(output);
     }
@@ -667,6 +707,10 @@ public final class StorageMessages {
         size += com.google.protobuf.CodedOutputStream
           .computeBytesSize(6, hash_);
       }
+      if (replica_ != 0) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeInt32Size(7, replica_);
+      }
       size += unknownFields.getSerializedSize();
       memoizedSize = size;
       return size;
@@ -694,6 +738,8 @@ public final class StorageMessages {
           .equals(other.getData());
       result = result && getHash()
           .equals(other.getHash());
+      result = result && (getReplica()
+          == other.getReplica());
       result = result && unknownFields.equals(other.unknownFields);
       return result;
     }
@@ -717,6 +763,8 @@ public final class StorageMessages {
       hash = (53 * hash) + getData().hashCode();
       hash = (37 * hash) + HASH_FIELD_NUMBER;
       hash = (53 * hash) + getHash().hashCode();
+      hash = (37 * hash) + REPLICA_FIELD_NUMBER;
+      hash = (53 * hash) + getReplica();
       hash = (29 * hash) + unknownFields.hashCode();
       memoizedHashCode = hash;
       return hash;
@@ -862,6 +910,8 @@ public final class StorageMessages {
 
         hash_ = com.google.protobuf.ByteString.EMPTY;
 
+        replica_ = 0;
+
         return this;
       }
 
@@ -894,6 +944,7 @@ public final class StorageMessages {
         result.chunkId_ = chunkId_;
         result.data_ = data_;
         result.hash_ = hash_;
+        result.replica_ = replica_;
         onBuilt();
         return result;
       }
@@ -960,6 +1011,9 @@ public final class StorageMessages {
         }
         if (other.getHash() != com.google.protobuf.ByteString.EMPTY) {
           setHash(other.getHash());
+        }
+        if (other.getReplica() != 0) {
+          setReplica(other.getReplica());
         }
         this.mergeUnknownFields(other.unknownFields);
         onChanged();
@@ -1210,6 +1264,32 @@ public final class StorageMessages {
       public Builder clearHash() {
         
         hash_ = getDefaultInstance().getHash();
+        onChanged();
+        return this;
+      }
+
+      private int replica_ ;
+      /**
+       * <code>int32 replica = 7;</code>
+       */
+      public int getReplica() {
+        return replica_;
+      }
+      /**
+       * <code>int32 replica = 7;</code>
+       */
+      public Builder setReplica(int value) {
+        
+        replica_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>int32 replica = 7;</code>
+       */
+      public Builder clearReplica() {
+        
+        replica_ = 0;
         onChanged();
         return this;
       }
@@ -2602,20 +2682,20 @@ public final class StorageMessages {
       descriptor;
   static {
     java.lang.String[] descriptorData = {
-      "\n\026storage_messages.proto\"x\n\007Message\022\032\n\004t" +
-      "ype\030\001 \001(\0162\014.messageType\022\020\n\010fileName\030\002 \001(" +
-      "\t\022\022\n\ntotalChunk\030\003 \001(\005\022\017\n\007chunkId\030\004 \001(\005\022\014" +
-      "\n\004data\030\005 \001(\014\022\014\n\004hash\030\006 \001(\014\"B\n\004Info\022\027\n\004ty" +
-      "pe\030\001 \001(\0162\t.infoType\022\014\n\004data\030\002 \001(\014\022\023\n\013int" +
-      "egerData\030\003 \001(\005\".\n\004Node\022\014\n\004host\030\001 \001(\t\022\014\n\004" +
-      "port\030\002 \001(\005\022\n\n\002id\030\003 \001(\005*\\\n\013messageType\022\013\n" +
-      "\007REQUEST\020\000\022\010\n\004DATA\020\001\022\010\n\004INFO\020\002\022\r\n\tHEARTB" +
-      "EAT\020\003\022\r\n\tFIND_HOST\020\004\022\016\n\nNUM_CHUNKS\020\005*\213\001\n" +
-      "\010infoType\022\032\n\026CLOSEST_PRECEDING_NODE\020\000\022\010\n" +
-      "\004NODE\020\001\022\t\n\005ASK_M\020\002\022\005\n\001M\020\003\022\021\n\rASK_SUCCESS" +
-      "OR\020\004\022\023\n\017ASK_PREDECESSOR\020\005\022\023\n\017ASK_NODE_DE" +
-      "TAIL\020\006\022\n\n\006NOTIFY\020\007B\022\n\020edu.usfca.cs.dfsb\006" +
-      "proto3"
+      "\n\026storage_messages.proto\"\211\001\n\007Message\022\032\n\004" +
+      "type\030\001 \001(\0162\014.messageType\022\020\n\010fileName\030\002 \001" +
+      "(\t\022\022\n\ntotalChunk\030\003 \001(\005\022\017\n\007chunkId\030\004 \001(\005\022" +
+      "\014\n\004data\030\005 \001(\014\022\014\n\004hash\030\006 \001(\014\022\017\n\007replica\030\007" +
+      " \001(\005\"B\n\004Info\022\027\n\004type\030\001 \001(\0162\t.infoType\022\014\n" +
+      "\004data\030\002 \001(\014\022\023\n\013integerData\030\003 \001(\005\".\n\004Node" +
+      "\022\014\n\004host\030\001 \001(\t\022\014\n\004port\030\002 \001(\005\022\n\n\002id\030\003 \001(\005" +
+      "*\\\n\013messageType\022\013\n\007REQUEST\020\000\022\010\n\004DATA\020\001\022\010" +
+      "\n\004INFO\020\002\022\r\n\tHEARTBEAT\020\003\022\r\n\tFIND_HOST\020\004\022\016" +
+      "\n\nNUM_CHUNKS\020\005*\232\001\n\010infoType\022\032\n\026CLOSEST_P" +
+      "RECEDING_NODE\020\000\022\010\n\004NODE\020\001\022\t\n\005ASK_M\020\002\022\005\n\001" +
+      "M\020\003\022\021\n\rASK_SUCCESSOR\020\004\022\023\n\017ASK_PREDECESSO" +
+      "R\020\005\022\023\n\017ASK_NODE_DETAIL\020\006\022\n\n\006NOTIFY\020\007\022\r\n\t" +
+      "LIST_NODE\020\010B\022\n\020edu.usfca.cs.dfsb\006proto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
@@ -2634,7 +2714,7 @@ public final class StorageMessages {
     internal_static_Message_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_Message_descriptor,
-        new java.lang.String[] { "Type", "FileName", "TotalChunk", "ChunkId", "Data", "Hash", });
+        new java.lang.String[] { "Type", "FileName", "TotalChunk", "ChunkId", "Data", "Hash", "Replica", });
     internal_static_Info_descriptor =
       getDescriptor().getMessageTypes().get(1);
     internal_static_Info_fieldAccessorTable = new

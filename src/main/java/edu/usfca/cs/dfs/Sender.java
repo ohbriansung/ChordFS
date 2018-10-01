@@ -169,4 +169,13 @@ public abstract class Sender extends Serializer {
 
         return n.getAddress();
     }
+
+    protected void send(InetSocketAddress addr, StorageMessages.Message message) throws IOException {
+        Socket socket = new Socket();
+        socket.connect(addr);
+        OutputStream out = socket.getOutputStream();
+        message.writeDelimitedTo(out);
+        System.out.println("Sent data to " + addr);
+        socket.close();
+    }
 }

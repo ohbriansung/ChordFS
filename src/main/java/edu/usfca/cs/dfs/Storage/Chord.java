@@ -14,9 +14,9 @@ import java.net.InetSocketAddress;
 abstract class Chord extends Sender {
     private int m;
     private int next;
-    private Node n;
     private Node predecessor;
-    private FingerTable fingers;
+    Node n;
+    FingerTable fingers;
     Utility util;
 
     Chord(String host, int port) {

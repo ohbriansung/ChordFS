@@ -51,6 +51,7 @@ class RequestHandler extends Serializer implements Runnable {
                     process = new StorageProcess(message);
                     process.store();
                     ((StorageNode) DFS.currentNode).recordMetadata(message);
+                    ((StorageNode) DFS.currentNode).replicate(message);
                     break;
                 case REQUEST:
                     process = new StorageProcess(message);

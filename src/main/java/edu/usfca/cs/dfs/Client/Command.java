@@ -8,11 +8,17 @@ abstract class Command extends Sender {
         super();
     }
 
+    void list() {
+
+    }
+
     void help() {
         StringBuilder sb = new StringBuilder();
 
         sb.append("[Command]\t\t\t\t[Usage]").append(System.lineSeparator());
-        sb.append("upload <file_name>\t\tUpload the file to file system.").append(System.lineSeparator());
+        sb.append("upload <file_name>\t\tUpload the file to the file system.").append(System.lineSeparator());
+        sb.append("download <file_name>\tDownload the file from the file system.").append(System.lineSeparator());
+        sb.append("list\t\t\t\t\tList all nodes in the file system and their free space.").append(System.lineSeparator());
         sb.append("help\t\t\t\t\tList all existing commands and usages.").append(System.lineSeparator());
         sb.append("exit\t\t\t\t\tTerminate the program.");
 

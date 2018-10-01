@@ -8,6 +8,7 @@ message Message {
     int32 chunkId = 4;
     bytes data = 5;
     bytes hash = 6;
+    int32 replica = 7;
 }
 
 enum messageType {
@@ -34,6 +35,7 @@ enum infoType {
     ASK_PREDECESSOR = 5;
     ASK_NODE_DETAIL = 6;  // get the detail of the node been asked
     NOTIFY = 7;
+    LIST_NODE = 8;  // get the list of node in the ring and their free space
 }
 
 message Node {

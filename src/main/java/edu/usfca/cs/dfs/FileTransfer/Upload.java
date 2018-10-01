@@ -45,12 +45,4 @@ public class Upload extends Sender implements Runnable {
                 .setFileName(filename).setTotalChunk(total).setChunkId(i).setData(ByteString.copyFrom(chunk))
                 .setHash(ByteString.copyFrom(hash.toByteArray())).build();
     }
-
-    private void send(InetSocketAddress addr, StorageMessages.Message message) throws IOException {
-        Socket socket = new Socket();
-        socket.connect(addr);
-        OutputStream out = socket.getOutputStream();
-        message.writeDelimitedTo(out);
-        socket.close();
-    }
 }

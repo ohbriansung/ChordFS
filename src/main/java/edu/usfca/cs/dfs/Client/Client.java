@@ -54,6 +54,7 @@ public class Client extends Command {
         String[] command = str.split("\\s+");
 
         switch (command[0]) {
+            default:
             case "help":
                 help();
                 break;
@@ -63,17 +64,11 @@ public class Client extends Command {
             case "download":
                 download(command[1]);
                 break;
+            case "list":
+                list();
+                break;
             case "exit":
                 exit();
-                break;
-            default:
-                try {
-                    System.out.println("asking " + this.storageNodeAddress);
-                    Node p = ask(this.storageNodeAddress, StorageMessages.infoType.ASK_PREDECESSOR);
-                    System.out.println(p.getId());
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
         }
     }
 

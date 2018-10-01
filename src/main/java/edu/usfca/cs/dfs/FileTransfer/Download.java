@@ -34,7 +34,7 @@ public class Download extends Sender implements Runnable {
         try {
             InetSocketAddress remote = getRemoteNode(this.hash, this.addr);
             StorageMessages.Message message = serialize(this.filename, this.i, this.hash);
-            send(remote, message);
+            _send(remote, message);
             this.count.countDown();
         } catch (IOException e) {
             e.printStackTrace();
@@ -46,7 +46,7 @@ public class Download extends Sender implements Runnable {
                 .setFileName(filename).setChunkId(i).setHash(ByteString.copyFrom(hash.toByteArray())).build();
     }
 
-    private void send(InetSocketAddress addr, StorageMessages.Message message) throws IOException {
+    private void _send(InetSocketAddress addr, StorageMessages.Message message) throws IOException {
         Socket socket = new Socket();
         socket.connect(addr);
         OutputStream out = socket.getOutputStream();
