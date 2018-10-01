@@ -32,18 +32,24 @@ abstract class Command extends Sender {
         String[] temp = addr.split(":");
         StorageMessages.Info info = serializeInfo(StorageMessages.infoType.LIST_FILE);
 
+        InetSocketAddress n;
         try {
-            InetSocketAddress n = new InetSocketAddress(temp[0], Integer.parseInt(temp[1]));
+            n = new InetSocketAddress(temp[0], Integer.parseInt(temp[1]));
+        } catch (NullPointerException | NumberFormatException ignore) {
+            System.out.println("Invalid address [" + addr + "]");
+            return;
+        }
+
+        try {
             StorageMessages.Info response = list(n, info);
 
             System.out.println("[File]\t\t\t[Total]\t[Chunks]");
             System.out.println(response.getData().toStringUtf8());
 
             ((Client) DFS.currentNode).addOneNode(n);
-        } catch (NullPointerException | NumberFormatException ignore) {
-            System.out.println("Invalid address [" + addr + "]");
         } catch (IOException e) {
-            e.printStackTrace();
+            System.out.println("Node [" + addr + "] is unreachable.");
+            ((Client) DFS.currentNode).removeOneNode(n);
         }
     }
 

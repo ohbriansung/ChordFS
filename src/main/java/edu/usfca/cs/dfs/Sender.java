@@ -123,22 +123,32 @@ public abstract class Sender extends Serializer {
         socket.close();
     }
 
-    protected void upload(String filename, List<byte[]> chunks, List<BigInteger> hashcode, InetSocketAddress addr) {
+    protected boolean upload(String filename, List<byte[]> chunks, List<BigInteger> hashcode, CountDownLatch count) {
         int size = chunks.size();
 
         // a thread for a chunk
         for (int i = 0; i < size; i++) {
-            this.pool.submit(new Upload(filename, size, i, chunks.get(i), hashcode.get(i), addr));
+            this.pool.submit(new Upload(filename, size, i, chunks.get(i), hashcode.get(i), count));
         }
+
+        boolean success = false;
+        try {
+            // wait for at most (30 * size) seconds
+            success = count.await(30 * size, TimeUnit.SECONDS);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        return success;
     }
 
-    protected boolean download(String filename, byte[][] chunks, CountDownLatch count, InetSocketAddress addr) throws HashException {
+    protected boolean download(String filename, byte[][] chunks, CountDownLatch count) throws HashException {
         SHA1 sha1 = new SHA1();
         int size = chunks.length;
 
         for (int i = 0; i < size; i++) {
             BigInteger hash = sha1.hash((filename + i).getBytes());
-            this.pool.submit(new Download(filename, i, hash, chunks, count, addr));
+            this.pool.submit(new Download(filename, i, hash, chunks, count));
         }
 
         boolean success = false;

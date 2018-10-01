@@ -20,27 +20,37 @@ public class Download extends Sender implements Runnable {
     private final BigInteger hash;
     private final byte[][] chunks;
     private final CountDownLatch count;
-    private final InetSocketAddress addr;
 
-    public Download(String filename, int i, BigInteger hash, byte[][] chunks, CountDownLatch count, InetSocketAddress addr) {
+    public Download(String filename, int i, BigInteger hash, byte[][] chunks, CountDownLatch count) {
         this.filename = filename;
         this.i = i;
         this.hash = hash;
         this.chunks = chunks;
         this.count = count;
-        this.addr = addr;
     }
 
     @Override
     public void run() {
+        InetSocketAddress remote = null;
+
+        while (remote == null) {
+            InetSocketAddress n = ((Client) DFS.currentNode).getOneNode();
+
+            try {
+                remote = getRemoteNode(this.hash, n);
+            } catch (IOException ignore) {
+                System.out.println("Node [" + n + "] is unreachable.");
+                ((Client) DFS.currentNode).removeOneNode(n);
+            }
+        }
+
+        StorageMessages.Message message = serialize(this.filename, this.i, this.hash);
         try {
-            InetSocketAddress remote = getRemoteNode(this.hash, this.addr);
-            StorageMessages.Message message = serialize(this.filename, this.i, this.hash);
             _send(remote, message);
-            ((Client) DFS.currentNode).addOneNode(remote);
             this.count.countDown();
-        } catch (IOException e) {
-            e.printStackTrace();
+        } catch (IOException ignore) {
+            System.out.println("Node [" + remote + "] is unreachable.");
+            ((Client) DFS.currentNode).removeOneNode(remote);
         }
     }
 
@@ -62,6 +72,7 @@ public class Download extends Sender implements Runnable {
             this.chunks[this.i] = chunk;
         }
 
+        ((Client) DFS.currentNode).addOneNode(addr);
         socket.close();
     }
 }

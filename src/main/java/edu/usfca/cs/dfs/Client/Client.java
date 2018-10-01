@@ -113,8 +113,11 @@ public class Client extends Command {
         try {
             List<byte[]> chunks = this.dp.breakFile(path);
             List<BigInteger> hashcode = hashChunks(filename, chunks);
-            upload(filename, chunks, hashcode, getOneNode());
-            System.out.println("Upload request has been sent.");
+            CountDownLatch count = new CountDownLatch(chunks.size());
+
+            System.out.println("Uploading...");
+            boolean success = upload(filename, chunks, hashcode, count);
+            System.out.println("Upload process was " + (success ? "" : "in") + "complete.");
         } catch (NoSuchFileException ignore) {
             System.out.println("File [" + path + "] does not exist.");
         } catch (HashException | IOException e) {
@@ -129,23 +132,47 @@ public class Client extends Command {
      * @param filename
      */
     private void download(String filename) {
+        int totalChunk = 0;
+
         try {
             // get total chunk number
             BigInteger firstHash = this.sha1.hash((filename + 0).getBytes());
             System.out.println("firstHash = [" + firstHash + "]");
-            InetSocketAddress firstKeyNode = getRemoteNode(firstHash, getOneNode());
-            StorageMessages.Message message = serializeMessage(filename, firstHash);
-            StorageMessages.Message response = ask(firstKeyNode, message);
-            int totalChunk = response.getTotalChunk();
 
-            if (totalChunk == 0) {
-                throw new NullPointerException();
+            InetSocketAddress firstKeyNode = null;
+            while (firstKeyNode == null) {
+                InetSocketAddress n = getOneNode();
+                try {
+                    firstKeyNode = getRemoteNode(firstHash, n);
+                } catch (IOException ignore) {
+                    System.out.println("Node [" + n + "] is unreachable.");
+                    removeOneNode(n);
+                }
             }
 
-            // download each chunk and wait for download to finish
+            StorageMessages.Message message = serializeMessage(filename, firstHash);
+            try {
+                StorageMessages.Message response = ask(firstKeyNode, message);
+                totalChunk = response.getTotalChunk();
+                addOneNode(firstKeyNode);
+            } catch (IOException ignore) {
+                System.out.println("Node [" + firstKeyNode + "] is unreachable, please try to download in a few seconds.");
+                return;
+            }
+        } catch (HashException e) {
+            e.printStackTrace();
+        }
+
+        if (totalChunk == 0) {
+            System.out.println("File [" + filename + "] does not exist in the file system.");
+            return;
+        }
+
+        try {
+            // download each chunk and use count down latch to wait for download to finish
             byte[][] chunks = new byte[totalChunk][DFS.MAX_CHUNK_SIZE];
             CountDownLatch count = new CountDownLatch(totalChunk);
-            boolean success = download(filename, chunks, count, firstKeyNode);
+            boolean success = download(filename, chunks, count);
 
             // restore it if download process successes.
             if (success) {
@@ -155,8 +182,6 @@ public class Client extends Command {
             else {
                 System.out.println("Download process did not finish in time, aborted.");
             }
-        } catch (NullPointerException ignore) {
-            System.out.println("File [" + filename + "] does not exist in the file system.");
         } catch (HashException | IOException e) {
             e.printStackTrace();
         }
@@ -184,7 +209,9 @@ public class Client extends Command {
     public void addOneNode(InetSocketAddress addr) {
         synchronized (this.addressBuffer) {
             if (this.addressBuffer.size() < 3 && !this.addressBuffer.contains(addr)) {
-                this.addressBuffer.add(addr);
+                if (this.addressBuffer.add(addr)) {
+                    System.out.println("Address Buffer = " + this.addressBuffer.toString());
+                }
             }
         }
     }
@@ -195,7 +222,9 @@ public class Client extends Command {
      */
     public void removeOneNode(InetSocketAddress addr) {
         synchronized (this.addressBuffer) {
-            this.addressBuffer.remove(addr);
+            if (this.addressBuffer.remove(addr)) {
+                System.out.println("Address Buffer = " + this.addressBuffer.toString());
+            }
         }
     }
 
@@ -203,7 +232,7 @@ public class Client extends Command {
      * Randomly return a node address from address buffer for load balancing.
      * @return InetSocketAddress
      */
-    private InetSocketAddress getOneNode() {
+    public InetSocketAddress getOneNode() {
         InetSocketAddress addr;
 
         synchronized (this.addressBuffer) {
