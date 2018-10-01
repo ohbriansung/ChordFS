@@ -2,7 +2,6 @@ package edu.usfca.cs.dfs.FileTransfer;
 
 import com.google.protobuf.ByteString;
 import edu.usfca.cs.dfs.DFS;
-import edu.usfca.cs.dfs.Serializer;
 import edu.usfca.cs.dfs.StorageMessages;
 
 import java.io.File;

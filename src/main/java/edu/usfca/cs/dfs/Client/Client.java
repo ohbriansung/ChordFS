@@ -20,13 +20,14 @@ import java.util.concurrent.CountDownLatch;
 public class Client extends Command {
     private final SHA1 sha1;
     private final DataProcessor dp;
-    private InetSocketAddress storageNodeAddress;
+    private final List<InetSocketAddress> addressBuffer;
 
     public Client(InetSocketAddress storageNodeAddress) {
         super();
         this.sha1 = new SHA1();
         this.dp = new DataProcessor();
-        this.storageNodeAddress = storageNodeAddress;
+        this.addressBuffer = new ArrayList<>();
+        this.addressBuffer.add(storageNodeAddress);
 
         try {
             // wait for receiver and sender
@@ -41,25 +42,24 @@ public class Client extends Command {
 
         String str;
         printInfo();
-        while (!(str = scanner.nextLine()).equals("exit")) {
+        while ((str = scanner.nextLine()) != null) {
             execute(str);
             printInfo();
         }
-
-        DFS.receiver.close();
     }
 
     private void execute(String str) {
         String[] command = str.split("\\s+");
 
         switch (command[0]) {
-            default:
+            case "":
+                break;
             case "help":
                 help();
                 break;
             case "upload":
                 if (command.length == 1) {
-                    help();
+                    invalid();
                 }
                 else {
                     upload(command[1]);
@@ -67,18 +67,18 @@ public class Client extends Command {
                 break;
             case "download":
                 if (command.length == 1) {
-                    help();
+                    invalid();
                 }
                 else {
                     download(command[1]);
                 }
                 break;
             case "list":
-                list(this.storageNodeAddress);
+                list(getOneNode());
                 break;
             case "file":
                 if (command.length < 3 || !command[1].equals("-l")) {
-                    help();
+                    invalid();
                 }
                 else {
                     file(command[2]);
@@ -86,6 +86,9 @@ public class Client extends Command {
                 break;
             case "exit":
                 exit();
+                break;
+            default:
+                invalid();
         }
     }
 
@@ -110,7 +113,7 @@ public class Client extends Command {
         try {
             List<byte[]> chunks = this.dp.breakFile(path);
             List<BigInteger> hashcode = hashChunks(filename, chunks);
-            upload(filename, chunks, hashcode, this.storageNodeAddress);
+            upload(filename, chunks, hashcode, getOneNode());
             System.out.println("Upload request has been sent.");
         } catch (NoSuchFileException ignore) {
             System.out.println("File [" + path + "] does not exist.");
@@ -130,7 +133,7 @@ public class Client extends Command {
             // get total chunk number
             BigInteger firstHash = this.sha1.hash((filename + 0).getBytes());
             System.out.println("firstHash = [" + firstHash + "]");
-            InetSocketAddress firstKeyNode = getRemoteNode(firstHash, this.storageNodeAddress);
+            InetSocketAddress firstKeyNode = getRemoteNode(firstHash, getOneNode());
             StorageMessages.Message message = serializeMessage(filename, firstHash);
             StorageMessages.Message response = ask(firstKeyNode, message);
             int totalChunk = response.getTotalChunk();
@@ -172,5 +175,43 @@ public class Client extends Command {
         }
 
         return hashcode;
+    }
+
+    /**
+     * Buffer 3 visited address in case of failure.
+     * @param addr
+     */
+    public void addOneNode(InetSocketAddress addr) {
+        synchronized (this.addressBuffer) {
+            if (this.addressBuffer.size() < 3 && !this.addressBuffer.contains(addr)) {
+                this.addressBuffer.add(addr);
+            }
+        }
+    }
+
+    /**
+     * Remove a node address when it is unreachable.
+     * @param addr
+     */
+    public void removeOneNode(InetSocketAddress addr) {
+        synchronized (this.addressBuffer) {
+            this.addressBuffer.remove(addr);
+        }
+    }
+
+    /**
+     * Randomly return a node address from address buffer for load balancing.
+     * @return InetSocketAddress
+     */
+    private InetSocketAddress getOneNode() {
+        InetSocketAddress addr;
+
+        synchronized (this.addressBuffer) {
+            Random r = new Random();
+            int i = r.nextInt(this.addressBuffer.size());
+            addr = this.addressBuffer.get(i);
+        }
+
+        return addr;
     }
 }

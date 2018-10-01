@@ -24,6 +24,7 @@ class RequestHandler extends Serializer implements Runnable {
     @Override
     public void run() {
         try (InputStream in = this.listening.getInputStream()) {
+
             StorageMessages.Message message = StorageMessages.Message.parseDelimitedFrom(in);
             parseMessage(message);
 

@@ -92,6 +92,12 @@ public class StorageNode extends Chord {
         return 0;
     }
 
+    /**
+     * Connect successor to retrieve system data.
+     * @param info
+     * @return StorageMessages.Info
+     * @throws IOException - Node is unreachable.
+     */
     public StorageMessages.Info listNode(StorageMessages.Info info) throws IOException {
         String data = info.getData().toStringUtf8();
         int n = info.getIntegerData();
@@ -100,7 +106,7 @@ public class StorageNode extends Chord {
         }
 
         String space = this.util.getFreeSpace(DFS.volume);
-        data += this.n.getId() + " " + this.n.getAddress() + " " + space + " ";
+        data += this.n.getId() + " " + this.n.getAddress() + " " + space + " " + DFS.receiver.getRequestCount() + " ";
         info = info.toBuilder().setData(ByteString.copyFromUtf8(data)).setIntegerData(n).build();
 
         Node successor = this.fingers.getFinger(0);
@@ -112,6 +118,10 @@ public class StorageNode extends Chord {
         return info;
     }
 
+    /**
+     * Return all Metadata.
+     * @return StorageMessages.Info
+     */
     public StorageMessages.Info listFile() {
         StringBuilder sb = new StringBuilder();
 

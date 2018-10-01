@@ -19,9 +19,9 @@ abstract class Command extends Sender {
             StorageMessages.Info response = list(addr, info);
             String[] list = response.getData().toStringUtf8().split("\\s+");
 
-            System.out.println("[Node]\t[Address]\t\t\t[FreeSpace]");
-            for (int i = 0; i < list.length; i += 4) {
-                System.out.println(list[i] + "\t\t" + list[i + 1] + "\t" + list[i + 2] + " " + list[i + 3]);
+            System.out.println("[Node]\t[Address]\t\t\t[FreeSpace]\t[Request]");
+            for (int i = 0; i < list.length; i += 5) {
+                System.out.println(list[i] + "\t\t" + list[i + 1] + "\t" + list[i + 2] + " " + list[i + 3] + "\t" + list[i + 4]);
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -38,6 +38,8 @@ abstract class Command extends Sender {
 
             System.out.println("[File]\t\t\t[Total]\t[Chunks]");
             System.out.println(response.getData().toStringUtf8());
+
+            ((Client) DFS.currentNode).addOneNode(n);
         } catch (NullPointerException | NumberFormatException ignore) {
             System.out.println("Invalid address [" + addr + "]");
         } catch (IOException e) {
@@ -63,11 +65,16 @@ abstract class Command extends Sender {
         System.out.println("Shutting down...");
         DFS.alive = false;
         DFS.receiver.close();
-        close();  // close sender thread pool
+        super.close();  // close sender thread pool
         System.exit(0);
     }
 
     void printInfo() {
         System.out.print("> ");
+    }
+
+    void invalid() {
+        System.out.println("Invalid command.");
+        help();
     }
 }

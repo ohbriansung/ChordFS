@@ -1,6 +1,8 @@
 package edu.usfca.cs.dfs.FileTransfer;
 
 import com.google.protobuf.ByteString;
+import edu.usfca.cs.dfs.Client.Client;
+import edu.usfca.cs.dfs.DFS;
 import edu.usfca.cs.dfs.Sender;
 import edu.usfca.cs.dfs.StorageMessages;
 
@@ -35,6 +37,7 @@ public class Download extends Sender implements Runnable {
             InetSocketAddress remote = getRemoteNode(this.hash, this.addr);
             StorageMessages.Message message = serialize(this.filename, this.i, this.hash);
             _send(remote, message);
+            ((Client) DFS.currentNode).addOneNode(remote);
             this.count.countDown();
         } catch (IOException e) {
             e.printStackTrace();

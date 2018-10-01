@@ -1,15 +1,14 @@
 package edu.usfca.cs.dfs.FileTransfer;
 
 import com.google.protobuf.ByteString;
+import edu.usfca.cs.dfs.Client.Client;
+import edu.usfca.cs.dfs.DFS;
 import edu.usfca.cs.dfs.Sender;
-import edu.usfca.cs.dfs.Storage.Node;
 import edu.usfca.cs.dfs.StorageMessages;
 
 import java.io.IOException;
-import java.io.OutputStream;
 import java.math.BigInteger;
 import java.net.InetSocketAddress;
-import java.net.Socket;
 
 public class Upload extends Sender implements Runnable {
     private final String filename;
@@ -34,6 +33,7 @@ public class Upload extends Sender implements Runnable {
             InetSocketAddress remote = getRemoteNode(this.hash, this.addr);
             StorageMessages.Message message = serialize(this.filename, this.totalSize, this.i, this.chunk, this.hash);
             send(remote, message);
+            ((Client) DFS.currentNode).addOneNode(remote);
         } catch (IOException e) {
             System.out.println("Failed to upload chunk [" + this.i + "] of file [" + this.filename + "].");
             e.printStackTrace();

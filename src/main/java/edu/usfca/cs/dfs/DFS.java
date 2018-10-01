@@ -12,13 +12,13 @@ import java.util.Map;
 import java.util.concurrent.CountDownLatch;
 
 public class DFS {
-    static final int THREAD = 16;
-    public static final int MAX_CHUNK_SIZE = 64 * 1024 * 1024;
-    public static final CountDownLatch READY = new CountDownLatch(1);  // ui waits for receiver and sender
+    static final int THREAD = 16;  // both sender and receiver will have 16 threads for handling requests
+    public static final int MAX_CHUNK_SIZE = 64 * 1024 * 1024;  // 64 mb for a chunk
+    public static final CountDownLatch READY = new CountDownLatch(1);  // ui waits for receiver and sender to start
     public static volatile boolean alive = true;
 
     static ServerSocket socket;
-    static Sender currentNode;
+    public static Sender currentNode;
     public static Receiver receiver;
     public static String volume;
 
@@ -35,7 +35,7 @@ public class DFS {
         }
 
         // default arguments
-        String host = "";
+        String host = "localhost";
         int port = 13000;
         int m = 4;
         try {
@@ -56,16 +56,10 @@ public class DFS {
         Map<String, String> map = new HashMap<>();
 
         for (int i = 0; i < args.length - 1; i += 2) {
-            String key;
-
             if (args[i].startsWith("--")) {
-                key = args[i].substring(2);
+                String key = args[i].substring(2);
+                map.put(key, args[i + 1]);
             }
-            else {
-                continue;
-            }
-
-            map.put(key, args[i + 1]);
         }
 
         return map;
@@ -92,6 +86,13 @@ public class DFS {
         return receiver;
     }
 
+    /**
+     * Start Storage or Client node base on the argument.
+     * @param arguments
+     * @param host
+     * @param port
+     * @param m
+     */
     private static void startNode(Map<String, String> arguments, String host, int port, int m) {
         if (arguments.get("run").equals("client")) {
             String[] address = arguments.get("node").split(":");
@@ -129,7 +130,8 @@ public class DFS {
         File temp = new File(volume);
         if (temp.exists() && temp.isDirectory()) {
             System.out.println("Set volume = [" + temp + "]");
-        } else {
+        }
+        else {
             System.out.println("Volume [" + temp + "] dose not exist or is not a directory.");
             System.exit(-1);
         }
