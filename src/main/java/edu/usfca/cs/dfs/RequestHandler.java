@@ -94,6 +94,9 @@ class RequestHandler extends Serializer implements Runnable {
             case ASK_NODE_DETAIL:
                 responseNode(((StorageNode) DFS.currentNode).getN());
                 break;
+            case LIST_NODE:
+                response(((StorageNode) DFS.currentNode).listNode(info));
+                break;
             case ASK_M:
                 responseM(((StorageNode) DFS.currentNode).getM());
         }
@@ -125,5 +128,10 @@ class RequestHandler extends Serializer implements Runnable {
     private void response(StorageMessages.Message data) throws IOException {
         OutputStream out = this.listening.getOutputStream();
         data.writeDelimitedTo(out);
+    }
+
+    private void response(StorageMessages.Info info) throws IOException {
+        OutputStream out = this.listening.getOutputStream();
+        info.writeDelimitedTo(out);
     }
 }

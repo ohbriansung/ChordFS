@@ -1,5 +1,6 @@
 package edu.usfca.cs.dfs;
 
+import java.io.File;
 import java.math.BigInteger;
 
 public class Utility {
@@ -50,5 +51,30 @@ public class Utility {
     public int getKey(BigInteger hash) {
         BigInteger rem = hash.remainder(new BigInteger(String.valueOf(this.capacity)));
         return rem.intValue();
+    }
+
+    public String getFreeSpace(String volume) {
+        String unit = " bytes";
+        double space = new File(volume).getFreeSpace();
+
+        while (space >= 1024) {
+            switch (unit) {
+                case " bytes":
+                    unit = " kb";
+                    break;
+                case " kb":
+                    unit = " mb";
+                    break;
+                case " mb":
+                    unit = " gb";
+                    break;
+                case " gb":
+                    unit = " tb";
+            }
+
+            space /= 1024;
+        }
+
+        return String.valueOf(space) + unit;
     }
 }

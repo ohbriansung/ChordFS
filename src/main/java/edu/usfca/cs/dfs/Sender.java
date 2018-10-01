@@ -178,4 +178,22 @@ public abstract class Sender extends Serializer {
         System.out.println("Sent data to " + addr);
         socket.close();
     }
+
+    protected StorageMessages.Info list(InetSocketAddress addr, StorageMessages.Info info) throws IOException {
+        // create socket and stream
+        Socket socket = new Socket();
+        socket.connect(addr);
+        OutputStream out = socket.getOutputStream();
+        InputStream in = socket.getInputStream();
+
+        // send message
+        StorageMessages.Message message = serializeMessage(StorageMessages.messageType.INFO, info.toByteString());
+        message.writeDelimitedTo(out);
+
+        // close socket
+        StorageMessages.Info response = StorageMessages.Info.parseDelimitedFrom(in);
+        socket.close();
+
+        return response;
+    }
 }

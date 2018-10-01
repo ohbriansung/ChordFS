@@ -2,14 +2,30 @@ package edu.usfca.cs.dfs.Client;
 
 import edu.usfca.cs.dfs.DFS;
 import edu.usfca.cs.dfs.Sender;
+import edu.usfca.cs.dfs.StorageMessages;
+
+import java.io.IOException;
+import java.net.InetSocketAddress;
 
 abstract class Command extends Sender {
     Command() {
         super();
     }
 
-    void list() {
+    void list(InetSocketAddress addr) {
+        StorageMessages.Info info = serializeInfo(StorageMessages.infoType.LIST_NODE);
 
+        try {
+            StorageMessages.Info response = list(addr, info);
+            String[] list = response.getData().toStringUtf8().split("\\s+");
+
+            System.out.println("[Node]\t[Address]\t\t\t[FreeSpace]");
+            for (int i = 0; i < list.length; i += 4) {
+                System.out.println(list[i] + "\t\t" + list[i + 1] + "\t" + list[i + 2] + " " + list[i + 3]);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     void help() {

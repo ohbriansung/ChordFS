@@ -1,7 +1,10 @@
 package edu.usfca.cs.dfs.Storage;
 
+import com.google.protobuf.ByteString;
+import edu.usfca.cs.dfs.DFS;
 import edu.usfca.cs.dfs.StorageMessages;
 
+import java.io.IOException;
 import java.math.BigInteger;
 import java.util.Hashtable;
 
@@ -58,7 +61,7 @@ public class StorageNode extends Chord {
      */
     public void replicate(StorageMessages.Message message) {
         int replica = message.getReplica();
-        message = message.toBuilder().setReplica(replica + 1).build();  // increase the replicate time after storing
+        message = message.toBuilder().setReplica(replica + 1).build();  // increase the replicate time after storing.
         Node successor = this.fingers.getFinger(0);
 
         if (message.getReplica() >= 3 || successor.getId() == this.n.getId()) {
@@ -71,6 +74,11 @@ public class StorageNode extends Chord {
         task.start();
     }
 
+    /**
+     * Return total chunk number of a particular file.
+     * @param message
+     * @return int
+     */
     public int getTotalChunk(StorageMessages.Message message) {
         String filename = message.getFileName();
         BigInteger hash = new BigInteger(message.getHash().toByteArray());
@@ -82,5 +90,25 @@ public class StorageNode extends Chord {
         }
 
         return 0;
+    }
+
+    public StorageMessages.Info listNode(StorageMessages.Info info) throws IOException {
+        String data = info.getData().toStringUtf8();
+        int n = info.getIntegerData();
+        if (data.length() == 0) {
+            n = this.n.getId();
+        }
+
+        String space = this.util.getFreeSpace(DFS.volume);
+        data += this.n.getId() + " " + this.n.getAddress() + " " + space + " ";
+        info = info.toBuilder().setData(ByteString.copyFromUtf8(data)).setIntegerData(n).build();
+
+        Node successor = this.fingers.getFinger(0);
+        if (successor.getId() != n) {
+            // if hasn't formed a cycle, send request to successor.
+            info = list(successor.getAddress(), info);
+        }
+
+        return info;
     }
 }

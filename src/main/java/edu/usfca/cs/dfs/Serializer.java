@@ -14,7 +14,7 @@ public abstract class Serializer {
         return StorageMessages.Info.newBuilder().setType(type).setIntegerData(i).build();
     }
 
-    StorageMessages.Info serializeInfo(StorageMessages.infoType type) {
+    protected StorageMessages.Info serializeInfo(StorageMessages.infoType type) {
         return StorageMessages.Info.newBuilder().setType(type).build();
     }
 
