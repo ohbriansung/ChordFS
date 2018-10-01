@@ -111,4 +111,14 @@ public class StorageNode extends Chord {
 
         return info;
     }
+
+    public StorageMessages.Info listFile() {
+        StringBuilder sb = new StringBuilder();
+
+        for (Metadata metadata : this.currentStorage.values()) {
+            sb.append(metadata.toString());
+        }
+
+        return StorageMessages.Info.newBuilder().setData(ByteString.copyFromUtf8(sb.toString())).build();
+    }
 }

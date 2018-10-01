@@ -29,4 +29,20 @@ class Metadata {
     int getTotalChunk(String filename) {
         return this.size.getOrDefault(filename, 0);
     }
+
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+
+        this.lock.readLock().lock();
+        for (String file : this.files) {
+            Set<Integer> chunks = this.chunks.get(file);
+
+            sb.append(file).append("\t\t");
+            sb.append(chunks.size()).append(" of ").append(this.size.get(file)).append("\t");
+            sb.append(chunks.toString()).append("\n");
+        }
+        this.lock.readLock().unlock();
+
+        return sb.toString();
+    }
 }

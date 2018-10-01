@@ -36,6 +36,7 @@ enum infoType {
     ASK_NODE_DETAIL = 6;  // get the detail of the node been asked
     NOTIFY = 7;
     LIST_NODE = 8;  // get the list of node in the ring and their free space
+    LIST_FILE = 9;
 }
 
 message Node {

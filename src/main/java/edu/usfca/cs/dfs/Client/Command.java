@@ -28,6 +28,23 @@ abstract class Command extends Sender {
         }
     }
 
+    void file(String addr) {
+        String[] temp = addr.split(":");
+        StorageMessages.Info info = serializeInfo(StorageMessages.infoType.LIST_FILE);
+
+        try {
+            InetSocketAddress n = new InetSocketAddress(temp[0], Integer.parseInt(temp[1]));
+            StorageMessages.Info response = list(n, info);
+
+            System.out.println("[File]\t\t\t[Total]\t[Chunks]");
+            System.out.println(response.getData().toStringUtf8());
+        } catch (NullPointerException | NumberFormatException ignore) {
+            System.out.println("Invalid address [" + addr + "]");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
     void help() {
         StringBuilder sb = new StringBuilder();
 
@@ -35,6 +52,7 @@ abstract class Command extends Sender {
         sb.append("upload <file_name>\t\tUpload the file to the file system.").append(System.lineSeparator());
         sb.append("download <file_name>\tDownload the file from the file system.").append(System.lineSeparator());
         sb.append("list\t\t\t\t\tList all nodes in the file system and their free space.").append(System.lineSeparator());
+        sb.append("file -l <node_address>\tList all files and chunks stored on a particular node.").append(System.lineSeparator());
         sb.append("help\t\t\t\t\tList all existing commands and usages.").append(System.lineSeparator());
         sb.append("exit\t\t\t\t\tTerminate the program.");
 

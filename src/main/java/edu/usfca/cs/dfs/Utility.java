@@ -70,11 +70,14 @@ public class Utility {
                     break;
                 case " gb":
                     unit = " tb";
+                    break;
+                case " tb":
+                    unit = " pb";
             }
 
             space /= 1024;
         }
 
-        return String.valueOf(space) + unit;
+        return String.valueOf(Math.round(space * 100.0) / 100.0) + unit;
     }
 }

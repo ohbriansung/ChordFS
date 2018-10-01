@@ -233,6 +233,10 @@ public final class StorageMessages {
      * <code>LIST_NODE = 8;</code>
      */
     LIST_NODE(8),
+    /**
+     * <code>LIST_FILE = 9;</code>
+     */
+    LIST_FILE(9),
     UNRECOGNIZED(-1),
     ;
 
@@ -300,6 +304,10 @@ public final class StorageMessages {
      * <code>LIST_NODE = 8;</code>
      */
     public static final int LIST_NODE_VALUE = 8;
+    /**
+     * <code>LIST_FILE = 9;</code>
+     */
+    public static final int LIST_FILE_VALUE = 9;
 
 
     public final int getNumber() {
@@ -329,6 +337,7 @@ public final class StorageMessages {
         case 6: return ASK_NODE_DETAIL;
         case 7: return NOTIFY;
         case 8: return LIST_NODE;
+        case 9: return LIST_FILE;
         default: return null;
       }
     }
@@ -2691,11 +2700,12 @@ public final class StorageMessages {
       "\022\014\n\004host\030\001 \001(\t\022\014\n\004port\030\002 \001(\005\022\n\n\002id\030\003 \001(\005" +
       "*\\\n\013messageType\022\013\n\007REQUEST\020\000\022\010\n\004DATA\020\001\022\010" +
       "\n\004INFO\020\002\022\r\n\tHEARTBEAT\020\003\022\r\n\tFIND_HOST\020\004\022\016" +
-      "\n\nNUM_CHUNKS\020\005*\232\001\n\010infoType\022\032\n\026CLOSEST_P" +
+      "\n\nNUM_CHUNKS\020\005*\251\001\n\010infoType\022\032\n\026CLOSEST_P" +
       "RECEDING_NODE\020\000\022\010\n\004NODE\020\001\022\t\n\005ASK_M\020\002\022\005\n\001" +
       "M\020\003\022\021\n\rASK_SUCCESSOR\020\004\022\023\n\017ASK_PREDECESSO" +
       "R\020\005\022\023\n\017ASK_NODE_DETAIL\020\006\022\n\n\006NOTIFY\020\007\022\r\n\t" +
-      "LIST_NODE\020\010B\022\n\020edu.usfca.cs.dfsb\006proto3"
+      "LIST_NODE\020\010\022\r\n\tLIST_FILE\020\tB\022\n\020edu.usfca." +
+      "cs.dfsb\006proto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {

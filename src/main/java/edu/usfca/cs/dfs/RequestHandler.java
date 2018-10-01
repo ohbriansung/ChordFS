@@ -12,7 +12,6 @@ import java.io.OutputStream;
 import java.math.BigInteger;
 import java.net.Socket;
 
-
 class RequestHandler extends Serializer implements Runnable {
     private final Socket listening;
     private final String addr;
@@ -96,6 +95,9 @@ class RequestHandler extends Serializer implements Runnable {
                 break;
             case LIST_NODE:
                 response(((StorageNode) DFS.currentNode).listNode(info));
+                break;
+            case LIST_FILE:
+                response(((StorageNode) DFS.currentNode).listFile());
                 break;
             case ASK_M:
                 responseM(((StorageNode) DFS.currentNode).getM());

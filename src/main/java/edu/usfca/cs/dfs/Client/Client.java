@@ -58,13 +58,31 @@ public class Client extends Command {
                 help();
                 break;
             case "upload":
-                upload(command[1]);
+                if (command.length == 1) {
+                    help();
+                }
+                else {
+                    upload(command[1]);
+                }
                 break;
             case "download":
-                download(command[1]);
+                if (command.length == 1) {
+                    help();
+                }
+                else {
+                    download(command[1]);
+                }
                 break;
             case "list":
                 list(this.storageNodeAddress);
+                break;
+            case "file":
+                if (command.length < 3 || !command[1].equals("-l")) {
+                    help();
+                }
+                else {
+                    file(command[2]);
+                }
                 break;
             case "exit":
                 exit();
