@@ -9,9 +9,6 @@ import java.math.BigInteger;
 import java.util.Hashtable;
 
 /**
- * Chord Reference: https://en.wikipedia.org/wiki/Chord_(peer-to-peer)
- * successor = fingers[0]
- * np = n'
  * @author Brian Sung
  */
 public class StorageNode extends Chord {

@@ -32,10 +32,6 @@ public class Utility {
         }
     }
 
-    public boolean includesLeft(int target, int left, int right) {
-        return (target ^ left) == 0b0 || in(target, left, right);
-    }
-
     public boolean includesRight(int target, int left, int right) {
         return (target ^ right) == 0b0 || in(target, left, right);
     }

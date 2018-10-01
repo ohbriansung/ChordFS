@@ -110,9 +110,9 @@ public class DFS {
                 InetSocketAddress np = new InetSocketAddress(address[0], Integer.parseInt(address[1]));
                 try {
                     ((StorageNode) DFS.currentNode).join(np);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                    System.out.println("Node " + np.toString() + " is unreachable, please try again.");
+                } catch (IOException ignore) {
+                    System.out.println("Node [" + np + "] is unreachable, please try again with another node.");
+                    DFS.shutdown();
                     System.exit(-1);
                 }
             }
@@ -135,5 +135,15 @@ public class DFS {
             System.out.println("Volume [" + temp + "] dose not exist or is not a directory.");
             System.exit(-1);
         }
+    }
+
+    public static void shutdown() {
+        System.out.println("Shutting down...");
+        DFS.alive = false;
+        try {
+            DFS.socket.close();
+        } catch (IOException ignore) {}
+        DFS.receiver.close();
+        DFS.currentNode.close();  // close sender thread pool
     }
 }

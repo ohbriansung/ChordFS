@@ -23,8 +23,9 @@ abstract class Command extends Sender {
             for (int i = 0; i < list.length; i += 5) {
                 System.out.println(list[i] + "\t\t" + list[i + 1] + "\t" + list[i + 2] + " " + list[i + 3] + "\t" + list[i + 4]);
             }
-        } catch (IOException e) {
-            e.printStackTrace();
+        } catch (IOException ignore) {
+            System.out.println("Node [" + addr + "] is unreachable.");
+            ((Client) DFS.currentNode).removeOneNode(addr);
         }
     }
 
@@ -47,7 +48,7 @@ abstract class Command extends Sender {
             System.out.println(response.getData().toStringUtf8());
 
             ((Client) DFS.currentNode).addOneNode(n);
-        } catch (IOException e) {
+        } catch (IOException ignore) {
             System.out.println("Node [" + addr + "] is unreachable.");
             ((Client) DFS.currentNode).removeOneNode(n);
         }
@@ -68,10 +69,7 @@ abstract class Command extends Sender {
     }
 
     void exit() {
-        System.out.println("Shutting down...");
-        DFS.alive = false;
-        DFS.receiver.close();
-        super.close();  // close sender thread pool
+        DFS.shutdown();
         System.exit(0);
     }
 

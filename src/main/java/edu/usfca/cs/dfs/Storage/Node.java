@@ -35,23 +35,7 @@ public class Node {
         printId();
     }
 
-    public String getHost() {
-        this.lock.readLock().lock();
-        String host = this.host;
-        this.lock.readLock().unlock();
-
-        return host;
-    }
-
-    public int getPort() {
-        this.lock.readLock().lock();
-        int port = this.port;
-        this.lock.readLock().unlock();
-
-        return port;
-    }
-
-    public int getId() {
+    int getId() {
         this.lock.readLock().lock();
         int id = this.id;
         this.lock.readLock().unlock();

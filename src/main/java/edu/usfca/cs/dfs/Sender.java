@@ -26,7 +26,7 @@ public abstract class Sender extends Serializer {
         this.pool = Executors.newFixedThreadPool(DFS.THREAD);
     }
 
-    protected void close() {
+    void close() {
         if (this.pool != null && !this.pool.isShutdown()) {
             this.pool.shutdown();
         }

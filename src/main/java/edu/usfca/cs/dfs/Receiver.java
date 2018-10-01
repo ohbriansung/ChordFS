@@ -19,16 +19,7 @@ public class Receiver implements Runnable {
         this.requestCounter = new AtomicInteger();
     }
 
-    /**
-     * Usage: for closing socket.
-     */
-    public void close() {
-        try {
-            DFS.socket.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
+    void close() {
         if (this.pool != null && !this.pool.isShutdown()) {
             this.pool.shutdown();
         }

@@ -27,7 +27,7 @@ public class Client extends Command {
         this.sha1 = new SHA1();
         this.dp = new DataProcessor();
         this.addressBuffer = new ArrayList<>();
-        this.addressBuffer.add(storageNodeAddress);
+        addOneNode(storageNodeAddress);
 
         try {
             // wait for receiver and sender
@@ -150,6 +150,7 @@ public class Client extends Command {
                 }
             }
 
+            // contact node responsible for key of first chunk to retrieve the total number of chunk
             StorageMessages.Message message = serializeMessage(filename, firstHash);
             try {
                 StorageMessages.Message response = ask(firstKeyNode, message);
@@ -187,6 +188,13 @@ public class Client extends Command {
         }
     }
 
+    /**
+     * Use SHA1 algorithm to hash file name with chunk id.
+     * @param filename
+     * @param chunks
+     * @return List
+     * @throws HashException
+     */
     private List<BigInteger> hashChunks(String filename, List<byte[]> chunks) throws HashException {
         int size = chunks.size();
         System.out.println("Converted file into [" + size + "] chunks:");
