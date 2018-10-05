@@ -24,17 +24,9 @@ public class DFS {
 
     public static void main(String[] args) {
         Map<String, String> arguments = parseArgs(args);
+        checkArgs(arguments);
 
-        if (!checkArgs(arguments)) {
-            StringBuilder sb = new StringBuilder();
-            sb.append("Usage: java dfs.jar ");
-            sb.append("--run <storage/client> --port <port> ");
-            sb.append("[--m <m_bits_ring>] [--node <existing_node_address:port>]");
-            System.out.println(sb.toString());
-            System.exit(-1);
-        }
-
-        // default arguments
+        // default arguments in case user doesn't indicate
         String host = "localhost";
         int port = 13000;
         int m = 4;
@@ -45,10 +37,10 @@ public class DFS {
             DFS.socket = new ServerSocket(port);
         } catch (NumberFormatException | IOException e) {
             e.printStackTrace();
-            System.exit(1);
+            System.exit(-1);
         }
 
-        DFS.receiver = startReceiver(host, port);
+        startReceiver(host, port);
         startNode(arguments, host, port, m);
     }
 
@@ -65,7 +57,7 @@ public class DFS {
         return map;
     }
 
-    private static boolean checkArgs(Map<String, String> arguments) {
+    private static void checkArgs(Map<String, String> arguments) {
         boolean checked = true;
 
         if (!arguments.containsKey("run")) {
@@ -75,15 +67,21 @@ public class DFS {
             checked = false;
         }
 
-        return checked;
+        if (!checked) {
+            StringBuilder sb = new StringBuilder();
+            sb.append("Usage: java dfs.jar ");
+            sb.append("--run <storage/client> --port <port> ");
+            sb.append("[--m <m_bits_ring>] [--node <existing_node_address:port>]");
+            System.out.println(sb.toString());
+            System.exit(-1);
+        }
     }
 
-    private static Receiver startReceiver(String host, int port) {
+    private static void startReceiver(String host, int port) {
         Receiver receiver = new Receiver(host, port);
         Thread listen = new Thread(receiver);
         listen.start();
-
-        return receiver;
+        DFS.receiver = receiver;
     }
 
     /**
@@ -110,8 +108,9 @@ public class DFS {
                 InetSocketAddress np = new InetSocketAddress(address[0], Integer.parseInt(address[1]));
                 try {
                     ((StorageNode) DFS.currentNode).join(np);
+                    ((StorageNode) DFS.currentNode).tellSuccToBackup();
                 } catch (IOException ignore) {
-                    System.out.println("Node [" + np + "] is unreachable, please try again with another node.");
+                    System.out.println("Node [" + np + "] or successor is unreachable, please try again with another node.");
                     DFS.shutdown();
                     System.exit(-1);
                 }

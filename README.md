@@ -60,11 +60,13 @@ Retrieving files in parallel. Each chunk in the file being retrieved will be req
 * Checkpoint 1
 * **Sep. 23, 2018**: storage node implementation, heartbeats.
 * **Sep. 30, 2018**: failure detection and recovery, parallel retrievals.
-* Checkpoint 2
 * **Oct. 05, 2018**: wrap-up, client functions, retrospective.
+* Checkpoint 2
 
 ## References
 
 * [1] [University of San Francisco](https://www.usfca.edu)
 * [2] [Chord paper](https://www.cs.usfca.edu/~mmalensek/cs677/schedule/papers/stoica2001chord.pdf)
 * [3] [Chord WiKi](https://en.wikipedia.org/wiki/Chord_(peer-to-peer))
+* [4] [Chord](https://slideplayer.com/slide/4168285/)
+* [5] [Chord, DHTs, and Naming](http://www.cs.utah.edu/~stutsman/cs6963/lecture/16/)

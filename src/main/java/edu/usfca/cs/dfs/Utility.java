@@ -11,8 +11,8 @@ public class Utility {
     }
 
     /**
+     * Check if target in (left, right)
      * The result of XOR two same integer will be 0.
-     *
      * @param target
      * @param left
      * @param right
@@ -32,6 +32,13 @@ public class Utility {
         }
     }
 
+    /**
+     * Check if target in (left, right]
+     * @param target
+     * @param left
+     * @param right
+     * @return boolean - in the range
+     */
     public boolean includesRight(int target, int left, int right) {
         return (target ^ right) == 0b0 || in(target, left, right);
     }
@@ -40,15 +47,31 @@ public class Utility {
         return Math.abs(Long.hashCode(System.currentTimeMillis()) % this.capacity);
     }
 
+    /**
+     * Return the start id of the finger.
+     * @param id
+     * @param i
+     * @return int
+     */
     public int start(int id, int i) {
         return (id + (0b1 << i)) % this.capacity;
     }
 
+    /**
+     * Calculate big integer's remainder and convert to integer.
+     * @param hash
+     * @return int
+     */
     public int getKey(BigInteger hash) {
         BigInteger rem = hash.remainder(new BigInteger(String.valueOf(this.capacity)));
         return rem.intValue();
     }
 
+    /**
+     * Get current free space on the disk in proper unit.
+     * @param volume - location on the disk
+     * @return String
+     */
     public String getFreeSpace(String volume) {
         String unit = " bytes";
         double space = new File(volume).getFreeSpace();

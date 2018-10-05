@@ -19,6 +19,7 @@ enum messageType {
     FIND_HOST = 4;  // get the node that is responsible for a particular key
     NUM_CHUNKS = 5;  // get total number of chunks of a particular file
     UPDATE = 6;  // update fingers when a node leaves the ring
+    BACKUP = 7;  // when a node join/leave the network
 }
 
 message Info {

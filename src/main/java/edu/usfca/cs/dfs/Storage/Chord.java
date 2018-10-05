@@ -21,9 +21,9 @@ abstract class Chord extends Sender {
     private int m;
     private int next;
     private Node predecessor;
-    private Node secondSuccessor;
     Node n;
     FingerTable fingers;
+    Node secondSuccessor;
     Utility util;
 
     Chord(String host, int port) {
@@ -69,7 +69,7 @@ abstract class Chord extends Sender {
                         return ask(n0.getAddress(), StorageMessages.infoType.ASK_SUCCESSOR, id);
                     } catch (IOException ignore) {
                         try {
-                            Thread.sleep(500); // wait for updating fingers
+                            Thread.sleep(500); // wait for updating fingers and retry
                         } catch (InterruptedException ignored) {}
                         return findSuccessor(id);
                     }
@@ -114,7 +114,7 @@ abstract class Chord extends Sender {
     }
 
     /**
-     * Join a Chord ring contains node np.
+     * Join a Chord ring contains existing node np.
      * Ask np the size of the Chord ring.
      * Id of current node could be already existed in the Chord ring,
      * keep generating new id until it is unique.
@@ -262,7 +262,7 @@ abstract class Chord extends Sender {
         System.out.println("Successor [" + successor.getId() + "] has failed, removing...");
 
         if (successor.getId() == this.predecessor.getId()) {
-            // when there were only two node in ring, and one failed, the rest is the only node in ring.
+            // when there are only two node in ring, and one fails, the rest is the only node in ring.
             this.predecessor = this.n;
             for (int i = 0; i < this.m; i++) {
                 this.fingers.setFinger(i, this.n);

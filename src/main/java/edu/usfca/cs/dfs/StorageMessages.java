@@ -59,6 +59,14 @@ public final class StorageMessages {
      * <code>UPDATE = 6;</code>
      */
     UPDATE(6),
+    /**
+     * <pre>
+     * when a node join/leave the network
+     * </pre>
+     *
+     * <code>BACKUP = 7;</code>
+     */
+    BACKUP(7),
     UNRECOGNIZED(-1),
     ;
 
@@ -102,6 +110,14 @@ public final class StorageMessages {
      * <code>UPDATE = 6;</code>
      */
     public static final int UPDATE_VALUE = 6;
+    /**
+     * <pre>
+     * when a node join/leave the network
+     * </pre>
+     *
+     * <code>BACKUP = 7;</code>
+     */
+    public static final int BACKUP_VALUE = 7;
 
 
     public final int getNumber() {
@@ -129,6 +145,7 @@ public final class StorageMessages {
         case 4: return FIND_HOST;
         case 5: return NUM_CHUNKS;
         case 6: return UPDATE;
+        case 7: return BACKUP;
         default: return null;
       }
     }
@@ -3780,14 +3797,15 @@ public final class StorageMessages {
       "\022\014\n\004host\030\001 \001(\t\022\014\n\004port\030\002 \001(\005\022\n\n\002id\030\003 \001(\005" +
       "\"W\n\006Update\022\022\n\003old\030\001 \001(\0132\005.Node\022\022\n\003new\030\002 " +
       "\001(\0132\005.Node\022\026\n\007whoSent\030\003 \001(\0132\005.Node\022\r\n\005co" +
-      "unt\030\004 \001(\005*h\n\013messageType\022\013\n\007REQUEST\020\000\022\010\n" +
+      "unt\030\004 \001(\005*t\n\013messageType\022\013\n\007REQUEST\020\000\022\010\n" +
       "\004DATA\020\001\022\010\n\004INFO\020\002\022\r\n\tHEARTBEAT\020\003\022\r\n\tFIND" +
-      "_HOST\020\004\022\016\n\nNUM_CHUNKS\020\005\022\n\n\006UPDATE\020\006*\251\001\n\010" +
-      "infoType\022\032\n\026CLOSEST_PRECEDING_NODE\020\000\022\010\n\004" +
-      "NODE\020\001\022\t\n\005ASK_M\020\002\022\005\n\001M\020\003\022\021\n\rASK_SUCCESSO" +
-      "R\020\004\022\023\n\017ASK_PREDECESSOR\020\005\022\023\n\017ASK_NODE_DET" +
-      "AIL\020\006\022\n\n\006NOTIFY\020\007\022\r\n\tLIST_NODE\020\010\022\r\n\tLIST" +
-      "_FILE\020\tB\022\n\020edu.usfca.cs.dfsb\006proto3"
+      "_HOST\020\004\022\016\n\nNUM_CHUNKS\020\005\022\n\n\006UPDATE\020\006\022\n\n\006B" +
+      "ACKUP\020\007*\251\001\n\010infoType\022\032\n\026CLOSEST_PRECEDIN" +
+      "G_NODE\020\000\022\010\n\004NODE\020\001\022\t\n\005ASK_M\020\002\022\005\n\001M\020\003\022\021\n\r" +
+      "ASK_SUCCESSOR\020\004\022\023\n\017ASK_PREDECESSOR\020\005\022\023\n\017" +
+      "ASK_NODE_DETAIL\020\006\022\n\n\006NOTIFY\020\007\022\r\n\tLIST_NO" +
+      "DE\020\010\022\r\n\tLIST_FILE\020\tB\022\n\020edu.usfca.cs.dfsb" +
+      "\006proto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {

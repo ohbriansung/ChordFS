@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.math.BigInteger;
+import java.net.InetSocketAddress;
 import java.net.Socket;
 
 class RequestHandler extends Serializer implements Runnable {
@@ -41,7 +42,6 @@ class RequestHandler extends Serializer implements Runnable {
             switch (type) {
                 case INFO:
                     StorageMessages.Info info = StorageMessages.Info.parseFrom(message.getData());
-                    System.out.println("Received " + info.getType().name() + " from " + this.addr);
                     parseInfo(info);
                     break;
                 case HEARTBEAT:
@@ -68,6 +68,11 @@ class RequestHandler extends Serializer implements Runnable {
                 case UPDATE:
                     System.out.println("Received " + message.getType().name() + " from " + this.addr);
                     ((StorageNode) DFS.currentNode).updateFinger(message);
+                    break;
+                case BACKUP:
+                    System.out.println("Received " + message.getType().name() + " from " + this.addr);
+                    InetSocketAddress addr = (InetSocketAddress) this.listening.getRemoteSocketAddress();
+                    ((StorageNode) DFS.currentNode).backup(addr, message.getReplica());
             }
         } catch (InvalidProtocolBufferException e) {
             e.printStackTrace();
@@ -76,6 +81,7 @@ class RequestHandler extends Serializer implements Runnable {
 
     private void parseInfo(StorageMessages.Info info) throws IOException {
         StorageMessages.infoType type = info.getType();
+        System.out.println("Received " + type.name() + " from " + this.addr);
 
         switch (type) {
             case NOTIFY:
