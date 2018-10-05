@@ -1,7 +1,6 @@
 package edu.usfca.cs.dfs;
 
 import edu.usfca.cs.dfs.Client.Client;
-import edu.usfca.cs.dfs.Storage.Fixing;
 import edu.usfca.cs.dfs.Storage.Stabilization;
 import edu.usfca.cs.dfs.Storage.StorageNode;
 
@@ -124,8 +123,6 @@ public class DFS {
 
             Thread stabilization = new Thread(new Stabilization(((StorageNode) DFS.currentNode)));
             stabilization.start();
-            Thread fixing = new Thread(new Fixing(((StorageNode) DFS.currentNode)));
-            fixing.start();
         }
     }
 

@@ -18,6 +18,7 @@ enum messageType {
     HEARTBEAT = 3;
     FIND_HOST = 4;  // get the node that is responsible for a particular key
     NUM_CHUNKS = 5;  // get total number of chunks of a particular file
+    UPDATE = 6;  // update fingers when a node leaves the ring
 }
 
 message Info {
@@ -43,4 +44,11 @@ message Node {
     string host = 1;
     int32 port = 2;
     int32 id = 3;
+}
+
+message Update {
+    Node old = 1;
+    Node new = 2;
+    Node whoSent = 3;
+    int32 count = 4;
 }

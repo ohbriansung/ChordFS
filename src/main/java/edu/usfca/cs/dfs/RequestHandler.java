@@ -24,7 +24,6 @@ class RequestHandler extends Serializer implements Runnable {
     @Override
     public void run() {
         try (InputStream in = this.listening.getInputStream()) {
-
             StorageMessages.Message message = StorageMessages.Message.parseDelimitedFrom(in);
             parseMessage(message);
 
@@ -63,9 +62,12 @@ class RequestHandler extends Serializer implements Runnable {
                     responseNode(((StorageNode) DFS.currentNode).findHost(hash));
                     break;
                 case NUM_CHUNKS:
-                    System.out.println("Received " + message.getType().name() + " from " + this.addr);
                     int total = ((StorageNode) DFS.currentNode).getTotalChunk(message);
                     response(serializeMessage(total));
+                    break;
+                case UPDATE:
+                    System.out.println("Received " + message.getType().name() + " from " + this.addr);
+                    ((StorageNode) DFS.currentNode).updateFinger(message);
             }
         } catch (InvalidProtocolBufferException e) {
             e.printStackTrace();

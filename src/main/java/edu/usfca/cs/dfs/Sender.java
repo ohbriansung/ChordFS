@@ -93,7 +93,7 @@ public abstract class Sender extends Serializer {
         return response.getIntegerData();
     }
 
-    protected void notify(InetSocketAddress addr, Node n) throws IOException {
+    protected void ask(InetSocketAddress addr, StorageMessages.infoType type, Node n) throws IOException {
         // create socket and stream
         Socket socket = new Socket();
         socket.connect(addr);
@@ -101,7 +101,7 @@ public abstract class Sender extends Serializer {
 
         // send message
         StorageMessages.Node node = n.serialize();
-        StorageMessages.Info info = serializeInfo(StorageMessages.infoType.NOTIFY, node.toByteString());
+        StorageMessages.Info info = serializeInfo(type, node.toByteString());
         StorageMessages.Message message = serializeMessage(StorageMessages.messageType.INFO, info.toByteString());
         message.writeDelimitedTo(out);
 
@@ -185,7 +185,6 @@ public abstract class Sender extends Serializer {
         socket.connect(addr);
         OutputStream out = socket.getOutputStream();
         message.writeDelimitedTo(out);
-        System.out.println("Sent data to " + addr);
         socket.close();
     }
 

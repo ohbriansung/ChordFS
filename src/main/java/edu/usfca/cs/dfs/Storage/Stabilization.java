@@ -13,9 +13,11 @@ public class Stabilization implements Runnable {
     public void run() {
         while (DFS.alive) {
             this.node.stabilize();
-            this.node.checkPredecessor();
+            this.node.fixFingers();
+            this.node.keepAlive();
+            this.node.stabilizeSecSucc();
             try {
-                Thread.sleep(1000);
+                Thread.sleep(600);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
