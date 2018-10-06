@@ -4,8 +4,6 @@ import com.google.protobuf.ByteString;
 import edu.usfca.cs.dfs.DFS;
 import edu.usfca.cs.dfs.StorageMessages;
 
-import javax.imageio.IIOException;
-import java.io.File;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.nio.file.Files;
@@ -23,6 +21,9 @@ class ReadWriteFileNIO {
         this.data = new ArrayList<>();
     }
 
+    /**
+     * Read all files recorded in metadata.
+     */
     List<StorageMessages.Message> read() {
         List<Thread> tasks = new ArrayList<>();
         List<String> files = this.metadata.getFile();
@@ -55,6 +56,9 @@ class ReadWriteFileNIO {
         return this.data;
     }
 
+    /**
+     * Delete all files recorded in metadata.
+     */
     void delete() {
         List<Thread> tasks = new ArrayList<>();
         List<String> files = this.metadata.getFile();

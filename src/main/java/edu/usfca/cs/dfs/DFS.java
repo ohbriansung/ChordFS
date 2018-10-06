@@ -125,6 +125,10 @@ public class DFS {
         }
     }
 
+    /**
+     * Check if volume exists or not.
+     * @param volume
+     */
     private static void checkVolume(String volume) {
         File temp = new File(volume);
         if (temp.exists() && temp.isDirectory()) {
@@ -136,6 +140,9 @@ public class DFS {
         }
     }
 
+    /**
+     * Close socket, thread pools.
+     */
     public static void shutdown() {
         System.out.println("Shutting down...");
         DFS.alive = false;

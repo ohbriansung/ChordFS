@@ -151,8 +151,9 @@ public class StorageNode extends Chord {
         if (!messages.isEmpty()) {
             CountDownLatch count = new CountDownLatch(messages.size());
             ExecutorService pool = Executors.newFixedThreadPool(4);
-            for (StorageMessages.Message m : messages) {
-                pool.submit(new Backup(addr, m, count));
+            while (!messages.isEmpty()) {
+                pool.submit(new Backup(addr, messages.get(0), count));
+                messages.remove(0);
             }
 
             try {
