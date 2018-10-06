@@ -77,6 +77,7 @@ abstract class Chord extends Sender {
             }
         } catch (IOException ignore) {
             updateSuccessor(successor);
+            ((StorageNode) DFS.currentNode).recover(successor.getId());
         }
 
         return successor;
@@ -168,6 +169,7 @@ abstract class Chord extends Sender {
             }
         } catch (IOException ignore) {
             updateSuccessor(successor);
+            ((StorageNode) DFS.currentNode).recover(successor.getId());
         }
     }
 
@@ -223,6 +225,7 @@ abstract class Chord extends Sender {
             heartbeat(successor.getAddress());
         } catch (IOException ignore) {
             updateSuccessor(successor);
+            ((StorageNode) DFS.currentNode).recover(successor.getId());
         }
     }
 
@@ -249,6 +252,7 @@ abstract class Chord extends Sender {
         } catch (IOException ignore) {
             updateSuccessor(successor);
             stabilizeSecSucc();
+            ((StorageNode) DFS.currentNode).recover(successor.getId());
         }
     }
 

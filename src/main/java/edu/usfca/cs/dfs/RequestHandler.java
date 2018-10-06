@@ -113,8 +113,11 @@ class RequestHandler extends Serializer implements Runnable {
                 break;
             case SEND_DATA_AND_DELETE:
             case SEND_DATA:
-                String[] hostAndPort = info.getData().toStringUtf8().split(":");
-                InetSocketAddress addr = new InetSocketAddress(hostAndPort[0], Integer.parseInt(hostAndPort[1]));
+                InetSocketAddress addr = null;
+                if (info.getData().toStringUtf8().length() != 0) {
+                    String[] hostAndPort = info.getData().toStringUtf8().split(":");
+                    addr = new InetSocketAddress(hostAndPort[0], Integer.parseInt(hostAndPort[1]));
+                }
                 int start = info.getIntegerData();
                 int end = info.getIntegerData2();
                 boolean delete = (type == StorageMessages.infoType.SEND_DATA_AND_DELETE);

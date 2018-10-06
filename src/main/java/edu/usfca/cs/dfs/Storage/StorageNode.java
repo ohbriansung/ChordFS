@@ -45,9 +45,9 @@ public class StorageNode extends Chord {
      * which is still in startup process and not in the network.
      * Node, its successor, and its second successor (3 replicas) need to copy file to the new node.
      * The key range for each node above to copy will be:
-     * Node - (Third predecessor, Second predecessor]
-     * Successor - (Second predecessor, Predecessor]
-     * Second successor - (Predecessor, New node's id]
+     * 1. Node - (Third predecessor, Second predecessor]
+     * 2. Successor - (Second predecessor, Predecessor]
+     * 3. Second successor - (Predecessor, New node's id]
      * @param addr - new node address
      * @param id - new node id
      */
@@ -88,6 +88,9 @@ public class StorageNode extends Chord {
         synchronized (this.currentStorage) {
             int i = this.util.start(start, 0);
             int init = i;
+            if (addr == null) {
+                addr = this.fingers.getFinger(0).getAddress();
+            }
 
             while (this.util.includesRight(i, start, end)) {
                 Metadata metadata;
@@ -113,10 +116,30 @@ public class StorageNode extends Chord {
         }
     }
 
-    public void recover() {
-        // send (Third predecessor, Second predecessor] to successor
-        // tell successor to send (Second predecessor, Predecessor] to its successor
-        // tell successor to send (Predecessor, New node's id] to its second successor
+    /**
+     * If there are more than two nodes remain in the network, then:
+     * 1. Tell successor to send (Second predecessor, Predecessor] to its successor
+     * 2. Tell second successor to send (Predecessor, Leaving node's id] to its successor
+     * 3. Send (Third predecessor, Second predecessor] to successor
+     * @param id - Leaving node's id
+     */
+    void recover(int id) {
+        Node s = this.fingers.getFinger(0);
+        Node ss = this.secondSuccessor;
+
+        if (s.getId() != this.n.getId() && ss.getId() != this.n.getId()) {
+            System.out.println("Start recovering process");
+
+            int[] p = getP1P2P3();
+            tellNodeToSendData(s, null, p[1], p[0], false);
+            tellNodeToSendData(ss, null, p[0], id, false);
+            backup(s.getAddress(), p[2], p[1], false);
+
+            System.out.println("Recovering process has completed.");
+        }
+        else {
+            System.out.println("No recover needed.");
+        }
     }
 
     /**
@@ -162,7 +185,10 @@ public class StorageNode extends Chord {
             return;
         }
 
-        String address = addr.toString().replaceAll("/", "");
+        String address = "";
+        if (addr != null) {
+            address = addr.toString().replaceAll("/", "");
+        }
         StorageMessages.infoType type = delete ? StorageMessages.infoType.SEND_DATA_AND_DELETE : StorageMessages.infoType.SEND_DATA;
         StorageMessages.Info info = StorageMessages.Info.newBuilder().setType(type)
                 .setData(ByteString.copyFromUtf8(address)).setIntegerData(start).setIntegerData2(end).build();
