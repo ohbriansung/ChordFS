@@ -63,41 +63,15 @@ public class StorageNode extends Chord {
             delete = false;
         }
 
-        Node p1 = this.getPredecessor();
-        int p2;
-        int p3;
-        if (p1.getId() == this.n.getId()) {
-            // if predecessor is current node, use current node's id directly.
-            p2 = p1.getId();
-            p3 = p1.getId();
-            backup(addr, p3, p2, delete);
-            System.out.println("Backup to " + addr.toString() + " has completed.");
-            return;
-        }
-
-        StorageMessages.Info info = StorageMessages.Info.newBuilder()
-                .setType(StorageMessages.infoType.ASK_TWO_PREDECESSOR).build();
-
-        StorageMessages.Info p2And3;
-        try {
-            p2And3 = list(p1.getAddress(), info);
-        } catch (IOException ignore) {
-            try {
-                Thread.sleep(500);
-            } catch (InterruptedException ignored) {
+        int[] p = getP1P2P3();
+        backup(addr, p[2], p[1], delete);
+        if (p[0] != this.n.getId()) {
+            // if there si only one node, the above step will copy all the data
+            tellNodeToSendData(s, addr, p[1], p[0], delete);
+            if (ss.getId() != this.n.getId()) {
+                // if there is only two nodes in the ring, the above two steps will copy all the data
+                tellNodeToSendData(ss, addr, p[0], id, delete);
             }
-            backup(addr, id);  // wait for half second and retry
-            return;
-        }
-        String[] ids = p2And3.getData().toStringUtf8().split(" ");
-        p2 = Integer.parseInt(ids[0]);
-        p3 = Integer.parseInt(ids[1]);
-
-        backup(addr, p3, p2, delete);
-        tellNodeToSendData(s, addr, p2, p1.getId(), delete);
-        if (ss.getId() != this.n.getId()) {
-            // if there s only two node in the ring, the above two steps will copy all the data
-            tellNodeToSendData(ss, addr, p1.getId(), id, delete);
         }
 
         System.out.println("Backup to " + addr.toString() + " has completed.");
@@ -137,6 +111,12 @@ public class StorageNode extends Chord {
                 System.out.println("Deleted key in (" + start + ", " + end + "].");
             }
         }
+    }
+
+    public void recover() {
+        // send (Third predecessor, Second predecessor] to successor
+        // tell successor to send (Second predecessor, Predecessor] to its successor
+        // tell successor to send (Predecessor, New node's id] to its second successor
     }
 
     /**
@@ -194,6 +174,42 @@ public class StorageNode extends Chord {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    /**
+     * Get the ids of Predecessor, Second Predecessor, and Third Predecessor.
+     * @return int[]
+     */
+    private int[] getP1P2P3() {
+        int[] p = new int[3];
+
+        Node pre = getPredecessor();
+        p[0] = pre.getId();
+
+        if (p[0] == this.n.getId()) {
+            // if predecessor is current node, use current node's id directly.
+            p[1] = p[0];
+            p[2] = p[0];
+        }
+        else {
+            StorageMessages.Info info = StorageMessages.Info.newBuilder()
+                    .setType(StorageMessages.infoType.ASK_TWO_PREDECESSOR).build();
+
+            StorageMessages.Info p2And3;
+            try {
+                p2And3 = list(pre.getAddress(), info);
+            } catch (IOException ignore) {
+                try {
+                    Thread.sleep(500);  // wait for update and retry
+                } catch (InterruptedException ignored) {}
+                return getP1P2P3();
+            }
+            String[] ids = p2And3.getData().toStringUtf8().split("\\s+");
+            p[1] = Integer.parseInt(ids[0]);
+            p[2] = Integer.parseInt(ids[1]);
+        }
+
+        return p;
     }
 
     /**
