@@ -385,6 +385,13 @@ public class StorageNode extends Chord {
         return metadata.verify(filename, i, checksum);
     }
 
+    /**
+     * If a chunk has corrupted, ask successors for replicas to recover the corruption.
+     * @param filename
+     * @param i
+     * @param count
+     * @return byte[]
+     */
     public byte[] recoverFromCorruption(String filename, int i, int count) {
         Node n;
         if (count == 0) {
