@@ -41,35 +41,136 @@ public class StorageNode extends Chord {
     }
 
     public void backup(InetSocketAddress addr,  int id) {
-        if (this.fingers.getFinger(0).getId() == this.n.getId()
-                || this.secondSuccessor.getId() == this.n.getId()) {
+        System.out.println("Starting backup to " + addr.toString());
+
+        Node s = this.fingers.getFinger(0);
+        Node ss = this.secondSuccessor;
+        boolean delete = true;
+        if (s.getId() == this.n.getId()
+                || ss.getId() == this.n.getId()) {
             // only one or two nodes in the ring, copy all data but not delete
-            synchronized (this.currentStorage) {
-                for (Metadata metadata : this.currentStorage.values()) {
-                    ReadWriteFileNIO rw = new ReadWriteFileNIO(metadata);
-                    List<StorageMessages.Message> messages = rw.read();
+            delete = false;
+        }
 
-                    if (!messages.isEmpty()) {
-                        CountDownLatch count = new CountDownLatch(messages.size());
-                        ExecutorService pool = Executors.newFixedThreadPool(4);
-                        for (StorageMessages.Message m : messages) {
-                            pool.submit(new Backup(addr, m, count));
-                        }
+        Node p1 = this.getPredecessor();
+        int p2;
+        int p3;
+        if (p1.getId() == this.n.getId()) {
+            // if predecessor is current node, use current node's id directly.
+            p2 = p1.getId();
+            p3 = p1.getId();
+            backup(addr, p3, p2, delete);
+            System.out.println("Backup to " + addr.toString() + " has completed.");
+            return;
+        }
 
-                        try {
-                            count.await();
-                            pool.shutdown();
-                        } catch (InterruptedException e) {
-                            e.printStackTrace();
-                        }
+        StorageMessages.Info info = StorageMessages.Info.newBuilder()
+                .setType(StorageMessages.infoType.ASK_TWO_PREDECESSOR).build();
+
+        StorageMessages.Info p2And3;
+        try {
+            p2And3 = list(p1.getAddress(), info);
+        } catch (IOException ignore) {
+            try {
+                Thread.sleep(500);
+            } catch (InterruptedException ignored) {
+            }
+            backup(addr, id);  // wait for half second and retry
+            return;
+        }
+        String[] ids = p2And3.getData().toStringUtf8().split(" ");
+        p2 = Integer.parseInt(ids[0]);
+        p3 = Integer.parseInt(ids[1]);
+
+        backup(addr, p3, p2, delete);
+        tellNodeToSendData(s, addr, p2, p1.getId(), delete);
+        tellNodeToSendData(ss, addr, p1.getId(), id, delete);
+
+        System.out.println("Backup to " + addr.toString() + " has completed.");
+    }
+
+    public void backup(InetSocketAddress addr, int start, int end, boolean delete) {
+        synchronized (this.currentStorage) {
+            int i = this.util.start(start, 0);
+            int init = i;
+
+            while (this.util.includesRight(i, start, end)) {
+                Metadata metadata;
+
+                if ((metadata = this.currentStorage.get(i)) != null) {
+                    ReadWriteFileNIO rw = readAndSend(addr, metadata);
+
+                    if (delete) {
+                        rw.delete();
+                        this.currentStorage.remove(i);
                     }
+                }
+
+                i = this.util.start(i, 0);
+                if (i == init) {
+                    break;
                 }
             }
 
-            System.out.println("Backup to " + addr.toString() + " has completed.");
+            if (delete) {
+                System.out.println("Deleted key in (" + start + ", " + end + "].");
+            }
         }
-        else {
-            // exists or more than three nodes in the ring, copy and delete
+    }
+
+    /**
+     * Read all files in metadata from the disk and send to the new node.
+     * @param addr - new node address.
+     * @param metadata
+     */
+    private ReadWriteFileNIO readAndSend(InetSocketAddress addr, Metadata metadata) {
+        ReadWriteFileNIO rw = new ReadWriteFileNIO(metadata);
+        List<StorageMessages.Message> messages = rw.read();
+
+        if (!messages.isEmpty()) {
+            CountDownLatch count = new CountDownLatch(messages.size());
+            ExecutorService pool = Executors.newFixedThreadPool(4);
+            for (StorageMessages.Message m : messages) {
+                pool.submit(new Backup(addr, m, count));
+            }
+
+            try {
+                count.await();
+                pool.shutdown();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+
+        return rw;
+    }
+
+    /**
+     * Tell successor or second successor to replicate data to new node.
+     * If successor or second successor is current node, do backup directly.
+     * @param n - successor or second successor
+     * @param addr - new node address
+     * @param start - data key range starting point
+     * @param end - data key range ending point
+     * @param delete - if delete after replication
+     */
+    private void tellNodeToSendData(Node n, InetSocketAddress addr, int start, int end, boolean delete) {
+        if (n.getId() == this.n.getId()) {
+            backup(addr, start, end, delete);
+            return;
+        }
+
+        String address = addr.toString().replaceAll("/", "");
+        StorageMessages.infoType type = delete ? StorageMessages.infoType.SEND_DATA_AND_DELETE : StorageMessages.infoType.SEND_DATA;
+        StorageMessages.Info info = StorageMessages.Info.newBuilder().setType(type)
+                .setData(ByteString.copyFromUtf8(address)).setIntegerData(start).setIntegerData2(end).build();
+        StorageMessages.Message message = StorageMessages.Message.newBuilder().setType(StorageMessages.messageType.INFO)
+                .setData(info.toByteString()).build();
+
+        try {
+            send(n.getAddress(), message);
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 
@@ -185,5 +286,19 @@ public class StorageNode extends Chord {
         }
 
         return StorageMessages.Info.newBuilder().setData(ByteString.copyFromUtf8(sb.toString())).build();
+    }
+
+    /**
+     * Ask predecessor for its predecessor.
+     * Return two predecessor's ids.
+     * @return StorageMessages.Info
+     * @throws IOException
+     */
+    public StorageMessages.Info askPreItsPre() throws IOException {
+        Node pre = getPredecessor();
+        Node itsPre = ask(pre.getAddress(), StorageMessages.infoType.ASK_PREDECESSOR);
+        String ids = "" + pre.getId() + " " + itsPre.getId();
+
+        return StorageMessages.Info.newBuilder().setData(ByteString.copyFromUtf8(ids)).build();
     }
 }

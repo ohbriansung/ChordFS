@@ -271,6 +271,22 @@ public final class StorageMessages {
      * <code>LIST_FILE = 9;</code>
      */
     LIST_FILE(9),
+    /**
+     * <pre>
+     * get predecessor of predecessor
+     * </pre>
+     *
+     * <code>ASK_TWO_PREDECESSOR = 10;</code>
+     */
+    ASK_TWO_PREDECESSOR(10),
+    /**
+     * <code>SEND_DATA_AND_DELETE = 11;</code>
+     */
+    SEND_DATA_AND_DELETE(11),
+    /**
+     * <code>SEND_DATA = 12;</code>
+     */
+    SEND_DATA(12),
     UNRECOGNIZED(-1),
     ;
 
@@ -342,6 +358,22 @@ public final class StorageMessages {
      * <code>LIST_FILE = 9;</code>
      */
     public static final int LIST_FILE_VALUE = 9;
+    /**
+     * <pre>
+     * get predecessor of predecessor
+     * </pre>
+     *
+     * <code>ASK_TWO_PREDECESSOR = 10;</code>
+     */
+    public static final int ASK_TWO_PREDECESSOR_VALUE = 10;
+    /**
+     * <code>SEND_DATA_AND_DELETE = 11;</code>
+     */
+    public static final int SEND_DATA_AND_DELETE_VALUE = 11;
+    /**
+     * <code>SEND_DATA = 12;</code>
+     */
+    public static final int SEND_DATA_VALUE = 12;
 
 
     public final int getNumber() {
@@ -372,6 +404,9 @@ public final class StorageMessages {
         case 7: return NOTIFY;
         case 8: return LIST_NODE;
         case 9: return LIST_FILE;
+        case 10: return ASK_TWO_PREDECESSOR;
+        case 11: return SEND_DATA_AND_DELETE;
+        case 12: return SEND_DATA;
         default: return null;
       }
     }
@@ -1411,6 +1446,11 @@ public final class StorageMessages {
      * <code>int32 integerData = 3;</code>
      */
     int getIntegerData();
+
+    /**
+     * <code>int32 integerData2 = 4;</code>
+     */
+    int getIntegerData2();
   }
   /**
    * Protobuf type {@code Info}
@@ -1428,6 +1468,7 @@ public final class StorageMessages {
       type_ = 0;
       data_ = com.google.protobuf.ByteString.EMPTY;
       integerData_ = 0;
+      integerData2_ = 0;
     }
 
     @java.lang.Override
@@ -1468,6 +1509,11 @@ public final class StorageMessages {
             case 24: {
 
               integerData_ = input.readInt32();
+              break;
+            }
+            case 32: {
+
+              integerData2_ = input.readInt32();
               break;
             }
             default: {
@@ -1537,6 +1583,15 @@ public final class StorageMessages {
       return integerData_;
     }
 
+    public static final int INTEGERDATA2_FIELD_NUMBER = 4;
+    private int integerData2_;
+    /**
+     * <code>int32 integerData2 = 4;</code>
+     */
+    public int getIntegerData2() {
+      return integerData2_;
+    }
+
     private byte memoizedIsInitialized = -1;
     @java.lang.Override
     public final boolean isInitialized() {
@@ -1560,6 +1615,9 @@ public final class StorageMessages {
       if (integerData_ != 0) {
         output.writeInt32(3, integerData_);
       }
+      if (integerData2_ != 0) {
+        output.writeInt32(4, integerData2_);
+      }
       unknownFields.writeTo(output);
     }
 
@@ -1580,6 +1638,10 @@ public final class StorageMessages {
       if (integerData_ != 0) {
         size += com.google.protobuf.CodedOutputStream
           .computeInt32Size(3, integerData_);
+      }
+      if (integerData2_ != 0) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeInt32Size(4, integerData2_);
       }
       size += unknownFields.getSerializedSize();
       memoizedSize = size;
@@ -1602,6 +1664,8 @@ public final class StorageMessages {
           .equals(other.getData());
       result = result && (getIntegerData()
           == other.getIntegerData());
+      result = result && (getIntegerData2()
+          == other.getIntegerData2());
       result = result && unknownFields.equals(other.unknownFields);
       return result;
     }
@@ -1619,6 +1683,8 @@ public final class StorageMessages {
       hash = (53 * hash) + getData().hashCode();
       hash = (37 * hash) + INTEGERDATA_FIELD_NUMBER;
       hash = (53 * hash) + getIntegerData();
+      hash = (37 * hash) + INTEGERDATA2_FIELD_NUMBER;
+      hash = (53 * hash) + getIntegerData2();
       hash = (29 * hash) + unknownFields.hashCode();
       memoizedHashCode = hash;
       return hash;
@@ -1758,6 +1824,8 @@ public final class StorageMessages {
 
         integerData_ = 0;
 
+        integerData2_ = 0;
+
         return this;
       }
 
@@ -1787,6 +1855,7 @@ public final class StorageMessages {
         result.type_ = type_;
         result.data_ = data_;
         result.integerData_ = integerData_;
+        result.integerData2_ = integerData2_;
         onBuilt();
         return result;
       }
@@ -1843,6 +1912,9 @@ public final class StorageMessages {
         }
         if (other.getIntegerData() != 0) {
           setIntegerData(other.getIntegerData());
+        }
+        if (other.getIntegerData2() != 0) {
+          setIntegerData2(other.getIntegerData2());
         }
         this.mergeUnknownFields(other.unknownFields);
         onChanged();
@@ -1969,6 +2041,32 @@ public final class StorageMessages {
       public Builder clearIntegerData() {
         
         integerData_ = 0;
+        onChanged();
+        return this;
+      }
+
+      private int integerData2_ ;
+      /**
+       * <code>int32 integerData2 = 4;</code>
+       */
+      public int getIntegerData2() {
+        return integerData2_;
+      }
+      /**
+       * <code>int32 integerData2 = 4;</code>
+       */
+      public Builder setIntegerData2(int value) {
+        
+        integerData2_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>int32 integerData2 = 4;</code>
+       */
+      public Builder clearIntegerData2() {
+        
+        integerData2_ = 0;
         onChanged();
         return this;
       }
@@ -3792,20 +3890,22 @@ public final class StorageMessages {
       "type\030\001 \001(\0162\014.messageType\022\020\n\010fileName\030\002 \001" +
       "(\t\022\022\n\ntotalChunk\030\003 \001(\005\022\017\n\007chunkId\030\004 \001(\005\022" +
       "\014\n\004data\030\005 \001(\014\022\014\n\004hash\030\006 \001(\014\022\017\n\007replica\030\007" +
-      " \001(\005\"B\n\004Info\022\027\n\004type\030\001 \001(\0162\t.infoType\022\014\n" +
-      "\004data\030\002 \001(\014\022\023\n\013integerData\030\003 \001(\005\".\n\004Node" +
-      "\022\014\n\004host\030\001 \001(\t\022\014\n\004port\030\002 \001(\005\022\n\n\002id\030\003 \001(\005" +
-      "\"W\n\006Update\022\022\n\003old\030\001 \001(\0132\005.Node\022\022\n\003new\030\002 " +
-      "\001(\0132\005.Node\022\026\n\007whoSent\030\003 \001(\0132\005.Node\022\r\n\005co" +
-      "unt\030\004 \001(\005*t\n\013messageType\022\013\n\007REQUEST\020\000\022\010\n" +
-      "\004DATA\020\001\022\010\n\004INFO\020\002\022\r\n\tHEARTBEAT\020\003\022\r\n\tFIND" +
-      "_HOST\020\004\022\016\n\nNUM_CHUNKS\020\005\022\n\n\006UPDATE\020\006\022\n\n\006B" +
-      "ACKUP\020\007*\251\001\n\010infoType\022\032\n\026CLOSEST_PRECEDIN" +
-      "G_NODE\020\000\022\010\n\004NODE\020\001\022\t\n\005ASK_M\020\002\022\005\n\001M\020\003\022\021\n\r" +
-      "ASK_SUCCESSOR\020\004\022\023\n\017ASK_PREDECESSOR\020\005\022\023\n\017" +
-      "ASK_NODE_DETAIL\020\006\022\n\n\006NOTIFY\020\007\022\r\n\tLIST_NO" +
-      "DE\020\010\022\r\n\tLIST_FILE\020\tB\022\n\020edu.usfca.cs.dfsb" +
-      "\006proto3"
+      " \001(\005\"X\n\004Info\022\027\n\004type\030\001 \001(\0162\t.infoType\022\014\n" +
+      "\004data\030\002 \001(\014\022\023\n\013integerData\030\003 \001(\005\022\024\n\014inte" +
+      "gerData2\030\004 \001(\005\".\n\004Node\022\014\n\004host\030\001 \001(\t\022\014\n\004" +
+      "port\030\002 \001(\005\022\n\n\002id\030\003 \001(\005\"W\n\006Update\022\022\n\003old\030" +
+      "\001 \001(\0132\005.Node\022\022\n\003new\030\002 \001(\0132\005.Node\022\026\n\007whoS" +
+      "ent\030\003 \001(\0132\005.Node\022\r\n\005count\030\004 \001(\005*t\n\013messa" +
+      "geType\022\013\n\007REQUEST\020\000\022\010\n\004DATA\020\001\022\010\n\004INFO\020\002\022" +
+      "\r\n\tHEARTBEAT\020\003\022\r\n\tFIND_HOST\020\004\022\016\n\nNUM_CHU" +
+      "NKS\020\005\022\n\n\006UPDATE\020\006\022\n\n\006BACKUP\020\007*\353\001\n\010infoTy" +
+      "pe\022\032\n\026CLOSEST_PRECEDING_NODE\020\000\022\010\n\004NODE\020\001" +
+      "\022\t\n\005ASK_M\020\002\022\005\n\001M\020\003\022\021\n\rASK_SUCCESSOR\020\004\022\023\n" +
+      "\017ASK_PREDECESSOR\020\005\022\023\n\017ASK_NODE_DETAIL\020\006\022" +
+      "\n\n\006NOTIFY\020\007\022\r\n\tLIST_NODE\020\010\022\r\n\tLIST_FILE\020" +
+      "\t\022\027\n\023ASK_TWO_PREDECESSOR\020\n\022\030\n\024SEND_DATA_" +
+      "AND_DELETE\020\013\022\r\n\tSEND_DATA\020\014B\022\n\020edu.usfca" +
+      ".cs.dfsb\006proto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
@@ -3830,7 +3930,7 @@ public final class StorageMessages {
     internal_static_Info_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_Info_descriptor,
-        new java.lang.String[] { "Type", "Data", "IntegerData", });
+        new java.lang.String[] { "Type", "Data", "IntegerData", "IntegerData2", });
     internal_static_Node_descriptor =
       getDescriptor().getMessageTypes().get(2);
     internal_static_Node_fieldAccessorTable = new

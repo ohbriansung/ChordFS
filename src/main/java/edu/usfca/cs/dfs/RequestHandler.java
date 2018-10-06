@@ -108,6 +108,18 @@ class RequestHandler extends Serializer implements Runnable {
             case LIST_FILE:
                 response(((StorageNode) DFS.currentNode).listFile());
                 break;
+            case ASK_TWO_PREDECESSOR:
+                response(((StorageNode) DFS.currentNode).askPreItsPre());
+                break;
+            case SEND_DATA_AND_DELETE:
+            case SEND_DATA:
+                String[] hostAndPort = info.getData().toStringUtf8().split(":");
+                InetSocketAddress addr = new InetSocketAddress(hostAndPort[0], Integer.parseInt(hostAndPort[1]));
+                int start = info.getIntegerData();
+                int end = info.getIntegerData2();
+                boolean delete = (type == StorageMessages.infoType.SEND_DATA_AND_DELETE);
+                ((StorageNode) DFS.currentNode).backup(addr, start, end, delete);
+                break;
             case ASK_M:
                 responseM(((StorageNode) DFS.currentNode).getM());
         }

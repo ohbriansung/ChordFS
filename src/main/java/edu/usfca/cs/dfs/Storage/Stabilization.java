@@ -12,15 +12,15 @@ public class Stabilization implements Runnable {
     @Override
     public void run() {
         while (DFS.alive) {
-            this.node.stabilize();
-            this.node.fixFingers();
-            this.node.keepAlive();
-            this.node.stabilizeSecSucc();
             try {
                 Thread.sleep(600);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
+            this.node.stabilize();
+            this.node.fixFingers();
+            this.node.keepAlive();
+            this.node.stabilizeSecSucc();
         }
     }
 }

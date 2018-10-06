@@ -26,6 +26,7 @@ message Info {
     infoType type = 1;
     bytes data = 2;
     int32 integerData = 3;
+    int32 integerData2 = 4;
 }
 
 enum infoType {
@@ -39,6 +40,9 @@ enum infoType {
     NOTIFY = 7;
     LIST_NODE = 8;  // get the list of node in the ring and their free space
     LIST_FILE = 9;
+    ASK_TWO_PREDECESSOR = 10;  // get predecessor of predecessor
+    SEND_DATA_AND_DELETE = 11;
+    SEND_DATA = 12;
 }
 
 message Node {
