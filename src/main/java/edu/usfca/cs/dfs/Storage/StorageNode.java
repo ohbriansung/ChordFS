@@ -40,6 +40,17 @@ public class StorageNode extends Chord {
         send(successor.getAddress(), message);
     }
 
+    /**
+     * Node receives backup request from its future predecessor,
+     * which is still in startup process and not in the network.
+     * Node, its successor, and its second successor (3 replicas) need to copy file to the new node.
+     * The key range for each node above to copy will be:
+     * Node - (Third predecessor, Second predecessor]
+     * Successor - (Second predecessor, Predecessor]
+     * Second successor - (Predecessor, New node's id]
+     * @param addr - new node address
+     * @param id - new node id
+     */
     public void backup(InetSocketAddress addr,  int id) {
         System.out.println("Starting backup to " + addr.toString());
 
@@ -84,11 +95,21 @@ public class StorageNode extends Chord {
 
         backup(addr, p3, p2, delete);
         tellNodeToSendData(s, addr, p2, p1.getId(), delete);
-        tellNodeToSendData(ss, addr, p1.getId(), id, delete);
+        if (ss.getId() != this.n.getId()) {
+            // if there s only two node in the ring, the above two steps will copy all the data
+            tellNodeToSendData(ss, addr, p1.getId(), id, delete);
+        }
 
         System.out.println("Backup to " + addr.toString() + " has completed.");
     }
 
+    /**
+     * Start copy process and delete process if indicated.
+     * @param addr - new node address
+     * @param start - data key range starting point
+     * @param end - data key range ending point
+     * @param delete - if delete after replication
+     */
     public void backup(InetSocketAddress addr, int start, int end, boolean delete) {
         synchronized (this.currentStorage) {
             int i = this.util.start(start, 0);
