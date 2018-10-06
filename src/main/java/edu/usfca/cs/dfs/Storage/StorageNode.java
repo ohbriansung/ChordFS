@@ -3,6 +3,7 @@ package edu.usfca.cs.dfs.Storage;
 import com.google.protobuf.ByteString;
 import edu.usfca.cs.dfs.DFS;
 import edu.usfca.cs.dfs.StorageMessages;
+import edu.usfca.cs.dfs.hash.SHA1;
 
 import java.io.IOException;
 import java.math.BigInteger;
@@ -17,15 +18,18 @@ import java.util.concurrent.Executors;
  * @author Brian Sung
  */
 public class StorageNode extends Chord {
+    private final SHA1 sha1;
     private final Hashtable<Integer, Metadata> currentStorage;
 
     public StorageNode(String host, int port) {
         super(host, port);
+        this.sha1 = new SHA1();
         this.currentStorage = new Hashtable<>();
     }
 
     public StorageNode(String host, int port, int m) {
         super(host, port, m);
+        this.sha1 = new SHA1();
         this.currentStorage = new Hashtable<>();
     }
 
@@ -258,13 +262,14 @@ public class StorageNode extends Chord {
         int i = message.getChunkId();
         BigInteger hash = new BigInteger(message.getHash().toByteArray());
         int key = this.util.getKey(hash);
+        BigInteger checksum = this.sha1.hash(message.getData().toByteArray());
 
         synchronized (this.currentStorage) {
             if (!this.currentStorage.containsKey(key)) {
                 this.currentStorage.put(key, new Metadata());
             }
             Metadata md = this.currentStorage.get(key);
-            md.add(filename, total, i, hash);
+            md.add(filename, total, i, hash, checksum);
         }
         System.out.println("Metadata of file [" + filename + i + "] has been recorded.");
     }
@@ -364,5 +369,42 @@ public class StorageNode extends Chord {
         String ids = "" + pre.getId() + " " + itsPre.getId();
 
         return StorageMessages.Info.newBuilder().setData(ByteString.copyFromUtf8(ids)).build();
+    }
+
+    /**
+     * Check if the file has been corrupted or not.
+     * @param filename
+     * @param i
+     * @param chunks
+     * @return boolean
+     */
+    public boolean checksum(String filename, int i, BigInteger hash, byte[] chunks) {
+        int key = this.util.getKey(hash);
+        Metadata metadata = this.currentStorage.get(key);
+        BigInteger checksum = this.sha1.hash(chunks);
+        return metadata.verify(filename, i, checksum);
+    }
+
+    public byte[] recoverFromCorruption(String filename, int i, int count) {
+        Node n;
+        if (count == 0) {
+            n = this.fingers.getFinger(0);  // successor: first replica
+        }
+        else {
+            n = this.secondSuccessor;  // second successor: second successor
+        }
+
+        if (n.getId() != this.n.getId()) {
+            try {
+                StorageMessages.Message m = StorageMessages.Message.newBuilder()
+                        .setType(StorageMessages.messageType.REQUEST).setFileName(filename).setChunkId(i).build();
+                return recover(n.getAddress(), m).getData().toByteArray();
+            } catch (IOException e) {
+
+                return null;
+            }
+        }
+
+        return null;
     }
 }

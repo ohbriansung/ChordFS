@@ -1,7 +1,6 @@
 package edu.usfca.cs.dfs.Client;
 
 import edu.usfca.cs.dfs.*;
-import edu.usfca.cs.dfs.hash.HashException;
 import edu.usfca.cs.dfs.hash.SHA1;
 
 import java.io.IOException;
@@ -20,14 +19,15 @@ import java.util.concurrent.CountDownLatch;
 public class Client extends Command {
     private final SHA1 sha1;
     private final DataProcessor dp;
+    private final InetSocketAddress storageNodeAddress;
     private final List<InetSocketAddress> addressBuffer;
 
     public Client(InetSocketAddress storageNodeAddress) {
         super();
         this.sha1 = new SHA1();
         this.dp = new DataProcessor();
+        this.storageNodeAddress = storageNodeAddress;
         this.addressBuffer = new ArrayList<>();
-        addOneNode(storageNodeAddress);
 
         try {
             // wait for receiver and sender
@@ -120,7 +120,7 @@ public class Client extends Command {
             System.out.println("Upload process was " + (success ? "" : "in") + "complete.");
         } catch (NoSuchFileException ignore) {
             System.out.println("File [" + path + "] does not exist.");
-        } catch (HashException | IOException e) {
+        } catch (IOException e) {
             e.printStackTrace();
         }
     }
@@ -134,34 +134,28 @@ public class Client extends Command {
     private void download(String filename) {
         int totalChunk = 0;
 
-        try {
-            // get total chunk number
-            BigInteger firstHash = this.sha1.hash((filename + 0).getBytes());
-            System.out.println("firstHash = [" + firstHash + "]");
-
-            InetSocketAddress firstKeyNode = null;
-            while (firstKeyNode == null) {
-                InetSocketAddress n = getOneNode();
-                try {
-                    firstKeyNode = getRemoteNode(firstHash, n);
-                } catch (IOException ignore) {
-                    System.out.println("Node [" + n + "] is unreachable.");
-                    removeOneNode(n);
-                }
-            }
-
-            // contact node responsible for key of first chunk to retrieve the total number of chunk
-            StorageMessages.Message message = serializeMessage(filename, firstHash);
+        // get total chunk number
+        BigInteger firstHash = this.sha1.hash((filename + 0).getBytes());
+        InetSocketAddress firstKeyNode = null;
+        while (firstKeyNode == null) {
+            InetSocketAddress n = getOneNode();
             try {
-                StorageMessages.Message response = ask(firstKeyNode, message);
-                totalChunk = response.getTotalChunk();
-                addOneNode(firstKeyNode);
+                firstKeyNode = getRemoteNode(firstHash, n);
             } catch (IOException ignore) {
-                System.out.println("Node [" + firstKeyNode + "] is unreachable, please try to download in a few seconds.");
-                return;
+                System.out.println("Node [" + n + "] is unreachable.");
+                removeOneNode(n);
             }
-        } catch (HashException e) {
-            e.printStackTrace();
+        }
+
+        // contact node responsible for key of first chunk to retrieve the total number of chunk
+        StorageMessages.Message message = serializeMessage(filename, firstHash);
+        try {
+            StorageMessages.Message response = ask(firstKeyNode, message);
+            totalChunk = response.getTotalChunk();
+            addOneNode(firstKeyNode);
+        } catch (IOException ignore) {
+            System.out.println("Node [" + firstKeyNode + "] is unreachable, please try to download in a few seconds.");
+            return;
         }
 
         if (totalChunk == 0) {
@@ -183,7 +177,7 @@ public class Client extends Command {
             else {
                 System.out.println("Download process did not finish in time, aborted.");
             }
-        } catch (HashException | IOException e) {
+        } catch (IOException e) {
             e.printStackTrace();
         }
     }
@@ -193,9 +187,8 @@ public class Client extends Command {
      * @param filename
      * @param chunks
      * @return List
-     * @throws HashException
      */
-    private List<BigInteger> hashChunks(String filename, List<byte[]> chunks) throws HashException {
+    private List<BigInteger> hashChunks(String filename, List<byte[]> chunks) {
         int size = chunks.size();
         System.out.println("Converted file into [" + size + "] chunks:");
 
@@ -244,9 +237,14 @@ public class Client extends Command {
         InetSocketAddress addr;
 
         synchronized (this.addressBuffer) {
-            Random r = new Random();
-            int i = r.nextInt(this.addressBuffer.size());
-            addr = this.addressBuffer.get(i);
+            if (this.addressBuffer.size() == 0) {
+                addr = this.storageNodeAddress;
+            }
+            else {
+                Random r = new Random();
+                int i = r.nextInt(this.addressBuffer.size());
+                addr = this.addressBuffer.get(i);
+            }
         }
 
         return addr;

@@ -2,11 +2,13 @@ package edu.usfca.cs.dfs.FileTransfer;
 
 import com.google.protobuf.ByteString;
 import edu.usfca.cs.dfs.DFS;
+import edu.usfca.cs.dfs.Storage.StorageNode;
 import edu.usfca.cs.dfs.StorageMessages;
 
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.math.BigInteger;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
 import java.nio.file.Files;
@@ -50,10 +52,38 @@ public class StorageProcess {
     public StorageMessages.Message retrieve() throws IOException {
         String filename = this.message.getFileName();
         int i = this.message.getChunkId();
-
         Path file = Paths.get(DFS.volume + filename + i);
-        byte[] chunk = Files.readAllBytes(file);
+
+        byte[] chunk;
+        if (this.message.getHash().isEmpty()) {  // hash will not be empty if the request is from client
+            chunk = Files.readAllBytes(file);
+        }
+        else {
+            BigInteger hash = new BigInteger(this.message.getHash().toByteArray());
+            chunk = getAndCheckData(filename, i, hash, file);
+        }
 
         return StorageMessages.Message.newBuilder().setData(ByteString.copyFrom(chunk)).build();
+    }
+
+    private byte[] getAndCheckData(String filename, int i, BigInteger hash, Path file) throws IOException {
+        byte[] chunk = Files.readAllBytes(file);
+
+        int count = 0;
+        boolean correct = false;
+        while (count < 2 && !(correct = ((StorageNode) DFS.currentNode).checksum(filename, i, hash, chunk))) {
+            chunk = ((StorageNode) DFS.currentNode).recoverFromCorruption(filename, i, count);
+            count++;
+        }
+
+        if (!correct) {
+            System.out.println("File [" + filename + "] chunk [" + i + "] can't be recover since all replicas are corrupted.");
+            throw new IOException();
+        }
+        else if (count > 0) {
+            System.out.println("File [" + filename + "] chunk [" + i + "] has been recovered from replicas.");
+        }
+
+        return chunk;
     }
 }

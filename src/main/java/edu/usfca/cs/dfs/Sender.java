@@ -4,7 +4,6 @@ import com.google.protobuf.ByteString;
 import edu.usfca.cs.dfs.FileTransfer.Download;
 import edu.usfca.cs.dfs.FileTransfer.Upload;
 import edu.usfca.cs.dfs.Storage.Node;
-import edu.usfca.cs.dfs.hash.HashException;
 import edu.usfca.cs.dfs.hash.SHA1;
 
 import java.io.IOException;
@@ -142,7 +141,7 @@ public abstract class Sender extends Serializer {
         return success;
     }
 
-    protected boolean download(String filename, byte[][] chunks, CountDownLatch count) throws HashException {
+    protected boolean download(String filename, byte[][] chunks, CountDownLatch count) {
         SHA1 sha1 = new SHA1();
         int size = chunks.length;
 
@@ -204,5 +203,22 @@ public abstract class Sender extends Serializer {
         socket.close();
 
         return response;
+    }
+
+    protected StorageMessages.Message recover(InetSocketAddress addr, StorageMessages.Message m) throws IOException {
+        // create socket and stream
+        Socket socket = new Socket();
+        socket.connect(addr);
+        OutputStream out = socket.getOutputStream();
+        InputStream in = socket.getInputStream();
+
+        // send message
+        m.writeDelimitedTo(out);
+
+        // close socket
+        StorageMessages.Message data = StorageMessages.Message.parseDelimitedFrom(in);
+        socket.close();
+
+        return data;
     }
 }

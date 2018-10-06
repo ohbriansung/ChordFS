@@ -14,7 +14,7 @@ public class SHA1 implements HashFunction<byte[]> {
     private Random random = new Random();
 
     @Override
-    public synchronized BigInteger hash(byte[] data) throws HashException {
+    public synchronized BigInteger hash(byte[] data) {
         return new BigInteger(1, checksum.hash(data));
     }
 

@@ -9,15 +9,17 @@ class Metadata {
     private final Set<String> files;
     private final Map<String, Integer> size;
     private final Map<String, Map<Integer, BigInteger>> chunks;
+    private final Map<String, Map<Integer, BigInteger>> checksum;
 
     Metadata() {
         this.lock = new ReentrantReadWriteLock();
         this.files = new HashSet<>();
         this.size = new HashMap<>();
         this.chunks = new HashMap<>();
+        this.checksum = new HashMap<>();
     }
 
-    void add(String filename, int size, int i, BigInteger hash) {
+    void add(String filename, int size, int i, BigInteger hash, BigInteger checksum) {
         this.lock.writeLock().lock();
         this.files.add(filename);
         this.size.put(filename, size);
@@ -25,6 +27,10 @@ class Metadata {
         Map<Integer, BigInteger> chunks = this.chunks.getOrDefault(filename, new HashMap<>());
         chunks.put(i, hash);
         this.chunks.put(filename, chunks);
+
+        Map<Integer, BigInteger> checksums = this.checksum.getOrDefault(filename, new HashMap<>());
+        checksums.put(i, checksum);
+        this.checksum.put(filename, checksums);
         this.lock.writeLock().unlock();
     }
 
@@ -58,6 +64,14 @@ class Metadata {
         this.lock.readLock().unlock();
 
         return hash;
+    }
+
+    boolean verify(String filename, int i, BigInteger chucksum) {
+        try {
+            return chucksum.equals(this.checksum.get(filename).get(i));
+        } catch (NullPointerException ignore) {
+            return false;
+        }
     }
 
     public String toString() {
