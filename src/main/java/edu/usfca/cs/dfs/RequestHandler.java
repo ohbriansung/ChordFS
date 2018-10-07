@@ -70,8 +70,9 @@ class RequestHandler extends Serializer implements Runnable {
                     ((StorageNode) DFS.currentNode).updateFinger(message);
                     break;
                 case BACKUP:
-                    System.out.println("Received " + message.getType().name() + " from " + this.addr);
-                    InetSocketAddress addr = (InetSocketAddress) this.listening.getRemoteSocketAddress();
+                    String[] hostAndPort = message.getData().toStringUtf8().replaceAll("/", "").split(":");
+                    InetSocketAddress addr = new InetSocketAddress(hostAndPort[0], Integer.parseInt(hostAndPort[1]));
+                    System.out.println("Received " + message.getType().name() + " from " + addr);
                     ((StorageNode) DFS.currentNode).backup(addr, message.getReplica());
             }
         } catch (InvalidProtocolBufferException e) {
@@ -104,9 +105,6 @@ class RequestHandler extends Serializer implements Runnable {
                 break;
             case LIST_NODE:
                 response(((StorageNode) DFS.currentNode).listNode(info));
-                break;
-            case LIST_FILE:
-                response(((StorageNode) DFS.currentNode).listFile());
                 break;
             case ASK_TWO_PREDECESSOR:
                 response(((StorageNode) DFS.currentNode).askPreItsPre());

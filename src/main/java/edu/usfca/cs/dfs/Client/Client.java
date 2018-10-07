@@ -12,6 +12,8 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
 import java.util.concurrent.CountDownLatch;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * @author Brian Sung
@@ -74,14 +76,15 @@ public class Client extends Command {
                 }
                 break;
             case "list":
-                list(getOneNode());
+                String list = list(getOneNode());
+                updateNodeList(list);
                 break;
-            case "file":
-                if (command.length < 3 || !command[1].equals("-l")) {
+            case "connect":
+                if (command.length == 1) {
                     invalid();
                 }
                 else {
-                    file(command[2]);
+                    addOneNode(connect(command[1]));
                 }
                 break;
             case "exit":
@@ -208,6 +211,10 @@ public class Client extends Command {
      * @param addr
      */
     public void addOneNode(InetSocketAddress addr) {
+        if (addr == null) {
+            return;
+        }
+
         synchronized (this.addressBuffer) {
             if (this.addressBuffer.size() < 3 && !this.addressBuffer.contains(addr)) {
                 if (this.addressBuffer.add(addr)) {
@@ -248,5 +255,19 @@ public class Client extends Command {
         }
 
         return addr;
+    }
+
+    /**
+     * Parse the list string and get all node address.
+     * Store the addresses into buffer.
+     * @param list - node list information
+     */
+    private void updateNodeList(String list) {
+        Pattern p = Pattern.compile("[^A]+Address:\\s{4}/([^:]+):([\\d]+)");
+        Matcher m = p.matcher(list);
+        while (m.find()) {
+            InetSocketAddress addr = new InetSocketAddress(m.group(1), Integer.parseInt(m.group(2)));
+            addOneNode(addr);
+        }
     }
 }

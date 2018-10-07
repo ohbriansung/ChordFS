@@ -99,6 +99,9 @@ public class DFS {
         }
         else {
             DFS.volume = arguments.getOrDefault("volume", System.getProperty("user.home") + '/');
+            if (!DFS.volume.endsWith("/")) {
+                DFS.volume += "/";
+            }
             checkVolume(DFS.volume);
 
             if (arguments.containsKey("node")) {

@@ -268,10 +268,6 @@ public final class StorageMessages {
      */
     LIST_NODE(8),
     /**
-     * <code>LIST_FILE = 9;</code>
-     */
-    LIST_FILE(9),
-    /**
      * <pre>
      * get predecessor of predecessor
      * </pre>
@@ -355,10 +351,6 @@ public final class StorageMessages {
      */
     public static final int LIST_NODE_VALUE = 8;
     /**
-     * <code>LIST_FILE = 9;</code>
-     */
-    public static final int LIST_FILE_VALUE = 9;
-    /**
      * <pre>
      * get predecessor of predecessor
      * </pre>
@@ -403,7 +395,6 @@ public final class StorageMessages {
         case 6: return ASK_NODE_DETAIL;
         case 7: return NOTIFY;
         case 8: return LIST_NODE;
-        case 9: return LIST_FILE;
         case 10: return ASK_TWO_PREDECESSOR;
         case 11: return SEND_DATA_AND_DELETE;
         case 12: return SEND_DATA;
@@ -3898,14 +3889,13 @@ public final class StorageMessages {
       "ent\030\003 \001(\0132\005.Node\022\r\n\005count\030\004 \001(\005*t\n\013messa" +
       "geType\022\013\n\007REQUEST\020\000\022\010\n\004DATA\020\001\022\010\n\004INFO\020\002\022" +
       "\r\n\tHEARTBEAT\020\003\022\r\n\tFIND_HOST\020\004\022\016\n\nNUM_CHU" +
-      "NKS\020\005\022\n\n\006UPDATE\020\006\022\n\n\006BACKUP\020\007*\353\001\n\010infoTy" +
+      "NKS\020\005\022\n\n\006UPDATE\020\006\022\n\n\006BACKUP\020\007*\334\001\n\010infoTy" +
       "pe\022\032\n\026CLOSEST_PRECEDING_NODE\020\000\022\010\n\004NODE\020\001" +
       "\022\t\n\005ASK_M\020\002\022\005\n\001M\020\003\022\021\n\rASK_SUCCESSOR\020\004\022\023\n" +
       "\017ASK_PREDECESSOR\020\005\022\023\n\017ASK_NODE_DETAIL\020\006\022" +
-      "\n\n\006NOTIFY\020\007\022\r\n\tLIST_NODE\020\010\022\r\n\tLIST_FILE\020" +
-      "\t\022\027\n\023ASK_TWO_PREDECESSOR\020\n\022\030\n\024SEND_DATA_" +
-      "AND_DELETE\020\013\022\r\n\tSEND_DATA\020\014B\022\n\020edu.usfca" +
-      ".cs.dfsb\006proto3"
+      "\n\n\006NOTIFY\020\007\022\r\n\tLIST_NODE\020\010\022\027\n\023ASK_TWO_PR" +
+      "EDECESSOR\020\n\022\030\n\024SEND_DATA_AND_DELETE\020\013\022\r\n" +
+      "\tSEND_DATA\020\014B\022\n\020edu.usfca.cs.dfsb\006proto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {

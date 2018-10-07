@@ -8,8 +8,7 @@ import edu.usfca.cs.dfs.hash.SHA1;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.net.InetSocketAddress;
-import java.util.Hashtable;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -40,7 +39,8 @@ public class StorageNode extends Chord {
     public void tellSuccToBackup() throws IOException {
         Node successor = this.fingers.getFinger(0);
         StorageMessages.Message message = StorageMessages.Message.newBuilder()
-                .setType(StorageMessages.messageType.BACKUP).setReplica(this.n.getId()).build();
+                .setType(StorageMessages.messageType.BACKUP).setReplica(this.n.getId())
+                .setData(ByteString.copyFromUtf8(this.n.getAddress().toString())).build();
         send(successor.getAddress(), message);
     }
 
@@ -70,7 +70,7 @@ public class StorageNode extends Chord {
         int[] p = getP1P2P3();
         backup(addr, p[2], p[1], delete);
         if (p[0] != this.n.getId()) {
-            // if there si only one node, the above step will copy all the data
+            // if there is only one node, the above step will copy all the data
             tellNodeToSendData(s, addr, p[1], p[0], delete);
             if (ss.getId() != this.n.getId()) {
                 // if there is only two nodes in the ring, the above two steps will copy all the data
@@ -89,42 +89,40 @@ public class StorageNode extends Chord {
      * @param delete - if delete after replication
      */
     public void backup(InetSocketAddress addr, int start, int end, boolean delete) {
-        synchronized (this.currentStorage) {
-            int i = this.util.start(start, 0);
-            int init = i;
-            if (addr == null) {
-                addr = this.fingers.getFinger(0).getAddress();
-            }
+        int i = this.util.start(start, 0);
+        int init = i;
+        if (addr == null) {
+            addr = this.fingers.getFinger(0).getAddress();
+        }
 
-            while (this.util.includesRight(i, start, end)) {
-                Metadata metadata;
+        while (this.util.includesRight(i, start, end)) {
+            Metadata metadata;
 
-                if ((metadata = this.currentStorage.get(i)) != null) {
-                    ReadWriteFileNIO rw = readAndSend(addr, metadata);
+            if ((metadata = this.currentStorage.get(i)) != null) {
+                ReadWriteFileNIO rw = readAndSend(addr, metadata);
 
-                    if (delete) {
-                        rw.delete();
-                        this.currentStorage.remove(i);
-                    }
-                }
-
-                i = this.util.start(i, 0);
-                if (i == init) {
-                    break;
+                if (delete) {
+                    rw.delete();
+                    this.currentStorage.remove(i);
                 }
             }
 
-            if (delete) {
-                System.out.println("Deleted key in (" + start + ", " + end + "].");
+            i = this.util.start(i, 0);
+            if (i == init) {
+                break;
             }
+        }
+
+        if (delete) {
+            System.out.println("Deleted key in (" + start + ", " + end + "].");
         }
     }
 
     /**
      * If there are more than two nodes remain in the network, then:
-     * 1. Tell successor to send (Second predecessor, Predecessor] to its successor
-     * 2. Tell second successor to send (Predecessor, Leaving node's id] to its successor
-     * 3. Send (Third predecessor, Second predecessor] to successor
+     * 1. Tell successor to send (Predecessor, Current node] to its successor
+     * 2. Tell second successor to send (Current node, Leaving node's id] to its successor
+     * 3. Send (Second predecessor, Predecessor] to successor
      * @param id - Leaving node's id
      */
     void recover(int id) {
@@ -135,9 +133,9 @@ public class StorageNode extends Chord {
             System.out.println("Start recovering process");
 
             int[] p = getP1P2P3();
-            tellNodeToSendData(s, null, p[1], p[0], false);
-            tellNodeToSendData(ss, null, p[0], id, false);
-            backup(s.getAddress(), p[2], p[1], false);
+            tellNodeToSendData(s, null, p[0], this.n.getId(), false);
+            tellNodeToSendData(ss, null, this.n.getId(), id, false);
+            backup(s.getAddress(), p[1], p[0], false);
 
             System.out.println("Recovering process has completed.");
         }
@@ -154,21 +152,18 @@ public class StorageNode extends Chord {
     private ReadWriteFileNIO readAndSend(InetSocketAddress addr, Metadata metadata) {
         ReadWriteFileNIO rw = new ReadWriteFileNIO(metadata);
         List<StorageMessages.Message> messages = rw.read();
+        List<Thread> tasks = new ArrayList<>();
 
-        if (!messages.isEmpty()) {
-            CountDownLatch count = new CountDownLatch(messages.size());
-            ExecutorService pool = Executors.newFixedThreadPool(4);
-            while (!messages.isEmpty()) {
-                pool.submit(new Backup(addr, messages.get(0), count));
-                messages.remove(0);
-            }
+        for (StorageMessages.Message message : messages) {
+            Thread task = new Thread(new Backup(addr, message));
+            tasks.add(task);
+            task.start();
+        }
 
+        for (Thread task : tasks) {
             try {
-                count.await();
-                pool.shutdown();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
+                task.join();
+            } catch (InterruptedException ignore) {}
         }
 
         return rw;
@@ -264,13 +259,11 @@ public class StorageNode extends Chord {
         int key = this.util.getKey(hash);
         BigInteger checksum = this.sha1.hash(message.getData().toByteArray());
 
-        synchronized (this.currentStorage) {
-            if (!this.currentStorage.containsKey(key)) {
-                this.currentStorage.put(key, new Metadata());
-            }
-            Metadata md = this.currentStorage.get(key);
-            md.add(filename, total, i, hash, checksum);
+        if (!this.currentStorage.containsKey(key)) {
+            this.currentStorage.put(key, new Metadata());
         }
+        Metadata md = this.currentStorage.get(key);
+        md.add(filename, total, i, hash, checksum);
         System.out.println("Metadata of file [" + filename + i + "] has been recorded.");
     }
 
@@ -305,11 +298,9 @@ public class StorageNode extends Chord {
         BigInteger hash = new BigInteger(message.getHash().toByteArray());
         int key = this.util.getKey(hash);
 
-        synchronized (this.currentStorage) {
-            if (this.currentStorage.containsKey(key)) {
-                Metadata m = this.currentStorage.get(key);
-                return m.getTotalChunk(filename);
-            }
+        if (this.currentStorage.containsKey(key)) {
+            Metadata m = this.currentStorage.get(key);
+            return m.getTotalChunk(filename);
         }
 
         return 0;
@@ -327,9 +318,15 @@ public class StorageNode extends Chord {
         if (data.length() == 0) {
             n = this.n.getId();
         }
-
         String space = this.util.getFreeSpace(DFS.volume);
-        data += this.n.getId() + " " + this.n.getAddress() + " " + space + " " + DFS.receiver.getRequestCount() + " ";
+
+        data += "----------------------------------" + System.lineSeparator();
+        data += "Node ID:    " + this.n.getId() + System.lineSeparator();
+        data += "Address:    " + this.n.getAddress() + System.lineSeparator();
+        data += "Free Space: " + space + System.lineSeparator();
+        data += "Requests:   " + DFS.receiver.getRequestCount() + System.lineSeparator();
+        data += "Files:" + System.lineSeparator();
+        data += listFile();
         info = info.toBuilder().setData(ByteString.copyFromUtf8(data)).setIntegerData(n).build();
 
         Node successor = this.fingers.getFinger(0);
@@ -343,18 +340,35 @@ public class StorageNode extends Chord {
 
     /**
      * Return all Metadata.
-     * @return StorageMessages.Info
+     * @return String
      */
-    public StorageMessages.Info listFile() {
+    private String listFile() {
+        Set<String> files = new TreeSet<>();
+        Map<String, Integer> total = new HashMap<>();
+        Map<String, Set<Integer>> chunks = new HashMap<>();
         StringBuilder sb = new StringBuilder();
 
-        synchronized (this.currentStorage) {
-            for (Metadata metadata : this.currentStorage.values()) {
-                sb.append(metadata.toString());
+        for (Metadata metadata : this.currentStorage.values()) {
+            List<String> f = metadata.getFile();
+            files.addAll(f);
+
+            for (String filename : f) {
+                if (!chunks.containsKey(filename)) {
+                    chunks.put(filename, new TreeSet<>());
+                }
+                chunks.get(filename).addAll(metadata.getChunks(filename));
+                total.put(filename, metadata.getTotalChunk(filename));
             }
         }
 
-        return StorageMessages.Info.newBuilder().setData(ByteString.copyFromUtf8(sb.toString())).build();
+        for (String filename : files) {
+            Set<Integer> s = chunks.get(filename);
+            sb.append(filename).append(" ");
+            sb.append(s.size()).append(" of ").append(total.get(filename)).append(" ");
+            sb.append(s.toString()).append(System.lineSeparator());
+        }
+
+        return sb.toString();
     }
 
     /**

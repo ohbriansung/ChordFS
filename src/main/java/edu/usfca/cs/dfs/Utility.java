@@ -77,7 +77,7 @@ public class Utility {
         String unit = " bytes";
         double space = new File(volume).getFreeSpace();
 
-        while (space >= 1024) {
+        while (space >= 1024 && !unit.equals(" gb")) {
             switch (unit) {
                 case " bytes":
                     unit = " kb";
@@ -88,11 +88,6 @@ public class Utility {
                 case " mb":
                     unit = " gb";
                     break;
-                case " gb":
-                    unit = " tb";
-                    break;
-                case " tb":
-                    unit = " pb";
             }
 
             space /= 1024;
