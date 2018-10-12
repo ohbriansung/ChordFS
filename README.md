@@ -1,16 +1,35 @@
-# Project 1 - Distributed File System
+# ChordFS
 
 ## Introduction
 
-For this project, I will be implementing a Distributed File System with Chord protocol [[2]](#references). Thus, there is no coordinator in the architecture. The client will be interacting with the Chord network (ring) directly. Each Storage Node holds a finger (router) table with M entries, M is indicated when the ring is created. The data will be separated into chunks for storing in varies of nodes. 
+ChordFS is a distributed/decentralized file system that implements Chord protocol [[2]](#references). Thus, there is no coordinator (NameNode) in the architecture. The client will be interacting with the Chord network (ring) directly. Each Storage Node holds a finger (router) table with M entries, M is indicated when the ring is created. The data will be separated into chunks for storing in varies of nodes. 
 
 ## Components
 
 ### Storage Node
 
+#### Chord Network Architecture
+
+Example of 4 bits network:
+<table>
+    <tr><td>Index</td><td>Node Id</td></tr>
+    <tr><td>0</td><td>CurrentId + 2^0</td></tr>
+    <tr><td>1</td><td>CurrentId + 2^1</td></tr>
+    <tr><td>2</td><td>CurrentId + 2^2</td></tr>
+    <tr><td>3</td><td>CurrentId + 2^3</td></tr>
+</table>
+
+Successor = finger[0]
+
+Second Successor = Successor.finger[0]
+
+Current Node = Predecessor.finger[0]
+
+*Second Successor is used for fail handling*
+
 #### Initializing the ring
 
-If creating a new Chord ring, add "--m <number of m>" to indicate the m bits capacity of the ring. The first node indicates its predecessor as itself, and creates the finger table that all the entry is itself.
+If creating a new Chord ring, add "--m <number_of_m>" to indicate the m bits capacity of the network, and imagine that the StorageNode network is a ring. The first node creates the finger table that all the finger is itself, and indicates the predecessor and the second successor to itself.
 
 #### Node joins
 
@@ -32,15 +51,15 @@ The node is responsible for storing data (chunk) with key K will replicate the d
 
 #### Accepts messages
 
-Storage Node accepts requests: Store chunk, get number of chunks, get chunk location, retrieve chunk, list chunks and file names, and get copy of current hash space.
+Storage Node accepts requests: Upload file, download file, heartbeat, list all the details of the nodes in the network including id, address, requests, files and chunks.
 
 #### Failures
 
-If nodes fail and go down, the successors will figure out and reconcile the finger tables, keys, and maintain the correct number of replicas.
+If nodes fail and go down, the predecessor will figure out and reconcile the finger tables by contact the second successor, and update the finger table of the nodes that could store the failed node. 
 
 ### Client
 
-Client connects to one Storage Node in the ring, is able to send the requests, and also represents the details of the system. Using java.nio for faster data processing.
+Client connects to one existing StorageNode in the ring. Client maintains a buffer that stores some StorageNode that it has seen. Each request from client will be randomly sent to one of the StorageNode in the buffer. The main purpose of the buffer is failure handling, remove failed node from the buffer and get another live node to send the request. Client can ask StorageNode to present the details of the file system. It is using java.nio for faster data processing.
 
 #### Stores data
 
@@ -51,6 +70,50 @@ Chunk size = 64 Mb
 #### Retrieves data
 
 Retrieving files in parallel. Each chunk in the file being retrieved will be requested and transferred on a separate thread. Once the chunks are retrieved, the file is reconstructed on the client machine.
+
+## Usage example
+
+<details>
+<summary>Start the first storage node and initialize the chord network</summary>
+
+```shell
+java -cp dfs.jar edu.usfca.cs.dfs.DFS --run storage --port 13000 --m 5 --volume /bigdata/csung4/1/
+```
+
+</details>
+
+<details>
+<summary>Start new storage node and join the chord network</summary>
+
+```shell
+java -cp dfs.jar edu.usfca.cs.dfs.DFS --run storage --port 13001 --node localhost:13000 --volume /bigdata/csung4/2/
+```
+
+</details>
+
+<details>
+<summary>Start client</summary>
+
+```shell
+java -cp dfs.jar edu.usfca.cs.dfs.DFS --run client --port 13099 --node localhost:13000
+```
+
+</details>
+
+<details>
+<summary>Client functionality</summary>
+
+```shell
+[Command]             [Usage]
+upload <file_name>    Upload the file to the file system.
+download <file_name>  Download the file from the file system.
+connect <address>     Connect to a particular node using address:port.
+list                  List all nodes in the file system and their details.
+help                  List all existing commands and usages.
+exit                  Terminate the program.
+```
+
+</details>
 
 ## Milestones and Checkpoints
 
@@ -69,3 +132,8 @@ Retrieving files in parallel. Each chunk in the file being retrieved will be req
 * [3] [Chord WiKi](https://en.wikipedia.org/wiki/Chord_(peer-to-peer))
 * [4] [Chord](https://slideplayer.com/slide/4168285/)
 * [5] [Chord, DHTs, and Naming](http://www.cs.utah.edu/~stutsman/cs6963/lecture/16/)
+
+## Author and contributors
+
+* **Brian Sung** - *Graduate student in department of Computer Science at University of San Francisco* - [LinkedIn](https://www.linkedin.com/in/ohbriansung/)
+* **Dr. Malensek** - *Assistant Professor in department of Computer Science at University of San Francisco* - [page](https://www.cs.usfca.edu/~mmalensek/)
