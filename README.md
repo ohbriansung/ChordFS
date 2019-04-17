@@ -2,13 +2,17 @@
 
 ## Introduction
 
-ChordFS is a distributed/decentralized file system that implements Chord protocol [\[2\]](#references). Thus, there is no coordinator (NameNode) in the architecture. The client will be interacting with the Chord network (ring) directly. Each Storage Node holds a finger (router) table with M entries, M is indicated when the ring is created. The data will be separated into chunks for storing in varies of nodes. 
+ChordFS is a distributed/decentralized file system that implements Chord protocol [\[2\]](#references). Thus, there is no coordinator (NameNode) in the architecture. The client will be interacting with the Chord network (ring) directly. Each Storage Node holds a finger (router) table with M entries, M is indicated when the ring is created. The data will be separated into chunks for storing in varies of nodes.
+
+## Architecture
+
+![ChordFS Architecture](https://i.imgur.com/gW3sp3e.jpg)
 
 ## Components
 
 ### Storage Node
 
-#### Chord Network Architecture
+#### Chord Network Details
 
 Example of 4 bits network:
 <table>
@@ -26,6 +30,8 @@ Second Successor = Successor.finger[0]
 Current Node = Predecessor.finger[0]
 
 *Second Successor is used for fail handling*
+
+![ChordFS Detail](https://i.imgur.com/CywIDoS.jpg)
 
 #### Initializing the ring
 
