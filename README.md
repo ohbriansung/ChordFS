@@ -127,8 +127,8 @@ exit                  Terminate the program.
 
 ## Author and Contributor
 
-* Chien-Yu (Brian) Sung
-* Dr. Malensek- [page](https://www.cs.usfca.edu/~mmalensek/)
+0. Chien-Yu (Brian) Sung
+1. Dr. Malensek - [page](https://www.cs.usfca.edu/~mmalensek/)
 
 ## Acknowledgment
 
