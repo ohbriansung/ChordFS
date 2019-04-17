@@ -2,7 +2,7 @@
 
 ## Introduction
 
-ChordFS is a distributed/decentralized file system that implements Chord protocol [[2]](#references). Thus, there is no coordinator (NameNode) in the architecture. The client will be interacting with the Chord network (ring) directly. Each Storage Node holds a finger (router) table with M entries, M is indicated when the ring is created. The data will be separated into chunks for storing in varies of nodes. 
+ChordFS is a distributed/decentralized file system that implements Chord protocol [\[2\]](#references). Thus, there is no coordinator (NameNode) in the architecture. The client will be interacting with the Chord network (ring) directly. Each Storage Node holds a finger (router) table with M entries, M is indicated when the ring is created. The data will be separated into chunks for storing in varies of nodes. 
 
 ## Components
 
@@ -117,23 +117,27 @@ exit                  Terminate the program.
 
 ## Milestones and Checkpoints
 
-* **Sep. 09, 2018**: design document complete, basic Protocol Buffer messaging implementation.
-* **Sep. 16, 2018**: client chunking functionality, Chord network data structures and messaging.
+* Sep. 09, 2018: design document complete, basic Protocol Buffer messaging implementation.
+* Sep. 16, 2018: client chunking functionality, Chord network data structures and messaging.
 * Checkpoint 1
-* **Sep. 23, 2018**: storage node implementation, heartbeats.
-* **Sep. 30, 2018**: failure detection and recovery, parallel retrievals.
-* **Oct. 05, 2018**: wrap-up, client functions, retrospective.
+* Sep. 23, 2018: storage node implementation, heartbeats.
+* Sep. 30, 2018: failure detection and recovery, parallel retrievals.
+* Oct. 05, 2018: wrap-up, client functions, retrospective.
 * Checkpoint 2
+
+## Author and Contributor
+
+* Chien-Yu (Brian) Sung
+* Dr. Malensek- [page](https://www.cs.usfca.edu/~mmalensek/)
+
+## Acknowledgment
+
+This project is for academic purposes only.
 
 ## References
 
-* [1] [University of San Francisco](https://www.usfca.edu)
-* [2] [Chord paper](https://www.cs.usfca.edu/~mmalensek/cs677/schedule/papers/stoica2001chord.pdf)
-* [3] [Chord WiKi](https://en.wikipedia.org/wiki/Chord_(peer-to-peer))
-* [4] [Chord](https://slideplayer.com/slide/4168285/)
-* [5] [Chord, DHTs, and Naming](http://www.cs.utah.edu/~stutsman/cs6963/lecture/16/)
-
-## Author and contributors
-
-* **Brian Sung** - *Graduate student in department of Computer Science at University of San Francisco* - [LinkedIn](https://www.linkedin.com/in/ohbriansung/)
-* **Dr. Malensek** - *Assistant Professor in department of Computer Science at University of San Francisco* - [page](https://www.cs.usfca.edu/~mmalensek/)
+0. [University of San Francisco](https://www.usfca.edu)
+1. [Chord paper](https://www.cs.usfca.edu/~mmalensek/cs677/schedule/papers/stoica2001chord.pdf)
+1. [Chord WiKi](https://en.wikipedia.org/wiki/Chord_(peer-to-peer))
+1. [Chord](https://slideplayer.com/slide/4168285/)
+1. [Chord, DHTs, and Naming](http://www.cs.utah.edu/~stutsman/cs6963/lecture/16/)
